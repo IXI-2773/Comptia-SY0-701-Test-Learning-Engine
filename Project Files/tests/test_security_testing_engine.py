@@ -442,6 +442,15 @@ class SecurityTestingEngineTests(unittest.TestCase):
         self.assertIn("Software-defined networking (SDN)", sdn_question["general_explanation"])
         self.assertNotIn("SON", sdn_question["prompt"])
         self.assertNotIn("(SON)", sdn_question["general_explanation"])
+        serverless_question = next(q for q in data["questions"] if q["question_number"] == 1124)
+        self.assertEqual(["B"], serverless_question["correct"])
+        self.assertIn("No need to patch infrastructure", serverless_question["choices"]["B"])
+        ipsec_question = next(q for q in data["questions"] if q["question_number"] == 1128)
+        self.assertEqual(["C"], ipsec_question["correct"])
+        self.assertEqual("An IPSec VPN", ipsec_question["choices"]["C"])
+        infrared_question = next(q for q in data["questions"] if q["question_number"] == 1072)
+        self.assertEqual(["A"], infrared_question["correct"])
+        self.assertEqual("Infrared", infrared_question["choices"]["A"])
 
     def test_merged_bank_validator_has_no_warnings(self):
         result = validate_bank(ROOT / "public_sy0701_bank_v4_plus_studyguide_clean.json")
