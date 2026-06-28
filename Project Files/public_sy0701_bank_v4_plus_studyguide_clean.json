@@ -36156,7 +36156,7 @@
         "B"
       ],
       "question_type": "single",
-      "general_explanation": "Moving devices to an isolated network segment that has appropriate controls in place to protect devices that may not be able to be secured or that may not receive regular patches is the best option available. Baselines, patching, and even scanning and remediation only help if the devices can be secured, patched, and otherwise protected. IoT devices are often not able to be secured this way, particularly as they age and both lighting and thermostats have relatively long useful lifespans. QUESTION % 141 of 226",
+      "general_explanation": "Moving devices to an isolated network segment that has appropriate controls in place to protect devices that may not be able to be secured or that may not receive regular patches is the best option available. Baselines, patching, and even scanning and remediation only help if the devices can be secured, patched, and otherwise protected. IoT devices are often not able to be secured this way, particularly as they age and both lighting and thermostats have relatively long useful lifespans. QUESTION % 141 of226",
       "choice_explanations": {
         "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
         "B": "Correct answer from verified Chapter 3 screenshot.",
@@ -36185,7 +36185,7 @@
       "source_image": "Screenshot 2026-06-14 at 06-18-34 Question 142 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
       "source_label": "Chapter 3 screenshot bank",
       "source_page": 142,
-      "prompt": "Chuck has deployed a cloud-based security environment that combines SD-WAN, zero trust, cloud access security broker (CASB), and firewall services to replace traditional VPNs. What sort of service has Chuck deployed?",
+      "prompt": "Chuck has deployed a cloud-based security environment that combines SD-WAN, zero trust, cloud access security' broker (CASS), and firewall services to replace traditional VPNs. What sort of service has Chuck deployed?",
       "choices": {
         "A": "SaaS",
         "B": "SASE",
@@ -36345,7 +36345,7 @@
       "source_image": "Screenshot 2026-06-15 at 01-13-38 Question 169 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
       "source_label": "Chapter 3 screenshot bank",
       "source_page": 169,
-      "prompt": "Yarif wants to create security zones in his network. Which of the following technologies is best suited to doing this based on roles and user identities?",
+      "prompt": "\u2022ncorrecl Yarifwants to create security zones in his network. Which of the following technologies is best suited to doing this based on roles and user identities?",
       "choices": {
         "A": "NAC and VLANs",
         "B": "802.1X and containerization",
@@ -36356,7 +36356,7 @@
         "A"
       ],
       "question_type": "single",
-      "general_explanation": "Network access control (NAC) tools that can allow for authentication and authorization based on user groups or roles and VLANs that separate groups based on those roles once they are on the network exactly fit the needs Yarif has. 802.1X can also be helpful with this, but containerization is used to allow applications to be deployed without worrying about the application environment. SDN and MAC address filtering do not account for user authentication and identities, just machine hardware addresses. SD-WAN is for external connectivity, not internal networks. QUESTION % 169 of 226",
+      "general_explanation": "Network access control (NAC) tools that can allow for authentication and authorization based on user groups or roles and VLANs that separate groups based on those roles once theyre on the network exactly fit the needs Yarif has. 802. IX can also be helpful with this, but containerization is used to allow applications to be deployed without worrying about the application environment. SDN and MAC address filtering doesn't account for user authentication and identities, just machine hardware addresses. SD-WAN is for external connectivity, not internal networks. QUESTION % 169 of 226",
       "choice_explanations": {
         "A": "Correct answer from verified Chapter 3 screenshot.",
         "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
@@ -36505,7 +36505,7 @@
       "source_image": "Screenshot 2026-06-18 at 00-38-43 Question 181 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
       "source_label": "Chapter 3 screenshot bank",
       "source_page": 181,
-      "prompt": "Vera wants to manage multiple commercial Internet services for her organization to ensure connectivity. What technology should she select to manage and maintain this?",
+      "prompt": "Overall Times Architecture Vera wants to manage multiple commercial Internet services for her organization to ensure connectivity. What technoloy should she select to manage and maintain this?",
       "choices": {
         "A": "SASE",
         "B": "SDN",
@@ -36516,7 +36516,7 @@
         "D"
       ],
       "question_type": "single",
-      "general_explanation": "Vera can use SD-WAN, or software-defined wide area network, to manage multiple connections dynamically, ensuring connectivity and performance for her organization. SASE is used to secure networks and device connectivity in modern organizations with complex and mobile boundaries. SDN is software-defined networking and manages networks as code. IPSec is a suite of protocols used to secure network traffic. QUESTION % 181 of 226",
+      "general_explanation": "Vera can use a SD-WAN, or software-defined wide area network, to manage multiple connections dynamically, ensuring connectivity and performance for her organization. SASE is used to secure networks and device connectivity in modern organizations with complex and mobile boundaries. SDN is software-defined networking and manages networks as code. IPSec is a suite of protocols used to secure network traffic. QUESTION % 181 of226",
       "choice_explanations": {
         "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
         "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
@@ -36745,18 +36745,18 @@
       "source_image": "Screenshot 2026-06-07 at 00-25-55 Question 139 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
       "source_label": "Chapter 4 screenshot bank",
       "source_page": 139,
-      "prompt": "What tool is commonly used to allow for measurement and monitoring of security settings to align with NIST 800-53 controls?",
+      "prompt": "Operations What tool is commonly used to allow for measurement and monitoring of security' settings to align with NIST 800-53 controls?",
       "choices": {
         "A": "SAML",
         "B": "CVE",
-        "C": "CVSS",
+        "C": "cvss",
         "D": "SCAP"
       },
       "correct": [
         "D"
       ],
       "question_type": "single",
-      "general_explanation": "The Security Content Automation Protocol (SCAP) is frequently used to allow for monitoring and measurement of NIST 800-53-based controls. SAML is used for authorization and authentication, and CVE and CVSS are used to identify and rank vulnerabilities.",
+      "general_explanation": "The Security Content Automation Protuol (SCAP) is frequently used to allow for monitoring and measurement of NIST 800-53-based controls. SAML is used for authorization and authentication, and CVE and CVSS are used to identify and rank vulnerabilities. QUESTION 1390f215",
       "choice_explanations": {
         "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
         "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
@@ -36876,7 +36876,7 @@
         "B"
       ],
       "question_type": "single",
-      "general_explanation": "Enterprise mode authentication is typically done with 802.1X. LDAP and Kerberos are not typically used for this, and SAML is more frequently part of federated and cloud services.",
+      "general_explanation": "QUESTION 1730f215 Sharon knows that Enterprise mode authentication is typically done with 802. IX LDAP and Kerberos are not typically used for this, and SAML is more frequently part of federated and cloud services.",
       "choice_explanations": {
         "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
         "B": "Correct answer from verified Chapter 4 screenshot.",
@@ -36990,7 +36990,7 @@
         "A": "Infrared",
         "B": "Pressure",
         "C": "Microwave",
-        "D": "Ultrasonic"
+        "D": "ultrasonic"
       },
       "correct": [
         "A"
@@ -36998,8 +36998,8 @@
       "question_type": "single",
       "general_explanation": "Infrared sensors are commonly used in open spaces. They are well suited to detecting individuals and are less likely to be overly sensitive. They can cover broader fields than a pressure sensor, and ultrasonic sensors are not commonly deployed as facility-level security sensors.",
       "choice_explanations": {
-        "A": "Corrected after source review: infrared sensors are commonly used in open spaces and are less likely to be overly sensitive.",
-        "B": "Not keyed as correct after source review. Pressure sensors are not the best fit for broad open-office intrusion detection.",
+        "A": "Correct answer from verified Chapter 1 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
         "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
         "D": "Not keyed as correct in the verified screenshot. Compare against: A."
       },
@@ -38116,7 +38116,7 @@
         "D"
       ],
       "question_type": "single",
-      "general_explanation": "Serverless architectures do not require a system administrator because the provider manages the underlying function-as-a-service (FaaS) capability. It can also scale up or scale down as needed, allowing it to be very flexible. Serverless architectures are typically not ideal for complex applications and instead tend to work better for microservices. QUESTION % 9 of 226",
+      "general_explanation": "Serverless architectures do not require a system administrator because the provider manages the underlying function-as-a-service (FaaS) capability. It can also scale up or scale down as needed, allowing it to be very flexible. Serverless architectures are typically not ideal for complex applications and instead tend to work better for microservices. QUESTION % 9 of22S",
       "choice_explanations": {
         "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
         "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
@@ -38233,13 +38233,13 @@
         "D": "Setting upa NIPS on each segment"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "question_type": "single",
       "general_explanation": "Network taps copy all traffic to another destination, allowing traffic visibility without a device inline. They are completely passive methods of getting network traffic to a central location. Port mirroring would get all the traffic to the network-based intrusion prevention system (NIPS) but is not completely passive. It requires the use of resources on switches to route a copy of the traffic. Incorrect switch configurations can cause looping. Configuring loop detection can prevent looped ports. Putting a network NIPS on every segment can be very expensive and require extensive configuration work. Setting up a NIPS on each segment would also dramatically increase administrative efforts.",
       "choice_explanations": {
-        "A": "Not keyed as correct after source review. Cost savings is not the direct security advantage.",
-        "B": "Corrected after source review: serverless reduces the need to patch underlying infrastructure.",
+        "A": "Correct answer from verified Chapter 3 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
         "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
         "D": "Not keyed as correct in the verified screenshot. Compare against: A."
       },
@@ -39073,15 +39073,15 @@
         "D": "No need to log events"
       },
       "correct": [
-        "B"
+        "A"
       ],
       "question_type": "single",
-      "general_explanation": "Serverless deployments remove the need to patch underlying infrastructure. They may still have vulnerable functions and should be logged. Cost savings is not a direct security advantage. QUESTION % 171 of 226",
+      "general_explanation": "Serverless deployments remove the need to patch underlying infrastructure. They may still have vulnerable functions and should be logged. Cost savings is not a direct security advantage. QUESTION % 171 of226",
       "choice_explanations": {
-        "A": "Not keyed as correct after source review. Cost savings is not the direct security advantage.",
-        "B": "Corrected after source review: serverless reduces the need to patch underlying infrastructure.",
-        "C": "Not keyed as correct after source review. Serverless functions can still contain vulnerable code.",
-        "D": "Not keyed as correct after source review. Serverless applications still need event logging."
+        "A": "Correct answer from verified Chapter 3 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
       },
       "chapter": "Chapter 3",
       "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
@@ -39225,23 +39225,23 @@
       "source_image": "Screenshot 2026-06-18 at 01-09-25 Question 191 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
       "source_label": "Chapter 3 screenshot bank",
       "source_page": 191,
-      "prompt": "Valerie wants to connect one of her company's remote locations back to the organization's main network. What type of solution can she use for a persistent connection between the networks that will securely tunnel data across a commodity Internet connection?",
+      "prompt": "Valerie wants to connect one of her companys remote locations back to the organization's main network. What type of solution can she use for a persistent connection between the networks that will securely tunnel data across a commodity Internet connection?",
       "choices": {
-        "A": "A TLS VPN",
+        "A": "ATLSVPN",
         "B": "A web proxy",
-        "C": "An IPSec VPN",
-        "D": "An 802.1X tunnel"
+        "C": "AnlPSecVPN",
+        "D": "An 802.1xtunnel"
       },
       "correct": [
-        "C"
+        "D"
       ],
       "question_type": "single",
-      "general_explanation": "An IPSec VPN is a common option for organizations that need to create a secure VPN tunnel between two locations. A VPN connection is established by network devices at both locations and traffic is able to travel securely over commodity Internet connections. TLS VPNs are more commonly used for individuals to connect to an organization's network. Web proxies are used to filter and control web traffic, not for this purpose. 802.1X is used to authenticate to networks and protect them from unauthorized connections, not to create secure, multisite tunnels. QUESTION % 191 of 226",
+      "general_explanation": "An IPSec VPN is a common option for organizations that need to create a secure VPN tunnel between two locations. A VPN connection is established by network devices at both locations and traffic is able to travel securely over commuiity Internet connections. TLS VPNs are more commonly used for individuals to connect to an organization's network. Web proxies are used to filter and control web traffic, not for this purpose. 802. IX is used to authenticate to networks and protect them from unauthorized connections, not to create secure, multisite tunnels. QUESTION % 191 of 226",
       "choice_explanations": {
-        "A": "Not keyed as correct after source review. TLS VPNs are more common for individual remote access.",
-        "B": "Not keyed as correct after source review. Web proxies filter web traffic, not site-to-site tunnels.",
-        "C": "Corrected after source review: IPSec VPN is the persistent site-to-site tunnel option.",
-        "D": "Not keyed as correct after source review. 802.1X is for network authentication, not site-to-site VPN tunneling."
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 3 screenshot."
       },
       "chapter": "Chapter 3",
       "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
