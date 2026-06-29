@@ -1174,17 +1174,39 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
         app.start_custom_session()
         session_path = app.session_path
-
-        app.toggle_choice("A")
-        app.toggle_choice("A")
-
-        self.assertFalse(session_path.exists())
         builder_context = app.current_builder_context(
             mode=app_module.MODE_SMART_PRACTICE,
             count=app.session_count_var.get(),
             randomize=False,
             source_label=app.current_builder_source_label(app_module.MODE_SMART_PRACTICE),
         )
+        stale_path = app.session_file_for_bank(
+            app.bank_path,
+            mode=app_module.MODE_SMART_PRACTICE,
+            question_numbers=[1, 3],
+        )
+        stale_path.write_text(
+            json.dumps(
+                {
+                    "mode": app_module.MODE_SMART_PRACTICE,
+                    "builder_context": builder_context,
+                    "source_label": "Smart practice",
+                    "question_numbers": [1, 3],
+                    "restore_question_numbers": [1, 3],
+                    "session_base_question_count": 2,
+                    "answers": [{"answered": False}, {"answered": False}],
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        for question in app.questions:
+            question["answered"] = True
+        with mock.patch.object(app, "open_analytics_window"):
+            app.finish_exam()
+
+        self.assertFalse(session_path.exists())
+        self.assertFalse(stale_path.exists())
         self.assertIsNone(app.find_resumable_session_for_builder(builder_context))
 
     def test_starting_a_set_collapses_sidebar_and_toggle_reopens_it(self):
