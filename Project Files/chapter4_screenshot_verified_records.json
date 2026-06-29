@@ -1,0 +1,1016 @@
+{
+  "screenshots": [
+    {
+      "filename": "Screenshot 2026-06-06 at 05-00-52 Question 100 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-06 at 05-00-52 Question 100 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 100,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Isabelle wants to gather information about what systems a host is connecting to, how much traffic is sent, and similar details. Which of the following options would not allow her to perform that task? @ A 'PHX O B. NetFlow O C. NXLog C) D. sFlow Explanation NXLog is a log collection and centralization tool. IPFIX, NetFlow, and sFlow all gather data about network traffic, including source, destination, QUESTION 1000f215 port, protocol, and amount of data sent to be collected. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Isabelle wants to gather information about what systems a host is connecting to, how much traffic is sent, and similar details. Which of the following options would not allow her to perform that task?",
+      "choices": {
+        "A": "'PHX",
+        "B": "NetFlow",
+        "C": "NXLog",
+        "D": "sFlow"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "NXLog is a log collection and centralization tool. IPFIX, NetFlow, and sFlow all gather data about network traffic, including source, destination, QUESTION 1000f215 port, protocol, and amount of data sent to be collected.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-06 at 05-02-09 Question 101 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-06 at 05-02-09 Question 101 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 101,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations Overall Time Spent: 03:20:07 O Incorrect Valerie wants to check to see if a SQL injection attack occurred against her web application on a Linux system. Which log file should she check for this type of information? @ A. The security log O B. The DNS log O C. The auth log C) D. The web server log Explanation QUESTION 101 of215 SQL injection (SQLi) attempts are sent as HTTP or HTTPS requests to a web server, meaning that Valerie will be able to see the attacks in the web server log. Domain Name System (DNS) logs, if available, will not show these. Auth logs show logins, not web or SQL Server queries or requests. Unlike Windows, there is no security log file for Linux, although there is a secure log for some systems. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Valerie wants to check to see if a SQL injection attack occurred against her web application on a Linux system. Which log file should she check for this type of information?",
+      "choices": {
+        "A": "The security log",
+        "B": "The DNS log",
+        "C": "The auth log",
+        "D": "The web server log"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "SQL injection (SQLi) attempts are sent as HTTP or HTTPS requests to a web server, meaning that Valerie will be able to see the attacks in the web server log. Domain Name System (DNS) logs, if available, will not show these. Auth logs show logins, not web or SQL Server queries or requests. Unlike Windows, there is no security log file for Linux, although there is a secure log for some systems.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-06 at 05-02-33 Question 102 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-06 at 05-02-33 Question 102 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 102,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Jean's company is preparing for litigation with another company that they believe has caused harm to Jean's organization. What type of legal action should Jean's lawyer take to ensure that the company preserves files and information related to the legal case? @ A A chain-of-custody demand letter O B. An e-discovery notice C. A legal hold notice C) D. An order of volatility Explanation QUESTION 1020f215 A legal hold notice will inform the company that they must preserve and protect information related to the case. None of the other items are terms used in this process. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Jean's company is preparing for litigation with another company that they believe has caused harm to Jean's organization. What type of legal action should Jean's lawyer take to ensure that the company preserves files and information related to the legal case?",
+      "choices": {
+        "A": "A chain-of-custody demand letter",
+        "B": "An e-discovery notice",
+        "C": "A legal hold notice",
+        "D": "An order of volatility"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "QUESTION 1020f215 A legal hold notice will inform the company that they must preserve and protect information related to the case. None of the other items are terms used in this process.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-06 at 05-03-49 Question 103 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-06 at 05-03-49 Question 103 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 103,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect What type of mitigation places a malicious file or application in a safe location for future review or study? @ A. Containment C) B. Quarantine O C. Isolation D. Deletion Explanation Overall Time Spent: 03:21:47 QUESTION 1030f215 A quarantine setting will place a malicious or suspect file in a safe location and will keep it there until a set timeframe has passed or until an administrator takes action to deal with it. This can allow you to further analyze the file or to restore it if it was an incorrect identification or if the file is needed for another purpose. Containment is used to limit the extent of an incident or attack, isolation keeps a system or device from connecting to or accessing others, and deleting a file wouldnt keep it around. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "What type of mitigation places a malicious file or application in a safe location for future review or study?",
+      "choices": {
+        "A": "Containment",
+        "B": "Quarantine",
+        "C": "Isolation",
+        "D": "Deletion"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Overall Time Spent: 03:21:47 QUESTION 1030f215 A quarantine setting will place a malicious or suspect file in a safe location and will keep it there until a set timeframe has passed or until an administrator takes action to deal with it. This can allow you to further analyze the file or to restore it if it was an incorrect identification or if the file is needed for another purpose. Containment is used to limit the extent of an incident or attack, isolation keeps a system or device from connecting to or accessing others, and deleting a file wouldnt keep it around.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-06 at 05-04-09 Question 104 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-06 at 05-04-09 Question 104 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 104,
+      "image_width": 1349,
+      "image_height": 708,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations QUESTION 1040f215 overall Time spent: Correct What phase of the incident response process often involves adding firewall rules and patching systems to address the incident? O A Preparation C) B. Detection @ C. Recovery O D. Analysis Explanation The recovery phase often involves adding firewall rules and patching systems in addition to rebuilding systems. Although preparation may involve configuring firewall rules or regular patching, it does not do so in response to an incident. Detection attempts to identify events and issues, and analysis involves investigating the events. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "What phase of the incident response process often involves adding firewall rules and patching systems to address the incident?",
+      "choices": {
+        "A": "Preparation",
+        "B": "Detection",
+        "C": "Recovery",
+        "D": "Analysis"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "The recovery phase often involves adding firewall rules and patching systems in addition to rebuilding systems. Although preparation may involve configuring firewall rules or regular patching, it does not do so in response to an incident. Detection attempts to identify events and issues, and analysis involves investigating the events.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-06 at 05-08-54 Question 106 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-06 at 05-08-54 Question 106 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 106,
+      "image_width": 1349,
+      "image_height": 688,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations Overall Time Spent: O Incorrect Michelle has been asked to use the CIS benchmark for Windows as part of her system security pmcess. What information will she be using? O A Information on how secure Windows is in its default state O B. A setof recommended security configurations to secure Windows @ C. Performance benchmark tools for Windows systems, including network speed and firewall throughput O D. Vulnerability scan data for Windows systems provided by various manufacturers Explanation QUESTION IOEof215 The Center for Internet Security (CIS) benchmarks provide recommendations for how to secure an operating system, application, or other covered technology. Michelle will find Windows-specific security configuration guidelines and techniques. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Michelle has been asked to use the CIS benchmark for Windows as part of her system security pmcess. What information will she be using?",
+      "choices": {
+        "A": "Information on how secure Windows is in its default state",
+        "B": "A setof recommended security configurations to secure Windows",
+        "C": "Performance benchmark tools for Windows systems, including network speed and firewall throughput",
+        "D": "Vulnerability scan data for Windows systems provided by various manufacturers"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "QUESTION IOEof215 The Center for Internet Security (CIS) benchmarks provide recommendations for how to secure an operating system, application, or other covered technology. Michelle will find Windows-specific security configuration guidelines and techniques.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-06 at 05-09-37 Question 108 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-06 at 05-09-37 Question 108 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 108,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations overall Time spent: O Incorrect Nina is tasked with putting radio frequency identification (RFID) tags on every new piece of equipment that enters her datacenter that costs more than 5500. What type of organizational policy is most likely to include this type of requirement? C) A A change management policy B. An incident response policy O C. An asset management policy @ D. An acceptable use policy Explanation QUESTION 1080f215 Asset management policies typically include all stages of an assets life cycle, and asset tags like those described are used to track assets in many organizations. Change management, incident response, and acceptable use policies do not require asset tagging. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Nina is tasked with putting radio frequency identification (RFID) tags on every new piece of equipment that enters her datacenter that costs more than 5500. What type of organizational policy is most likely to include this type of requirement?",
+      "choices": {
+        "A": "A change management policy",
+        "B": "An incident response policy",
+        "C": "An asset management policy",
+        "D": "An acceptable use policy"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "QUESTION 1080f215 Asset management policies typically include all stages of an assets life cycle, and asset tags like those described are used to track assets in many organizations. Change management, incident response, and acceptable use policies do not require asset tagging.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-06 at 05-13-35 Question 110 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-06 at 05-13-35 Question 110 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 110,
+      "image_width": 1349,
+      "image_height": 744,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations Overall Time Spent: 03:31 Correct Juan's team is in charge of responding to potential phishing attacks and advertises an infosec@example.com email address to his organization to send examples of potential phishing attacks to. Which of the following is not a benefit Juan's team would get from automating the creation of tickets in their support tool based on these emails? C) A The ability to track whether thefve been resolved @ B. Automated phishing prevention O C. The ability to correlate multiple emails into a single event C) D. The ability to trigger additional actions Explanation Support tools typically require additional steps or integrations to take action on a ticket and a human is often involved to ensure that QUESTION 1100f215 legitimate emails do not result in the creation of unwanted rules or responses. Juan's team could use the ticketing system to track whether emails are dealt with, to correlate them,and ootentiallv to trigger additional actions. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Juan's team is in charge of responding to potential phishing attacks and advertises an infosecexample.com email address to his organization to send examples of potential phishing attacks to. Which of the following is not a benefit Juan's team would get from automating the creation of tickets in their support tool based on these emails?",
+      "choices": {
+        "A": "The ability to track whether thefve been resolved",
+        "B": "Automated phishing prevention",
+        "C": "The ability to correlate multiple emails into a single event",
+        "D": "The ability to trigger additional actions"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Support tools typically require additional steps or integrations to take action on a ticket and a human is often involved to ensure that QUESTION 1100f215 legitimate emails do not result in the creation of unwanted rules or responses. Juan's team could use the ticketing system to track whether emails are dealt with, to correlate them,and ootentiallv to trigger additional actions.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-06 at 05-15-08 Question 111 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-06 at 05-15-08 Question 111 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 111,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Valerie wants to implement an email security framework that will help to ensure that only authorized systems send email on behalf of her domains. Which of the following should she implement? O A DKIM @ B. DMARC O C. STP O D. SPF Explanation The Sender Policy Framework (SPF) lists IP addresses of systems allowed to send email in DNS TXT records for a domain. DKIM (DomainKeys Identified Mail) validates a domain's identity using a public key pair, validating the authenticity of the sender. DMARC (domain-based message authentication, reporting, and conformance) controls how unauthenticated messages are handled by mailbox providers, including QUESTION 111 of215 quarantining, rejecting, or rejecting messages. STP is not an email security framework. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Valerie wants to implement an email security framework that will help to ensure that only authorized systems send email on behalf of her domains. Which of the following should she implement?",
+      "choices": {
+        "A": "DKIM",
+        "B": "DMARC",
+        "C": "STP",
+        "D": "SPF"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "The Sender Policy Framework (SPF) lists IP addresses of systems allowed to send email in DNS TXT records for a domain. DKIM (DomainKeys Identified Mail) validates a domain's identity using a public key pair, validating the authenticity of the sender. DMARC (domain-based message authentication, reporting, and conformance) controls how unauthenticated messages are handled by mailbox providers, including quarantining, rejecting, or rejecting messages. STP is not an email security framework.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-06 at 05-42-56 Question 120 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-06 at 05-42-56 Question 120 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 120,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Jill wants to configure her IPS to detect a SQL injection attack that has become increasingly common against an open source web application that her organization runs. What information would she need to create a signature for the attack? @ A. The source IP address O B. The SQLcode C. The hash of the attack C) D. The source port Explanation Jill can build a signature if she has an example of the SQL code. IPS signatures require data to match against potential attack traffic. A source IP address would only match specific potential attackers instead of the many different potential sources. A hash of the attack would detect one specific version of the attack, but a SQL injection (SQLi) attack may have multiple versions or configurations. The source port will vary with each request and isnt useful in most cases. QUESTION CONTENT FEEDBACK 120 of 215 PREVIOUS N EXT",
+      "prompt": "Jill wants to configure her IPS to detect a SQL injection attack that has become increasingly common against an open source web application that her organization runs. What information would she need to create a signature for the attack?",
+      "choices": {
+        "A": "The source IP address",
+        "B": "The SQLcode",
+        "C": "The hash of the attack",
+        "D": "The source port"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Jill can build a signature if she has an example of the SQL code. IPS signatures require data to match against potential attack traffic. A source IP address would only match specific potential attackers instead of the many different potential sources. A hash of the attack would detect one specific version of the attack, but a SQL injection (SQLi) attack may have multiple versions or configurations. The source port will vary with each request and isnt useful in most cases.",
+      "parse_warnings": [
+        "missing inferred correct answer"
+      ],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-06 at 06-14-08 Question 128 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-06 at 06-14-08 Question 128 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 128,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations Overall Time Spent: 04:31:18 O Incorrect Jim wants to ensure that users who are located in his organization's London office have access to the building. What type of access control scheme should he select to best fit this specific need? O A Rule O B. ABAC @ C. Role BAC O D. MAC Explanation QUESTION 1280f215 Attribute-based access control (ABAC) provides access based on attributes like location, age, rank, or other attributes of a user. Rule-based access control uses defined rules to make access decisions. Role-based access control uses a users role in an organization to make access control decisions, and mandatory access control (MAC) enforces access control using centralized control. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Jim wants to ensure that users who are located in his organization's London office have access to the building. What type of access control scheme should he select to best fit this specific need?",
+      "choices": {
+        "A": "Rule",
+        "B": "ABAC",
+        "C": "Role BAC",
+        "D": "MAC"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "QUESTION 1280f215 Attribute-based access control (ABAC) provides access based on attributes like location, age, rank, or other attributes of a user. Rule-based access control uses defined rules to make access decisions. Role-based access control uses a users role in an organization to make access control decisions, and mandatory access control (MAC) enforces access control using centralized control.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-06 at 06-14-26 Question 129 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-06 at 06-14-26 Question 129 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 129,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Dane wants to implement passwordless authentication for his organization. What type of device should he issue to his users to support this type of authentication? C) A A password manager O B. An RFID card C) C. A security key @ D. A biometric token Explanation Security' keys are commonly used for passwordless authentication since they can provide both a physical token and cryptographic login credentials that are unlocked using a password, fingerprint reader, or camera. A password manager does not provide this but does securely store and manage passwords. RFID cards are simply something you have, and biometrics are typically not tokens\u2014thefre data stored to match a user's biometric signature. QUESTION CONTENT FEEDBACK 1290f215 PREVIOUS N EXT",
+      "prompt": "Dane wants to implement passwordless authentication for his organization. What type of device should he issue to his users to support this type of authentication?",
+      "choices": {
+        "A": "A password manager",
+        "B": "An RFID card",
+        "C": "A security key",
+        "D": "A biometric token"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Security' keys are commonly used for passwordless authentication since they can provide both a physical token and cryptographic login credentials that are unlocked using a password, fingerprint reader, or camera. A password manager does not provide this but does securely store and manage passwords. RFID cards are simply something you have, and biometrics are typically not tokens-thefre data stored to match a user's biometric signature. QUESTION 1290f215",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 00-19-42 Question 130 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 00-19-42 Question 130 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 130,
+      "image_width": 869,
+      "image_height": 762,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Overall Time Spent: 04:31 Chapter 4: Domain 4.0: Security Operations Ensuring that inetd services like echo, time, rsh, and telnet are not enabled are all examples of what type of action? C) A Preventing SQL injection @ B. Hardening a Linux system O C. Hardening a Windows system C) D. Patching insecure services Explanation Older, insecure services like chargen, daytime, echo, time, rsh, and telnet are all managed by inetd in Linux distributions. Disabling these services is a common item in security' hardening benchmarks like the CIS benchmarks. These services are not Windows services, they are not SQL-related, and disabling them is not a type of patching. QUESTION CONTENT FEEDBACK 1300f215 PREVIOUS N EXT",
+      "prompt": "Operations Ensuring that inetd services like echo, time, rsh, and telnet are not enabled are all examples of what type of action?",
+      "choices": {
+        "A": "Preventing SQL injection",
+        "B": "Hardening a Linux system",
+        "C": "Hardening a Windows system",
+        "D": "Patching insecure services"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Older, insecure services like chargen, daytime, echo, time, rsh, and telnet are all managed by inetd in Linux distributions. Disabling these services is a common item in security' hardening benchmarks like the CIS benchmarks. These services are not Windows services, they are not SQL-related, and disabling them is not a type of patching. QUESTION 1300f215",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 00-20-41 Question 132 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 00-20-41 Question 132 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 132,
+      "image_width": 869,
+      "image_height": 744,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations QUESTION 132 of 215 Overall Time Spent: 04:32:25 Correct Akio has set the secure cookie attribute as part of her web application's process for sending new cookies to users. What does this attribute do? C) A It encrypts the cookie's content when it is stored. O B. It stores the cookie on the server instead of on the remove device. C) C. It removes the cookie after it has been used. @ D. It requires that the cookie be sent only HTTPS. Explanation The secure cookie attribute is intended to keep cookies secure in transit. That means that it requires secure cookies be sent only via HTTPS. It does not encrypt the cookie at rest, store it on the server instead of the remote system, nor does it remove the cookie CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Akio has set the secure cookie attribute as part of her web application's process for sending new cookies to users. What does this attribute do?",
+      "choices": {
+        "A": "It encrypts the cookie's content when it is stored.",
+        "B": "It stores the cookie on the server instead of on the remove device.",
+        "C": "It removes the cookie after it has been used.",
+        "D": "It requires that the cookie be sent only HTTPS."
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "The secure cookie attribute is intended to keep cookies secure in transit. That means that it requires secure cookies be sent only via HTTPS. It does not encrypt the cookie at rest, store it on the server instead of the remote system, nor does it remove the cookie",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 00-25-11 Question 138 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 00-25-11 Question 138 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 138,
+      "image_width": 869,
+      "image_height": 760,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Lucca knows that the CVSS environmental score is made up of three components, including an impact metric. What three components does he need to consider as part of the impact metric score? C) A Confidentiality, integrity', and availability O B. Network, disk, and memory @ C. Severity, likelihocd and impact C) D. Probability, impact, and cost Explanation The CVSS environmental score's impact metric takes into account confidentiality, integrity, and availability risks, with each rated between high, medium, and low levels. It is not a direct rating of network, disk, memory, severity, likelihocd probability, or cost. QUESTION CONTENT FEEDBACK 138 of 215 PREVIOUS N EXT",
+      "prompt": "Lucca knows that the CVSS environmental score is made up of three components, including an impact metric. What three components does he need to consider as part of the impact metric score?",
+      "choices": {
+        "A": "Confidentiality, integrity', and availability",
+        "B": "Network, disk, and memory",
+        "C": "Severity, likelihocd and impact",
+        "D": "Probability, impact, and cost"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "The CVSS environmental score's impact metric takes into account confidentiality, integrity, and availability risks, with each rated between high, medium, and low levels. It is not a direct rating of network, disk, memory, severity, likelihocd probability, or cost.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 00-25-55 Question 139 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 00-25-55 Question 139 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 139,
+      "image_width": 869,
+      "image_height": 742,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations What tool is commonly used to allow for measurement and monitoring of security' settings to align with NIST 800-53 controls? O A SAML @ B. CVE O c. cvss O D. SCAP Explanation The Security Content Automation Protuol (SCAP) is frequently used to allow for monitoring and measurement of NIST 800-53-based controls. SAML is used for authorization and authentication, and CVE and CVSS are used to identify and rank vulnerabilities. QUESTION CONTENT FEEDBACK 1390f215 PREVIOUS N EXT",
+      "prompt": "Operations What tool is commonly used to allow for measurement and monitoring of security' settings to align with NIST 800-53 controls?",
+      "choices": {
+        "A": "SAML",
+        "B": "CVE",
+        "C": "cvss",
+        "D": "SCAP"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "The Security Content Automation Protuol (SCAP) is frequently used to allow for monitoring and measurement of NIST 800-53-based controls. SAML is used for authorization and authentication, and CVE and CVSS are used to identify and rank vulnerabilities. QUESTION 1390f215",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 00-29-27 Question 141 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 00-29-27 Question 141 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 141,
+      "image_width": 869,
+      "image_height": 726,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations Correct Tom wants to set up an authentication service for network devices. Which of the following is commonly used for authentication to enterprise network devices? @ A. Kerberos O B. SAML O C. TKIP O D. OpenID Explanation Kerberos is one of a small number of commonly used AAA protuols for network devices. SAML and OpenID are more commonly used for federated services, and TKIP is an encryption method. QUESTION CONTENT FEEDBACK 141 of215 PREVIOUS N EXT",
+      "prompt": "Tom wants to set up an authentication service for network devices. Which of the following is commonly used for authentication to enterprise network devices?",
+      "choices": {
+        "A": "Kerberos",
+        "B": "SAML",
+        "C": "TKIP",
+        "D": "OpenID"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Kerberos is one of a small number of commonly used AAA protocols for network devices. SAML andpenID are more commonly used for federated services, and TKIP is an encryption method.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 00-29-53 Question 142 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 00-29-53 Question 142 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 142,
+      "image_width": 869,
+      "image_height": 796,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Ian wants to test embedded device web servers for potential security issues with the version of the web server software. What tool should he select to do this most effectively across his large organization's network of IoT devices? O A A WAF C) B. Pentesting C. A vulnerability scanner @ D. A port scanner Explanation Vulnerability scanners are perfectly suited to this type of task and can be configured to specifically test the web servers that are part of the IoT devices to increase the speed of the scan. A WAF is used to protect web applications and servers, not to assess vulnerabilities and security' issues. Pentesting can identify these problems but is typically not fast or scalable. Port scanners identify open ports and service but don't identify vulnerabilities as effectively as a dedicated vulnerability scanning tool will. QUESTION CONTENT FEEDBACK 1420f215 PREVIOUS N EXT",
+      "prompt": "Ian wants to test embedded device web servers for potential security issues with the version of the web server software. What tool should he select to do this most effectively across his large organization's network of IoT devices?",
+      "choices": {
+        "A": "A WAF",
+        "B": "Pentesting",
+        "C": "A vulnerability scanner",
+        "D": "A port scanner"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Vulnerability scanners are perfectly suited to this type of task and can be configured to specifically test the web servers that are part of the IoT devices to increase the speed of the scan. A WAF is used to protect web applications and servers, not to assess vulnerabilities and security' issues. Pentesting can identify these problems but is typically not fast or scalable. Port scanners identify open ports and service but don't identify vulnerabilities as effectively as a dedicated vulnerability scanning tool will. QUESTION 1420f215",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 00-31-01 Question 143 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 00-31-01 Question 143 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 143,
+      "image_width": 869,
+      "image_height": 798,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations Correct Tom wants his email servers to reject email that is not authenticated in a way to prevent spoofing. Which of the following should he implement? O A SPF @ B. DMARC O C. DKIM O D. TLS Explanation DMARC, or Domain-based Message Authentication, Reporting, and Conformance, controls how unauthenticated messages are handled by mailbox providers, including quarantining, rejecting, or rejecting messages. SPF (Sender Policy Framework) lists IP addresses of systems allowed to send email in DNS TXT records for a domain. DomainKeys Identified Mail (DKIM) validates a domain's identity using a public key pair, validating the authenticity of the sender. TLS (Transport Layer Security) is used to QUESTION CONTENT FEEDBACK 143 of 215 PREVIOUS N EXT",
+      "prompt": "Tom wants his email servers to reject email that is not authenticated in a way to prevent spoofing. Which of the following should he implement?",
+      "choices": {
+        "A": "SPF",
+        "B": "DMARC",
+        "C": "DKIM",
+        "D": "TLS"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "DMARC, or Domain-based Message Authentication, Reporting, and Conformance, controls how unauthenticated messages are handled by mailbox providers, including quarantining, rejecting, or rejecting messages. SPF (Sender Policy Framework) lists IP addresses of systems allowed to send email in DNS TXT records for a domain. DomainKeys Identified Mail (DKIM) validates a domain's identity using a public key pair, validating the authenticity of the sender. TLS (Transport Layer Security) is used to",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 00-40-38 Question 146 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 00-40-38 Question 146 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 146,
+      "image_width": 869,
+      "image_height": 796,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Sam has completed patching of a critical vulnerability. What step is often performed next to ensure that the patching occurred properly? C) A Noting false positives O B. Rebooting the system O C. Rescanning the system @ D. Performing an audit Explanation Organizations often immediately rescan a system after patching to ensure that the patching worked. While this isnt an absolutely certain means of validating the patch, it helps to quickly ensure that patching was effective across many machines. Noting false positives may ucur if the patch was successful, but systems continue to show as vulnerable. Rebooting may be done but doesn't necessarily validate the patching installation's success, and performing an audit may be done but is a less common next step. QUESTION CONTENT FEEDBACK 146 of 215 PREVIOUS N EXT",
+      "prompt": "Sam has completed patching of a critical vulnerability. What step is often performed to ensure that the patching occurred properly?",
+      "choices": {
+        "A": "Noting false positives",
+        "B": "Rebooting the system",
+        "C": "Rescanning the system",
+        "D": "Performing an audit"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Organizations often immediately rescan a system after patching to ensure that the patching worked. While this isnt an absolutely certain means of validating the patch, it helps to quickly ensure that patching was effective across many machines. Noting false positives may ucur if the patch was successful, but systems continue to show as vulnerable. Rebooting may be done but doesn't necessarily validate the patching installation's success, and performing an audit may be done but is a less common step.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 00-42-36 Question 148 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 00-42-36 Question 148 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 148,
+      "image_width": 869,
+      "image_height": 742,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Alan wants to configure his firewall to allow Microsoft SQL traffic through to the database server from web application servers in a screened subnet design. What is the minimum set of ports that he should port to allow this? O A TCP 3389 and 1433 O B. TCP1433 @ C. TCP 8080 O D. TCP139and445 Explanation TCP port 1433 is the minimum port requirement for a Microsoft SQL server connection. TCP 3389 is used for Remote Desktop Protocol (RDP). TCP 8080 is a common alternate port for web servers, and TCP 139 and 445 are used for SMB connections. QUESTION CONTENT FEEDBACK 148 of 215 PREVIOUS N EXT",
+      "prompt": "Alan wants to configure his firewall to allow Microsoft SQL traffic through to the database server from web application servers in a screened subnet design. What is the minimum set of ports that he should port to allow this?",
+      "choices": {
+        "A": "TCP 3389 and 1433",
+        "B": "TCP1433",
+        "C": "TCP 8080",
+        "D": "TCP139and445"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "TCP port 1433 is the minimum port requirement for a Microsoft SQL server connection. TCP 3389 is used for Remote Desktop Protocol (RDP). TCP 8080 is a common alternate port for web servers, and TCP 139 and 445 are used for SMB connections.",
+      "parse_warnings": [
+        "missing inferred correct answer"
+      ],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 00-46-41 Question 150 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 00-46-41 Question 150 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 150,
+      "image_width": 869,
+      "image_height": 784,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Overall Time Spent: Chapter 4: Domain 4.0: Security Operations Zhen's new organization has informed him that they used a COPE model for their mobile devices. What does this tell Zhen about what he can do with the device? @ A. He can choose what device he uses, but the organization will own it. O B. He will be provided with a device but can use it for reasonable personal use. O C. He will be provided with a device and can only use it for business purposes. D. He will have to bring his own device but can use it for personal and business o use. Explanation COPE, or company-owned, personally enabled, models allow staffto use organizationally owned devices for reasonable personal use. CYOD, or choose your own device, allows users to pick their company-owned device from a list of approved devices. COBO, or company-owned, business-only, is just that\u2014users can only use the devices for business purposes. BYOD asks users to bring their own device, often leaving organizations with limited or no control of the device. QUESTION CONTENT FEEDBACK 1500f215 PREVIOUS N EXT",
+      "prompt": "Zhen's new organization has informed him that they used a COPE model for their mobile devices. What does this tell Zhen about what he can do with the device?",
+      "choices": {
+        "A": "He can choose what device he uses, but the organization will own it.",
+        "B": "He will be provided with a device but can use it for reasonable personal use.",
+        "C": "He will be provided with a device and can only use it for business purposes.",
+        "D": "He will have to bring his own device but can use it for personal and business o use."
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "COPE, or company-owned, personally enabled, models allow staffto use organizationally owned devices for reasonable personal use. CYOD, or choose your own device, allows users to pick their company-owned device from a list of approved devices. COBO, or company-owned, business-only, is just that-users can only use the devices for business purposes. BYOD asks users to bring their own device, often leaving organizations with limited or no control of the device. QUESTION 1500f215",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 00-48-07 Question 151 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 00-48-07 Question 151 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 151,
+      "image_width": 869,
+      "image_height": 742,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations The Windows Task Manager can be used to identify malware through what technique? @ A. Dynamic analysis B. auditing C) C. CVSS matching C) D. Vulnerability scanning Explanation Process auditing involves reviewing pruesses to identify unknown or unexpected processes. During incident response scenarios, this is often initially done via the Task Manager. Dynamic analysis is a code review process that uses running code. CVSS matching was made up for this question, and vulnerability scanning tests open services and doesNt involve the Task Manager. QUESTION CONTENT FEEDBACK 151 of215 PREVIOUS N EXT",
+      "prompt": "Operations The Windows Task Manager can be used to identify malware through what technique?",
+      "choices": {
+        "A": "Dynamic analysis",
+        "B": "auditing",
+        "C": "CVSS matching",
+        "D": "Vulnerability scanning"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Process auditing involves reviewing pruesses to identify unknown or unexpected processes. During incident response scenarios, this is often initially done via the Task Manager. Dynamic analysis is a code review process that uses running code. CVSS matching was made up for this question, and vulnerability scanning tests open services and doesNt involve the Task Manager.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 00-56-33 Question 156 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 00-56-33 Question 156 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 156,
+      "image_width": 869,
+      "image_height": 778,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Overall Time Spent: 4 Chapter 4: Domain 4.0: Security Operations Quarantine and isolation are both common options in what phase of the incident response p rocess? O A Detection @ B. Analysis C) C. Containment O D. Eradication Explanation Quarantine and isolation are both commonly used in the containment phase of an incident to ensure that impacted systems are unable to impact other systems or parts of the organization. Files may also be quarantined to prevent further impact from malware. Detection and analysis typically do not involve quarantine and isolation, but quarantine and isolation may carry through into the eradication phase before systems are returned to normal operation. QUESTION CONTENT FEEDBACK 15Eof215 PREVIOUS N EXT",
+      "prompt": "Operations Quarantine and isolation are both common options in what phase of the incident response p rocess?",
+      "choices": {
+        "A": "Detection",
+        "B": "Analysis",
+        "C": "Containment",
+        "D": "Eradication"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Quarantine and isolation are both commonly used in the containment phase of an incident to ensure that impacted systems are unable to impact other systems or parts of the organization. Files may also be quarantined to prevent further impact from malware. Detection and analysis typically do not involve quarantine and isolation, but quarantine and isolation may carry through into the eradication phase before systems are returned to normal operation. QUESTION 15Eof215",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 01-06-32 Question 158 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 01-06-32 Question 158 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 158,
+      "image_width": 869,
+      "image_height": 760,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Beena is granted access to her organization's customer information because she is a data steward; her access occurs between 8 a.m. and 5 p.m., and it is occurring from a known workstation that has passed security checks. What type of access control scheme is in use? C) A Rule-based access control @ B. Role-based access control O C. Mandatory access control C) D. Attribute-based access control Explanation A set of rules that defines who can access the data has determined if Beena is granted access. Here, rules assess her role, the time of day, and the workstation's status. This is not accomplished using a classification or clearance system like MAC uses, and it does not rely on just an attribute like Beena's luation or other information about her. QUESTION CONTENT FEEDBACK 1580f215 PREVIOUS N EXT",
+      "prompt": "Beena is granted access to her organization's customer information because she is a data steward; her access occurs between 8 a.m. and 5 p.m., and it is occurring from a known workstation that has passed security checks. What type of access control scheme is in use?",
+      "choices": {
+        "A": "Rule-based access control",
+        "B": "Role-based access control",
+        "C": "Mandatory access control",
+        "D": "Attribute-based access control"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "A set of rules that defines who can access the data has determined if Beena is granted access. Here, rules assess her role, the time of day, and the workstation's status. This is not accomplished using a classification or clearance system like MAC uses, and it does not rely on just an attribute like Beena's luation or other information about her. QUESTION 1580f215",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 01-12-34 Question 159 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 01-12-34 Question 159 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 159,
+      "image_width": 869,
+      "image_height": 742,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Juan wants to use his IDS to detect anomalous behavior. What type of detection technique would most effectively help him identify unknown new attacks? O A Trend analysis @ B. Signature-based detection O C. IP-based detection C) D. Port-based detection Explanation Trend analysis is commonly used as part of behavior-based detections, which can help identify new attacks. Signatures require knowledge of existing attacks to match signatures. IP- and port-based detection is useful for known attacks but not typically useful for unknown attacks. QUESTION CONTENT FEEDBACK 159 of 215 PREVIOUS N EXT",
+      "prompt": "Juan wants to use his IDS to detect anomalous behavior. What type of detection technique would most effectively help him identify unknown new attacks?",
+      "choices": {
+        "A": "Trend analysis",
+        "B": "Signature-based detection",
+        "C": "IP-based detection",
+        "D": "Port-based detection"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Trend analysis is commonly used as part of behavior-based detections, which can help identify new attacks. Signatures require knowledge of existing attacks to match signatures. IP- and port-based detection is useful for known attacks but not typically useful for unknown attacks.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 01-56-46 Question 163 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 01-56-46 Question 163 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 163,
+      "image_width": 869,
+      "image_height": 760,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect aug bounty programs are an example of what type of program? C) A Contracted penetration testing B. Responsible disclosure @ C. Third-party bounty D. Trusted threat Explanation QUESTION 163 of 215 aug bounty programs are frequently part of responsible disclosure programs intended to provide a way for third parties to report security issues and to be incentivized to report them in responsible ways. Bug bounties can help identify flaws, but theyre not typically part of contracted penetration testing engagements. Third-party bounty is not a typical way of describing them, and trusted threat programs were made up for this question. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "aug bounty programs are an example of what type of program?",
+      "choices": {
+        "A": "Contracted penetration testing",
+        "B": "Responsible disclosure",
+        "C": "Third-party bounty",
+        "D": "Trusted threat"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "aug bounty programs are frequently part of responsible disclosure programs intended to provide a way for third parties to report security issues and to be incentivized to report them in responsible ways. Bug bounties can help identify flaws, but theyre not typically part of contracted penetration testing engagements. Third-party bounty is not a typical way of describing them, and trusted threat programs were made up for this question.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 04-58-59 Question 166 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 04-58-59 Question 166 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 166,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect The hospital that Isabella works for leverages threat information from the Health-ISAC as part of their security team's work. What type of threat information provider is the Health-ISAC? @ A. An OSINT provider O B. A dark web source O C. An information-sharing organization C) D. A proprietary threat data source Explanation ISACs, or Information Sharing and Analysis Centers, are information-sharing organizations established to connect organizations in verticals like health care, government, utilities, and higher education. While it may provide OSINT information, they go far beyond that. They are not typically found \u2022vila the dark web and don't require TOR to access their information, and they are not commercial or proprietary threat data sources. QUESTION CONTENT FEEDBACK 16Eof215 PREVIOUS N EXT",
+      "prompt": "The hospital that Isabella works for leverages threat information from the Health-ISAC as part of their security team's work. What type of threat information provider is the Health-ISAC?",
+      "choices": {
+        "A": "AnSINT provider",
+        "B": "A dark web source",
+        "C": "An information-sharing organization",
+        "D": "A proprietary threat data source"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "ISACs, or Information Sharing and Analysis Centers, are information-sharing organizations established to connect organizations in verticals like health care, government, utilities, and higher education. While it may provideSINT information, they go far beyond that. They are not typically found \u2022vila the dark web and don't require TOR to access their information, and they are not commercial or proprietary threat data sources. QUESTION 16Eof215",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-07 at 05-01-04 Question 168 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-07 at 05-01-04 Question 168 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 168,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Hector is concerned about Bluetooth security. Which of the following is a legitimate security' concern about Bluetooth? C) A It is not encrypted. B. Bluetooth is only useful at short range. @ C. Bluejacking may occur. O D. Bluetooth devices can be fingerprinted. Explanation Bluetooth devices can be fingerprinted relatively easily, making it easy to identify individual users who have Bluetooth turned on. Modern Bluetooth traffic is encrypted, its relatively short range is not a security concern, and Bluejacking sends unwanted spam, which isn't a direct QUESTION 1680f215 data security' issue. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Hector is concerned about Bluetooth security. Which of the following is a legitimate security' concern about Bluetooth?",
+      "choices": {
+        "A": "It is not encrypted.",
+        "B": "Bluetooth is only useful at short range.",
+        "C": "cur.",
+        "D": "Bluetooth devices can be fingerprinted."
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Bluetooth devices can be fingerprinted relatively easily, making it easy to identify individual users who have Bluetooth turned on. Modern Bluetooth traffic is encrypted, its relatively short range is not a security concern, and Bluejacking sends unwanted spam, which isn't a direct QUESTION 1680f215 data security' issue.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-08 at 00-56-07 Question 173 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-08 at 00-56-07 Question 173 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 173,
+      "image_width": 1349,
+      "image_height": 708,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations Correct Sharon wants to implement WPA3 Enterprise. What technology will she need to use for authorization after wireless devices associate with access points? O A LDAP @ B. 802.1X O C. Kerberos O D. SAML Explanation QUESTION 1730f215 Sharon knows that Enterprise mode authentication is typically done with 802. IX LDAP and Kerberos are not typically used for this, and SAML is more frequently part of federated and cloud services. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Sharon wants to implement WPA3 Enterprise. What technology will she need to use for authorization after wireless devices associate with access points?",
+      "choices": {
+        "A": "LDAP",
+        "B": "802.1X",
+        "C": "Kerberos",
+        "D": "SAML"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "QUESTION 1730f215 Sharon knows that Enterprise mode authentication is typically done with 802. IX LDAP and Kerberos are not typically used for this, and SAML is more frequently part of federated and cloud services.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-08 at 00-56-26 Question 174 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-08 at 00-56-26 Question 174 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 174,
+      "image_width": 1349,
+      "image_height": 708,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations Correct What purpose do the password history and password minimum age settings have in Windows? C) A To prevent attackers from resetting passwords O B. To prevent brute-force attacks @ C. To prevent password reuse C) D. To ensure proper password expiration Explanation Overall Time Spent: 06:21 QUESTION 174 of 215 Windows supports both password history and a minimum password age to help prevent users from simply resetting their password over and over again until they can reuse their preferred password. This does not prevent attackers from resetting passwords or using brute-force attacks and doesn't ensure password expiration. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "What purpose do the password history and password minimum age settings have in Windows?",
+      "choices": {
+        "A": "To prevent attackers from resetting passwords",
+        "B": "To prevent brute-force attacks",
+        "C": "To prevent password reuse",
+        "D": "To ensure proper password expiration"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Overall Time Spent: 06:21 Windows supports both password history and a minimum password age to help prevent users from simply resetting their password over and over again until they can reuse their preferred password. This does not prevent attackers from resetting passwords or using brute-force attacks and doesn't ensure password expiration.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-08 at 00-57-55 Question 175 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-08 at 00-57-55 Question 175 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 175,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect A CVSS score is based on what three metric groups of data? C) A Scope, Impact, Environmental O B. Base, Temporal, and Environmental @ C. Risk, Threat, Impact C) D. Time, Risk, Scope Explanation CVSS scores are based on base metrics like the attack vector; complexity; scope; user interaction required and privileges required; the temporal group, which includes exploit code maturity, remediation level, and report confidence; and the environmental group, including confidentiality, availability, and integrity' requirements. While scope, impact, risk, and threat all play into these elements, CVSS calls the three QUESTION 175 of 215 metric groups Base, Temporal, and Environmental. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Operations Incorrect",
+      "choices": {
+        "A": "Scope, Impact, Environmental",
+        "B": "Base, Temporal, and Environmental",
+        "C": "Risk, Threat, Impact",
+        "D": "Time, Risk, Scope"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "CVSS scores are based on base metrics like the attack vector; complexity; scope; user interaction required and privileges required; the temporal group, which includes exploit code maturity, remediation level, and report confidence; and the environmental group, including confidentiality, availability, and integrity' requirements. While scope, impact, risk, and threat all play into these elements, CVSS calls the three metric groups Base, Temporal, and Environmental.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-08 at 01-28-54 Question 179 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-08 at 01-28-54 Question 179 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 179,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Renee has implemented WPA3 Enterprise, and she wants to use an EAP protocol for secure authentication. What EAP version should she implement? O A LEAP O B. EAP-TLS @ C. EAP-PSK O D. EAP-PWD Explanation QUESTION 1790f215 EAR-TLS provides TLS-based Transport Layer Security' as part of a secure authentication implementation. LEAP is the Lightweight Extensible Authentication Protocol, which was in use before 802.11 i but is now largely outdated. EAR-PSK uses a preshared key for mutual authentication and does not rely on public key encryption, but it is not supported in WPA3 deployments. EAP-PWD uses a shared password for authentication and, like EAP-PSK, is not supported by WPA3. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Renee has implemented WPA3 Enterprise, and she wants to use an EAP protocol for secure authentication. What EAP version should she implement?",
+      "choices": {
+        "A": "LEAP",
+        "B": "EAP-TLS",
+        "C": "EAP-PSK",
+        "D": "EAP-PWD"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "QUESTION 1790f215 EAR-TLS provides TLS-based Transport Layer Security' as part of a secure authentication implementation. LEAP is the Lightweight Extensible Authentication Protocol, which was in use before 802.11 i but is now largely outdated. EAR-PSK uses a preshared key for mutual authentication and does not rely on public key encryption, but it is not supported in WPA3 deployments. EAP-PWD uses a shared password for authentication and, like EAP-PSK, is not supported by WPA3.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-08 at 01-52-40 Question 180 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-08 at 01-52-40 Question 180 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 180,
+      "image_width": 1349,
+      "image_height": 760,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect The organization that Chris works for has recently acquired another company. As part of the acquisition, Chris is preparing to address the data that the newly acquired company used, including setting up rules to handle it in his data loss prevention (DLP) system. What step is commonly required prior to data being protected by a DLP system? C) A Hashing the data and creating signatures B. Encrypting the data O C. Classifying and tagging the data @ D. Applying a mandatory access control scheme to the data Explanation e DLP systems often rely on classification, tagging, and metadata to help them identify sensitive data that the organization handles and which could be exfiltrated or sent inadvertently outside of the organization. Hashing and creating signatures is more commonly associated with filesystem-monitoring tools. Encrypting the data is not required by a DLP and may actually make it harder for the DLP to identify the data. Applying a mandatory access control scheme to the data is not a typical step in preparing for OLP-based protection. QUESTION CONTENT FEEDBACK 180 of 215 PREVIOUS N EXT",
+      "prompt": "The organization that Chris works for has recently acquired another company. As part of the acquisition, Chris is preparing to address the data that the newly acquired company used, including setting up rules to handle it in his data loss prevention (DLP) system. What step is commonly required prior to data being protected by a DLP system?",
+      "choices": {
+        "A": "Hashing the data and creating signatures",
+        "B": "Encrypting the data",
+        "C": "Classifying and tagging the data",
+        "D": "Applying a mandatory access control scheme to the data"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "DLP systems often rely on classification, tagging, and metadata to help them identify sensitive data that the organization handles and which could be exfiltrated or sent inadvertently outside of the organization. Hashing and creating signatures is more commonly associated with filesystem-monitoring tools. Encrypting the data is not required by a DLP and may actually make it harder for the DLP to identify the data. Applying a mandatory access control scheme to the data is not a typical step in preparing forLP-based protection.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-08 at 01-57-00 Question 182 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-08 at 01-57-00 Question 182 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 182,
+      "image_width": 1349,
+      "image_height": 762,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Overall Time Spent: Chapter 4: Domain 4.0: Security Operations Katie's organization uses an IOC feed that helps her to identify new threats. A recent feed update includes the following hash for Emotet malware: cecc5bba6193d744837e689e68bc25c43eda7235 Where is Katie most likely going to be able to use this hash to identify potential attacks? C) A Via her EDR tools C) B. Via her firewall @ C. Via her system logs D. AJI of the above Explanation Endpoint detection and response (EDR) tools are most likely to use hashing to match known malicious files like this. Firewalls may provide the capability, but system logs do not, ruling out the \"all of the above\" option. QUESTION CONTENT FEEDBACK 1820f215 PREVIOUS N EXT",
+      "prompt": "Katie's organization uses an IOC feed that helps her to identify new threats.",
+      "choices": {
+        "A": "Via her EDR tools",
+        "B": "Via her firewall",
+        "C": "Via her system logs",
+        "D": "AJI of the above"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Endpoint detection and response (EDR) tools are most likely to use hashing to match known malicious files like this. Firewalls may provide the capability, but system logs do not, ruling out the \"all of the above\" option. QUESTION 1820f215",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-08 at 02-54-20 Question 199 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_4_domain_4.0_security_operations\\Screenshot 2026-06-08 at 02-54-20 Question 199 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 199,
+      "image_width": 877,
+      "image_height": 740,
+      "domain": "Security Operations",
+      "chapter": "Chapter 4",
+      "topic": "General Review",
+      "domain_code": "4.0",
+      "source_label": "Chapter 4 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect Joe has configured ACLs on a Cisco network device. The ACL he has configured is as follcwvs: interface ethernete ip access-group 111 in access-list 111 deny tcp any any eq http access-list 111 permit ip any any access-list 111 deny tcp any any eq https What does this ACL do? O A. Blocks HTTP traffic @ B. &locks bath HTTP and HTTPS traffic O C. Prevents web application attacks O D. Allcwvs for inspection ofweb traffic Explanation ACLs are interpreted in the order they are listed. This ACL is not properly vvritten if it is intended to block HTTPS because the ACL order includes a rule that allcwvs any traffic after the rule that blocks HTTP is processeff This means that traffc Will first be checked to see if it is HTTP traffic If it is not, it will be allcmed, and thus Will bypass the HTTPS block. It will not prevent web application attacks since HTTPS can pass the ACC and no specific configuration is set for ins#ction of web traffc_ QUESTION OCONTENT FEEDBACK 19scf21s PREVIOUS NEXT",
+      "prompt": "Joe has configured ACLs on a Cisco network device. The ACL he has configured is as follcwvs: interface ethernete ip access-group 111 in access-list 111 deny tcp any any eq http access-list 111 permit ip any any access-list 111 deny tcp any any eq https What does this ACL do?",
+      "choices": {
+        "A": "Blocks HTTP traffic",
+        "B": "&locks bath HTTP and HTTPS traffic",
+        "C": "Prevents web application attacks",
+        "D": "Allcwvs for inspection ofweb traffic"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "ACLs are interpreted in the order they are listed. This ACL is not properly vvritten if it is intended to block HTTPS because the ACL order includes a rule that allcwvs any traffic after the rule that blocks HTTP is processeff This means that traffc Will first be checked to see if it is HTTP traffic If it is not, it will be allcmed, and thus Will bypass the HTTPS block. It will not prevent web application attacks since HTTPS can pass the ACC and no specific configuration is set for ins#ction of web traffc_ QUESTIONCONTENT FEEDBACK 19scf21s",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    }
+  ]
+}

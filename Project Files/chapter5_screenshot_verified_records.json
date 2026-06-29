@@ -1,0 +1,1489 @@
+{
+  "title": "Chapter 5 screenshot import - verified",
+  "screenshots": [
+    {
+      "filename": "Screenshot 2026-06-20 at 03-36-36 Question 3 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-20 at 03-36-36 Question 3 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 3,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Jill's organization wants to ensure that services and systems are back online and functioning normally within 4 hours of an event or incident. What term best describes this goal? O A An RTO O B. An MTTR @ C. An RPO O D. An MTBF Explanation A recovery time objective (RTO) is set by organizations to describe how long restoring systems or services to normal function after a disruption can take. Mean time to repair (MTTR) is the average time it takes to repair a system or device. A recovery point objective (RPO) describes how much data can be lost in the event of an outage or issue, and the mean time between failures (MTBF) is a measure of the reliability of a system. It is the expected amount of time that will elapse between system failures. QUESTION CONTENT FEEDBACK 3 of227 PREVIOUS N EXT",
+      "prompt": "Jill's organization wants to ensure that services and systems are back online and functioning normally within 4 hours of an event or incident. What term best describes this goal?",
+      "choices": {
+        "A": "An RTO",
+        "B": "An MTTR",
+        "C": "An RPO",
+        "D": "An MTBF"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "A recovery time objective (RTO) is set by organizations to describe how long restoring systems or services to normal function after a disruption can take. Mean time to repair (MTTR) is the average time it takes to repair a system or device. A recovery point objective (RPO) describes how much data can be lost in the event of an outage or issue, and the mean time between failures (MTBF) is a measure of the reliability of a system. It is the expected amount of time that will elapse between system failures.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 03-37-29 Question 5 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-20 at 03-37-29 Question 5 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 5,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Angie is performing a penetration test and has gathered information using the Shodan search engine about her target. What type of reconnaissance has she performed? @ A Active C) B. Commercial C. Scanner-based O D. Passive Explanation Angie has conducted passive reconnaissance. She did not perform a scan or otherwise take direct active action to gather her information. Instead, she used the existing Shodan engine to gather information. While Shodan is a commercial product and does gather information using scans, databases like Shodan are considered passive reconnaissance, and the Security* exam objectives recognize two types of reconnaissance: active and passive. QUESTION CONTENT FEEDBACK S of227 PREVIOUS N EXT",
+      "prompt": "Angie is performing a penetration test and has gathered information using the Shodan search engine about her target. What type of reconnaissance has she performed?",
+      "choices": {
+        "A": "Active",
+        "B": "Commercial",
+        "C": "Scanner-based",
+        "D": "Passive"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Angie has conducted passive reconnaissance. She did not perform a scan or otherwise take direct active action to gather her information. Instead, she used the existing Shodan engine to gather information. While Shodan is a commercial product and does gather information using scans, databases like Shodan are considered passive reconnaissance, and the Security+ exam objectives recognize two types of reconnaissance: active and passive. QUESTION S of227",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 03-51-17 Question 14 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-20 at 03-51-17 Question 14 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 14,
+      "image_width": 1349,
+      "image_height": 760,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Sharon's organization wants to understand the risks that it will experience due to acquiring a new subsidiary, but it needs to conduct the assessment quickly while leveraging their industry expertise. Which of the following risk assessment options should Sharon recommend to address this need? @ A Conduct an ad hoc risk assessment. O B. Conduct a one-time risk assessment. C Conduct a third-party risk assessment. O D. Build a continuous risk assessment process. Explanation QUESTION 14 of 227 A one-time risk assessment that addresses the acquisition will best meet Sharon's needs. Ad hoc assessments are less formal, and they are often used to quickly assess a system or other potential risk. There is no requirement listed for third-party assessment, and they can be both expensive and time-consuming. Continuous risk assessment efforts are typically built into ongoing pruesses and are not suited to this type of one-time review. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Sharon's organization wants to understand the risks that it will experience due to acquiring a new subsidiary, but it needs to conduct the assessment quickly while leveraging their industry expertise. Which of the following risk assessment options should Sharon recommend to address this need?",
+      "choices": {
+        "A": "Conduct an ad hoc risk assessment.",
+        "B": "Conduct a one-time risk assessment.",
+        "C": "Conduct a third-party risk assessment.",
+        "D": "Build a continuous risk assessment process."
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "A one-time risk assessment that addresses the acquisition will best meet Sharon's needs. Ad hoc assessments are less formal, and they are often used to quickly assess a system or other potential risk. There is no requirement listed for third-party assessment, and they can be both expensive and time-consuming. Continuous risk assessment efforts are typically built into ongoing processes and are not suited to this type of one-time review.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 03-52-55 Question 16 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-20 at 03-52-55 Question 16 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 16,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Which of the following will provide a customer the opportunity to engage a third party to deliver an SX 2, Type 1 report created by third-party assessors? C) A A penetration testing agreement O B. A risk assessment agreement @ C. A vulnerability scan clause C) D. A right-to-audit clause Explanation QUESTION 16 of 227 Right-to-audit clauses provide customers with the right to have an audit of their vendor like an SOC 2, Type 1 assessment performed. SOC 2, Type 1 reports are not penetration testing reports, vulnerability scan reports, or risk assessment reports. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Which of the following will provide a customer the opportunity to engage a third party to deliver an SX 2, Type 1 report created by third-party assessors?",
+      "choices": {
+        "A": "A penetration testing agreement",
+        "B": "A risk assessment agreement",
+        "C": "A vulnerability scan clause",
+        "D": "A right-to-audit clause"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Right-to-audit clauses provide customers with the right to have an audit of their vendor like an SOC 2, Type 1 assessment performed. SOC 2, Type 1 reports are not penetration testing reports, vulnerability scan reports, or risk assessment reports.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 04-52-26 Question 21 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-20 at 04-52-26 Question 21 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 21,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect As part of her organization's marketing efforts, Julie's team gathers information about customers and others who visit their website. Julie has engaged an analytics company that uses the data gathered to identify trends and potential new market opportunities. What data role does this third-party company play? O A Data owner C) B. Data processor C) C. Data controller @ D. Data custodian Explanation Data pruessors process data for data controllers. In this scenario, Julie or a member of her staff is the data controller and the third-party organization is a processor. They do not own the data, and they are not custodians who are responsible for the data on an ongoing basis. QUESTION CONTENT FEEDBACK 21 of 227 PREVIOUS N EXT",
+      "prompt": "As part of her organization's marketing efforts, Julie's team gathers information about customers and others who visit their website. Julie has engaged an analytics company that uses the data gathered to identify trends and potential new market opportunities. What data role does this third-party company play?",
+      "choices": {
+        "A": "Data owner",
+        "B": "Data processor",
+        "C": "Data controller",
+        "D": "Data custodian"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Data processors process data for data controllers. In this scenario, Julie or a member of her staff is the data controller and the third-party organization is a processor. They do not own the data, and they are not custodians who are responsible for the data on an ongoing basis.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 04-53-46 Question 27 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-20 at 04-53-46 Question 27 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 27,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect What does a data steward do? O A Create data. O B. Carry out data use and security policies. O C. Explain compliance requirements for data. @ D. Oversee data throughout its life cycle. Explanation Data stewards are responsible for the data in their charge. That means they carry out data usage and security policies and ensure that data is handled appropriately. Creating data is typically done by data owners, who also explain and set data security policies. Multiple roles QUESTION 27 of 227 oversee data throughout its life cycle, not just a data steward. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "What does a data steward do?",
+      "choices": {
+        "A": "Create data.",
+        "B": "Carry out data use and security policies.",
+        "C": "Explain compliance requirements for data.",
+        "D": "Oversee data throughout its life cycle."
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Data stewards are responsible for the data in their charge. That means they carry out data usage and security policies and ensure that data is handled appropriately. Creating data is typically done by data owners, who also explain and set data security policies. Multiple roles oversee data throughout its life cycle, not just a data steward.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 04-55-43 Question 29 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-20 at 04-55-43 Question 29 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 29,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Colleen's organization has deployed web application firewalls (WAFs) to protect their web services from being impacted by a known SQL injection attack. What risk management strategy has the organization adopted? O A Transfer C) B. Accept C) C. Avoid @ D. Mitigate Explanation QUESTION 29 of 227 Avoidance seeks to prevent the risk from ucurring. In this case, the WAF is a method of preventing the attack, thus avoiding the risk. Risk transfer options move the costs of risks to another organization such as through insurance. Acceptance involves management acknowledging that the risk and its impacts may occur and that the organization will move fomard despite that chance. Mitigation works to limit the impact of a risk. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Colleen's organization has deployed web application firewalls (WAFs) to protect their web services from being impacted by a known SQL injection attack. What risk management strategy has the organization adopted?",
+      "choices": {
+        "A": "Transfer",
+        "B": "Accept",
+        "C": "Avoid",
+        "D": "Mitigate"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Avoidance seeks to prevent the risk from occurring. In this case, the WAF is a method of preventing the attack, thus avoiding the risk. Risk transfer options move the costs of risks to another organization such as through insurance. Acceptance involves management acknowledging that the risk and its impacts may occur and that the organization will move forward despite that chance. Mitigation works to limit the impact of a risk.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 04-59-00 Question 34 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-20 at 04-59-00 Question 34 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 34,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Jill's organization has selected Agile with a CI/CD process for their organization. What type of policy would document this selection? @ A. Business continuity O B. Disaster recovery C) C. Incident response C) D. Software development life cycle Explanation Agile, along with continuous integration/continuous delivery (CI/CD) pipelines, describes a software development life cycle. Business continuity, disaster recovery, and incident response policies may mention the Agile process and impacts on the CI/CD pipeline, but it is not QUESTION 34 of 227 the primary fuus of those types of policies. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Jill's organization has selected Agile with a CI/CD process for their organization. What type of policy would document this selection?",
+      "choices": {
+        "A": "Business continuity",
+        "B": "Disaster recovery",
+        "C": "Incident response",
+        "D": "Software development life cycle"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Agile, along with continuous integration/continuous delivery (CI/CD) pipelines, describes a software development life cycle. Business continuity, disaster recovery, and incident response policies may mention the Agile process and impacts on the CI/CD pipeline, but it is not the primary fuus of those types of policies.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 05-00-57 Question 36 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-20 at 05-00-57 Question 36 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 36,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Liz wants to assess the critical functions of her business and ensure that the systems that are part of those functions are assessed to determine how often they are likely to fail, how long it would take to restore them, and what recovery objectives will be. What process should she engage in? C) A A quantitative risk assessment B. A business impact analysis @ C. A qualitative risk assessment C) D. A penetration test Explanation A business impact analysis (BIA) is a formal process used to identify mission-critical functions and to ensure that critical systems that support those functions are identified and assessed. Risk assessment seeks to identify risks and their probability and impact, and a penetration test attempts to emulate how attackers might gain access to or otherwise impact systems and services. QUESTION CONTENT FEEDBACK 36 of 227 PREVIOUS N EXT",
+      "prompt": "Liz wants to assess the critical functions of her business and ensure that the systems that are part of those functions are assessed to determine how often they are likely to fail, how long it would take to restore them, and what recovery objectives will be. What process should she engage in?",
+      "choices": {
+        "A": "A quantitative risk assessment",
+        "B": "A business impact analysis",
+        "C": "A qualitative risk assessment",
+        "D": "A penetration test"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "A business impact analysis (BIA) is a formal process used to identify mission-critical functions and to ensure that critical systems that support those functions are identified and assessed. Risk assessment seeks to identify risks and their probability and impact, and a penetration test attempts to emulate how attackers might gain access to or otherwise impact systems and services.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 05-01-54 Question 38 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-20 at 05-01-54 Question 38 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 38,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Sophie wants to ensure that her vendor meets their SLA. What does Sophie need to do? O A Ensure performance targets are defined in the contract with appropriate penalties. @ B. Establish key performance indicators (KPIs) for her team and assess them regularly. O C. Ensure that security levels are not reduced when performing maintenance. O D. Determine if supply chain levels are met in order to meet demand. Explanation QUESTION 38 of 227 Service level agreements set forth the expected service level as well as penalties for nonperformance. That means that Sophie needs to determine whether her vendor is meeting their promised delivery levels or availability levels and to claim appropriate penalties as defined in the contract if they are not met. KPIs may be involved but would be measured against her vendors performanca not her team's performance. Security levels and supply chain availability levels are not the only potential items covered by an SLA. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Sophie wants to ensure that her vendor meets their SLA. What does Sophie need to do?",
+      "choices": {
+        "A": "Ensure performance targets are defined in the contract with appropriate penalties.",
+        "B": "Establish key performance indicators (KPIs) for her team and assess them regularly.",
+        "C": "Ensure that security levels are not reduced when performing maintenance.",
+        "D": "Determine if supply chain levels are met in order to meet demand."
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Service level agreements set forth the expected service level as well as penalties for nonperformance. That means that Sophie needs to determine whether her vendor is meeting their promised delivery levels or availability levels and to claim appropriate penalties as defined in the contract if they are not met. KPIs may be involved but would be measured against her vendors performanca not her team's performance. Security levels and supply chain availability levels are not the only potential items covered by an SLA.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 05-05-59 Question 41 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-20 at 05-05-59 Question 41 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 41,
+      "image_width": 1349,
+      "image_height": 690,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight Correct aeth is a data owner in her company. Which of the following is not a typical part of the role of data owner? C) A They categorize data. @ B. They are responsible for processing data. C) C. They are responsible for protecting data. C) D. They are responsible for data quality. Explanation Overs\" Time spent: QUESTION 41 of 227 Data owners are responsible for categorizing, overseeing the usage of, and protecting data, but are typically not directly responsible for processing it. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Beth is a data owner in her company. Which of the following is not a typical part of the role of data owner?",
+      "choices": {
+        "A": "They categorize data.",
+        "B": "They are responsible for processing data.",
+        "C": "They are responsible for protecting data.",
+        "D": "They are responsible for data quality."
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Overs\" Time spent: Data owners are responsible for categorizing, overseeing the usage of, and protecting data, but are typically not directly responsible for processing it.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 05-10-35 Question 43 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-20 at 05-10-35 Question 43 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 43,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect The company that Leon works for has experienced a significant malware infection and has segmented their network to prevent further spread. What risk mitigation strategy have they chosen? C) A Avoid @ B. Transfer C) C. Accept O D. Mitigate Explanation Mitigation works to limit the impact of a risk, such as by taking action like segmenting the network to prevent further malware spread. Avoidance seeks to prevent the risk from ucurring. Risk transfer options move the costs of risks to another organization such as through insurance. Acceptance involves management acknowledging that the risk and its impacts may occur, and that the organization will move forward despite that chance. QUESTION CONTENT FEEDBACK 43 of 227 PREVIOUS N EXT",
+      "prompt": "The company that Leon works for has experienced a significant malware infection and has segmented their network to prevent further spread. What risk mitigation strategy have they chosen?",
+      "choices": {
+        "A": "Avoid",
+        "B": "Transfer",
+        "C": "Accept",
+        "D": "Mitigate"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Mitigation works to limit the impact of a risk, such as by taking action like segmenting the network to prevent further malware spread. Avoidance seeks to prevent the risk from occurring. Risk transfer options move the costs of risks to another organization such as through insurance. Acceptance involves management acknowledging that the risk and its impacts may occur, and that the organization will move forward despite that chance.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 05-14-20 Question 46 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-20 at 05-14-20 Question 46 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 46,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Jack recently joined his organization's security team. A system was identified as likely being impacted by ransomware, and Jack was given a document that described the organization's ransomware handling practices. What common security document has he been given? A The IR policy @ B. A ransomware cookbook O C. A ransomware playbook C) D. A disaster recovery handbook Explanation Detailed guides to organization practices for security events are called playbooks. In this case, Jack received the organization's ransomware playbook. A policy would include high-level statements of intent, cookbooks are not a typical term used for documents like these, and this situation involves ransomware, not a disaster recovery scenario. QUESTION CONTENT FEEDBACK 46 of 227 PREVIOUS N EXT",
+      "prompt": "Jack recently joined his organization's security team.",
+      "choices": {
+        "A": "The IR policy",
+        "B": "A ransomware cookbook",
+        "C": "A ransomware playbook",
+        "D": "A disaster recovery handbook"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Detailed guides to organization practices for security events are called playbooks. In this case, Jack received the organization's ransomware playbook. A policy would include high-level statements of intent, cookbooks are not a typical term used for documents like these, and this situation involves ransomware, not a disaster recovery scenario.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 02-31-04 Question 56 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 02-31-04 Question 56 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 56,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect The company that Omar works for wants to co-develop a mobile application with a third-party company. What type of agreement should they both sign as part of this? O A An SLA O B. An NDA @ c. An MSA O D.A8PA Explanation 8PAs, or business partners agreements, are used when two organizations want to do business as a partnership. SLAs, or service level agreements, determine service levels and penalties if they are not met. Nondisclosure agreements, or NDAs, are used to protect sensitive data. Master service agreements, or MSAs, are foundational documents determining how organizations will work together as a foundation for specific work covered in SOWS, or statements of work. QUESTION CONTENT FEEDBACK 56 of 227 PREVIOUS N EXT",
+      "prompt": "The company that Omar works for wants to co-develop a mobile application with a third-party company. What type of agreement should they both sign as part of this?",
+      "choices": {
+        "A": "An SLA",
+        "B": "An NDA",
+        "C": "An MSA",
+        "D": "A BPA"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "BPAs, or business partners agreements, are used when two organizations want to do business as a partnership. SLAs, or service level agreements, determine service levels and penalties if they are not met. Nondisclosure agreements, or NDAs, are used to protect sensitive data. Master service agreements, or MSAs, are foundational documents determining how organizations will work together as a foundation for specific work covered in SOWS, or statements of work.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 02-31-33 Question 57 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 02-31-33 Question 57 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 57,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Alex wants to hire a penetration tester who will simulate an attackers potential attacks against his environment. What type of test best fits this model? @ A A partially known environment test O B. An unknown environment test O C. A known environment test C) D. A third-party test Explanation Unknown environment tests simulate what an attacker would encounter and do not provide irformation; instead, the testers have to discover it themselves. Known environment tests provide full information to testers, allowing them to use information about the environment without having to discover it. Partially known environment tests provide some, but not all information about the environment for testers. Third-party tests are conducted by external groups or individuals and may be known, unknown, or partial knowledge tests. QUESTION CONTENT FEEDBACK 57 of 227 PREVIOUS N EXT",
+      "prompt": "Alex wants to hire a penetration tester who will simulate an attackers potential attacks against his environment. What type of test best fits this model?",
+      "choices": {
+        "A": "A partially known environment test",
+        "B": "An unknown environment test",
+        "C": "A known environment test",
+        "D": "A third-party test"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Unknown environment tests simulate what an attacker would encounter and do not provide information; instead, the testers have to discover it themselves. Known environment tests provide full information to testers, allowing them to use information about the environment without having to discover it. Partially known environment tests provide some, but not all information about the environment for testers. Third-party tests are conducted by external groups or individuals and may be known, unknown, or partial knowledge tests.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-02-51 Question 66 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-02-51 Question 66 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 66,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect How is exposure factor (EF) expressed for risk calculations? C) A As a calculation of the ALE multiplied by the ARO B. As the likelihood of loss O C. As a potential percentage of loss @ D. As a calculation of the SLE multiplied by the ARO Explanation QUESTION 66 of 227 Exposure factors are the percentage of value of an asset that would be lost due to an incident. ALE is the annual loss expectancy, and the ARO is the annual rate of occurrence. SLE is the single loss expectancy. Calculating these gives the cost of an incident, but EF is the impact of the risk and is not calculated using these, nor does it involve the likelihood of the risk. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "How is exposure factor (EF) expressed for risk calculations?",
+      "choices": {
+        "A": "As a calculation of the ALE multiplied by the ARO",
+        "B": "As the likelihood of loss",
+        "C": "As a potential percentage of loss",
+        "D": "As a calculation of the SLE multiplied by the ARO"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Exposure factors are the percentage of value of an asset that would be lost due to an incident. ALE is the annual loss expectancy, and the ARO is the annual rate of occurrence. SLE is the single loss expectancy. Calculating these gives the cost of an incident, but EF is the impact of the risk and is not calculated using these, nor does it involve the likelihood of the risk.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-04-45 Question 68 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-04-45 Question 68 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 68,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Valerie's organization wants to ensure that their access control vestibule, ID card system, and guards are effective in stopping unwanted entrance. What type of penetration test should she use to validate this? @ A. Physical C) B. Offensive O C. Defensive D. Integrated Explanation Integrated penetration testing combines both offensive and defensive penetration testing, and testing guards as well as attempting to make it through access controls is an example of an integrated test. Physical security testing involves testing an organization's physical security defenses and practices, including guards, locks and doors, and other physical security components like access control vestibules. Offensive penetration testing involves acting like attackers, while defensive penetration testing seeks to learn as defenders. QUESTION CONTENT FEEDBACK 68 of 227 PREVIOUS N EXT",
+      "prompt": "Valerie's organization wants to ensure that their access control vestibule, ID card system, and guards are effective in stopping unwanted entrance. What type of penetration test should she use to validate this?",
+      "choices": {
+        "A": "Physical",
+        "B": "Offensive",
+        "C": "Defensive",
+        "D": "Integrated"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Integrated penetration testing combines both offensive and defensive penetration testing, and testing guards as well as attempting to make it through access controls is an example of an integrated test. Physical security testing involves testing an organization's physical security defenses and practices, including guards, locks and doors, and other physical security components like access control vestibules. Offensive penetration testing involves acting like attackers, while defensive penetration testing seeks to learn as defenders.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-06-02 Question 71 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-06-02 Question 71 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 71,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Alexandria wants to mitigate the risk of ransomware during its initial infection stages. Which of the following strategies should she employ? C) A Deploy an EDR tool. @ B. Purchase cybersecurity insurance. O C. use secure, ransomware-resistant backups. C) D. Continue to operate as usual. Explanation QUESTION 71 of 227 Secure, ransomware resistant backups can mitigate the impact of ransomware but cannot stop it from impacting systems like an endpoint detection and response (EDR) tool can. Since Alexandria's focus is on immediate mitigation, her best answer is EDR. Cybersecurity insurance is a means of transferring risk, and simply operating as usual is an acceptance strategy. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Alexandria wants to mitigate the risk of ransomware during its initial infection stages. Which of the following strategies should she employ?",
+      "choices": {
+        "A": "Deploy an EDR tool.",
+        "B": "Purchase cybersecurity insurance.",
+        "C": "use secure, ransomware-resistant backups.",
+        "D": "Continue to operate as usual."
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Secure, ransomware resistant backups can mitigate the impact of ransomware but cannot stop it from impacting systems like an endpoint detection and response (EDR) tool can. Since Alexandria's focus is on immediate mitigation, her best answer is EDR. Cybersecurity insurance is a means of transferring risk, and simply operating as usual is an acceptance strategy.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-14-35 Question 84 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-14-35 Question 84 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 84,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Jaime wants to establish her organization's change management policy. What should the policy include? O A High-level descriptions of how the organization will review, approve, and implement proposed changes @ B. A detailed process for review and approval of changes O C. Descriptions of how a change request should be created, formatted, reviewed, and approved O D. An outline of the regulatory requirements for changes Explanation Policies are high-level descriptions of an organization's intent and understanding of their topic. Procedures will have descriptions of how a change is made in detailed form, while standards will describe how changes are created, made, and approved. Regulatory requirements are QUESTION 84 of 227 most likely to be part of standards or CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Jaime wants to establish her organization's change management policy. What should the policy include?",
+      "choices": {
+        "A": "High-level descriptions of how the organization will review, approve, and implement proposed changes",
+        "B": "A detailed process for review and approval of changes",
+        "C": "Descriptions of how a change request should be created, formatted, reviewed, and approved",
+        "D": "An outline of the regulatory requirements for changes"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Policies are high-level descriptions of an organization's intent and understanding of their topic. Procedures will have descriptions of how a change is made in detailed form, while standards will describe how changes are created, made, and approved. Regulatory requirements are most likely to be part of standards or",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-16-53 Question 86 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-16-53 Question 86 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 86,
+      "image_width": 1349,
+      "image_height": 743,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight QUESTION 86 of 227 O Incorrect What is the key difference between a business continuity plan and a business continuity policy? A. The plan describes how an organization will respond, whereas the policy outlines the high-level intent of the organization's business o continuity efforts. 8. The plan includes detailed steps for each part of the response, including how to restore systems and investigate issues, whereas the policy outlines the high-level intent of the organization's business continuity efforts. C. The plan describes the high-level intent of the organization's business continuity efforts, whereas the incident response policy o describes how the organization will respond. O D. They are the same; the terms are interchangeable. Explanation Business continuity plans address how the organization will respond, including referencing runbooks that may detail how to handle restoration or other efforts on a step-by-step basis, but doesn't itself include that level of detail. Business continuity policies describe the organization's intent at a high level and are likely to reference the business continuity plan. They are not the same, as the policy is a higher- level than the plan is. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "What is the key difference between a business continuity plan and a business continuity policy?",
+      "choices": {
+        "A": "The plan describes how an organization will respond, whereas the policy outlines the high-level intent of the organization's business continuity efforts.",
+        "B": "The plan includes detailed steps for each part of the response, including how to restore systems and investigate issues, whereas the policy outlines the high-level intent of the organization's business continuity efforts.",
+        "C": "The plan describes the high-level intent of the organization's business continuity efforts, whereas the incident response policy describes how the organization will respond.",
+        "D": "They are the same; the terms are interchangeable."
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Business continuity plans address how the organization will respond, including referencing runbooks that may detail how to handle restoration or other efforts on a step-by-step basis, but doesn't itself include that level of detail. Business continuity policies describe the organization's intent at a high level and are likely to reference the business continuity plan. They are not the same, as the policy is a higher- level than the plan is.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-28-08 Question 90 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-28-08 Question 90 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 90,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Gary wants to determine the probability of a risk occurring. What should he base his assessment on if he is performing a qualitative risk assessment? @ A. A calculated rate of occurrence using industry statistical data O B. A rating from an experienced team of staff O C. The number of times it has happened to their competitors in a year O D. Actuarial tables provided by his insurance broker Explanation Qualitative risk assessment relies on expertise and staff members who have relevant knowledge to provide a rating based on their experience, skills, and knowledge. A common rating for probability in a qualitative risk assessment might be low, medium, or high, rather than a 0\u2014100 rating based on statistics or large datasets. QUESTION CONTENT FEEDBACK 90 of 227 PREVIOUS N EXT",
+      "prompt": "Gary wants to determine the probability of a risk occurring. What should he base his assessment on if he is performing a qualitative risk assessment?",
+      "choices": {
+        "A": "A calculated rate of occurrence using industry statistical data",
+        "B": "A rating from an experienced team of staff",
+        "C": "The number of times it has happened to their competitors in a year",
+        "D": "Actuarial tables provided by his insurance broker"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Qualitative risk assessment relies on expertise and staff members who have relevant knowledge to provide a rating based on their experience, skills, and knowledge. A common rating for probability in a qualitative risk assessment might be low, medium, or high, rather than a 0-100 rating based on statistics or large datasets.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-29-52 Question 92 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-29-52 Question 92 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 92,
+      "image_width": 1349,
+      "image_height": 778,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Maeve is preparing to sign a penetration testing contract with a third-party security service provider. The security service provider provides a questionnaire that asks the scope of systems that can and cannot be tested, the schedule and times that penetration testing can and cannot occur, and what to do if a preexisting compromise is discovered. What document is the third-party service provider assembling? C) A Aright-to-audit clause O B. A service-level agreement @ C. A memorandum of understanding C) D. Rules of engagement Explanation Rules of engagement are created for penetration testing efforts that include a wide variety of information, including scope, schedules, what to do if a preexisting compromise is discovered, requirements for how to handle third-party-hosted tools and environments, how sensitive data and data related to the penetration test will be handled, and who to contact in emergencies. A right-to-audit clause is included in contracts, allowing audits to occur as part of the contract. SLAS are used to set service levels and penalties if they are not met, and MOUs document organizations' interest and willingness to work together. QUESTION CONTENT FEEDBACK 92 of 227 PREVIOUS N EXT",
+      "prompt": "Maeve is preparing to sign a penetration testing contract with a third-party security service provider. The security service provider provides a questionnaire that asks the scope of systems that can and cannot be tested, the schedule and times that penetration testing can and cannot occur, and what to do if a preexisting compromise is discovered. What document is the third-party service provider assembling?",
+      "choices": {
+        "A": "Aright-to-audit clause",
+        "B": "A service-level agreement",
+        "C": "A memorandum of understanding",
+        "D": "Rules of engagement"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Rules of engagement are created for penetration testing efforts that include a wide variety of information, including scope, schedules, what to do if a preexisting compromise is discovered, requirements for how to handle third-party-hosted tools and environments, how sensitive data and data related to the penetration test will be handled, and who to contact in emergencies. A right-to-audit clause is included in contracts, allowing audits to occur as part of the contract. SLAS are used to set service levels and penalties if they are not met, and MOUs document organizations' interest and willingness to work together.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-30-35 Question 93 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-30-35 Question 93 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 93,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight Overall Time Spent: 01 O Incorrect Alaina wants to describe the level of impact and probability where her organization will either accept or attempt to mitigate or otherwise handle a risk at. What term describes this? A Risk threshold B. Ad hoc risk level O C. Third-party risk level @ D. Risk appetite Explanation QUESTION 93 of 227 An organization's risk threshold is the level where they will switch from accepting a risk to seeking to handle the risk. Their risk appetite is the amount of risk an organization is willing to accept to achieve its goals. Ad hoc risk level and third-party risk level were made up for this question. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Alaina wants to describe the level of impact and probability where her organization will either accept or attempt to mitigate or otherwise handle a risk at. What term describes this?",
+      "choices": {
+        "A": "Risk threshold",
+        "B": "Ad hoc risk level",
+        "C": "Third-party risk level",
+        "D": "Risk appetite"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "An organization's risk threshold is the level where they will switch from accepting a risk to seeking to handle the risk. Their risk appetite is the amount of risk an organization is willing to accept to achieve its goals. Ad hoc risk level and third-party risk level were made up for this question.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-31-00 Question 94 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-31-00 Question 94 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 94,
+      "image_width": 1349,
+      "image_height": 670,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Alaina has been asked to create an ALIP for her organization. Which ofthe following should she include? @ A. An access and usage policy that lists times and roles allowed to access specific resources O B. A document that describes how the organization intends to approach change and related functions O C. An antivirus (AV) update policy that describes when and how AV updates are deployed O D. A description of acceptable use by organizational users Explanation Overall Time Spent: 01:41100 QUESTION 94 of 227 ALIPs, or acceptable use policies, describe how organizational resources, systems, and services can and should be used. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Alaina has been asked to create an AUP for her organization. Which ofthe following should she include?",
+      "choices": {
+        "A": "An access and usage policy that lists times and roles allowed to access specific resources",
+        "B": "A document that describes how the organization intends to approach change and related functions",
+        "C": "An antivirus (AV) update policy that describes when and how AV updates are deployed",
+        "D": "A description of acceptable use by organizational users"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Overall Time Spent: 01:41100 AUPs, or acceptable use policies, describe how organizational resources, systems, and services can and should be used.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-31-53 Question 96 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-31-53 Question 96 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 96,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect What type of agreement do organizations create after signing an MSA that describes the specific tasks or deliverables that will be created or performed? @ A AMOU O B. A SOW C. A punch list O D.A8PA Explanation A statement of work (SOW) or work order (WO) is created to list the tasks and deliverables that will be performed under the blanket master services agreement (MSA). An MOU, or memorandum of understanding, declares how two organizations want to work together; a business partners agreement (BPA) establishes a partnership between two organizations; and punch lists are not covered under the Security* exam outline but are a list of tasks that must be accomplished for a contractor to be paid. QUESTION CONTENT FEEDBACK 96 of 227 PREVIOUS N EXT",
+      "prompt": "What type of agreement do organizations create after signing an MSA that describes the specific tasks or deliverables that will be created or performed?",
+      "choices": {
+        "A": "AMOU",
+        "B": "A SOW",
+        "C": "A punch list",
+        "D": "ABPA"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "A statement of work (SOW) or work order (WO) is created to list the tasks and deliverables that will be performed under the blanket master services agreement (MSA). An MOU, or memorandum of understanding, declares how two organizations want to work together; a business partners agreement (BPA) establishes a partnership between two organizations; and punch lists are not covered under the Security+ exam outline but are a list of tasks that must be accomplished for a contractor to be paid.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-45-50 Question 99 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-45-50 Question 99 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 99,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Melissa's organization wants to establish a metric that defines how much data could be lost if an issue occurs. What should they set? O A An RTO @ B. An MTTR O C. An RPO O D. An MTBF Explanation A recovery point objective, or RPO, describes how much data can be lost in the event of an outage or issue. A recovery time objective, or RTO, is set by organizations to describe how long restoring systems or services to normal function after a disruption can take. Mean time to repair, or MTTR, is the average time it takes to repair a system or device. The mean time between failures (MTBF) is a measure of the reliability of a system. It is the expected amount of time that will elapse between system failures. QUESTION CONTENT FEEDBACK 99 of 227 PREVIOUS N EXT",
+      "prompt": "Melissa's organization wants to establish a metric that defines how much data could be lost if an issue occurs. What should they set?",
+      "choices": {
+        "A": "An RTO",
+        "B": "An MTTR",
+        "C": "An RPO",
+        "D": "An MTBF"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "A recovery point objective, or RPO, describes how much data can be lost in the event of an outage or issue. A recovery time objective, or RTO, is set by organizations to describe how long restoring systems or services to normal function after a disruption can take. Mean time to repair, or MTTR, is the average time it takes to repair a system or device. The mean time between failures (MTBF) is a measure of the reliability of a system. It is the expected amount of time that will elapse between system failures.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-52-08 Question 102 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-52-08 Question 102 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 102,
+      "image_width": 1349,
+      "image_height": 778,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Overall Time Spent: Chapter 5: Domain 5.0: Security Program Management and Oversight Olivia's organization operates servers in a datacenter that support customers across the country. As Olivia is determining her service level agreements, what information is most important in determining how quickly a server can be restored to operation if its motherboard fails? O A An RTO O B. An MTTR @ C. An RPO O D. An MTBF Explanation Mean time to repair, or MTTR, is the average time it takes to repair a system or device, and Olivia needs to know that to determine what she can promise in her service level agreements that rely on server repair timelines. A recovery time objective, or RTO, is set by organizations to describe how long restoring systems or services to normal function after a disruption can take; it doesn't determine how fast the server can be fixed but sets a goal that needs to take things like repair and recovery time into account as it is determined. A recovery point objective, or RPO, describes how much data can be lost in the event of an outage or issue, and the mean time between failures (MTBF) is a measure of the reliability of a system. It is the expected amount of time that will elapse between system failures. QUESTION CONTENT FEEDBACK 102 of 227 PREVIOUS N EXT",
+      "prompt": "Management and Oversight Olivia's organization operates servers in a datacenter that support customers across the country. As Olivia is determining her service level agreements, what information is most important in determining how quickly a server can be restored to operation if its motherboard fails?",
+      "choices": {
+        "A": "An RTO",
+        "B": "An MTTR",
+        "C": "An RPO",
+        "D": "An MTBF"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Mean time to repair, or MTTR, is the average time it takes to repair a system or device, and Olivia needs to know that to determine what she can promise in her service level agreements that rely on server repair timelines. A recovery time objective, or RTO, is set by organizations to describe how long restoring systems or services to normal function after a disruption can take; it doesn't determine how fast the server can be fixed but sets a goal that needs to take things like repair and recovery time into account as it is determined. A recovery point objective, or RPO, describes how much data can be lost in the event of an outage or issue, and the mean time between failures (MTBF) is a measure of the reliability of a system. It is the expected amount of time that will elapse between system failures.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-54-07 Question 103 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-54-07 Question 103 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 103,
+      "image_width": 1349,
+      "image_height": 778,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "overall Time spent: Chapter 5: Domain 5.0: Security Program Management and Oversight Irina's organization wants to work with one of their vendors and wishes to establish an ongoing relationship with them. What type of agreement should they create between the organizations so that they can create SOWS as they determine what services they need from their service provider's organization? O A An MOU @ B.AnSl_A O c. An MSA O D.A8PA Explanation The underlying agreement between two organizations that determines how the organizations will work together is a master services agreement (MSA). A MOLI, or memorandum of understanding, declares how two organizations want to work together; a business partners agreement (BPA) establishes a partnership between two organizations; SLAS (service level agreements) set service level expectations and penalties if they are not met; and a business partners agreement (8PA) establishes two organizations as partners rather than establishing a working relationship for services as set forth in SOWS. QUESTION CONTENT FEEDBACK 103 of 227 PREVIOUS N EXT",
+      "prompt": "Management and Oversight Irina's organization wants to work with one of their vendors and wishes to establish an ongoing relationship with them. What type of agreement should they create between the organizations so that they can create SOWS as they determine what services they need from their service provider's organization?",
+      "choices": {
+        "A": "An MOU",
+        "B": "An SLA",
+        "C": "An MSA",
+        "D": "A BPA"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "The underlying agreement between two organizations that determines how the organizations will work together is a master services agreement (MSA). A MOU, or memorandum of understanding, declares how two organizations want to work together; a business partners agreement (BPA) establishes a partnership between two organizations; SLAS (service level agreements) set service level expectations and penalties if they are not met; and a business partners agreement (BPA) establishes two organizations as partners rather than establishing a working relationship for services as set forth in SOWS.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-54-28 Question 104 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-54-28 Question 104 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 104,
+      "image_width": 1349,
+      "image_height": 760,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Dani's organization relies on journaling to help protect transactions that ucur through its database. Which of the following does journaling impact the most? @ A An RTO O B. An MTTR O C. An RPO O D. An MTBF Explanation A recovery point objective, or RPO, describes how much data can be lost in the event of an outage or issue, and journaling allows recovery of database transactions by replaying them against the database once it is restored. Journaling may slow down recovery time objectives as the actions are replayed. A recovery time objectiva or RTO, is set by organizations to describe how long restoring systems or services to normal function after a disruption can take. Mean time to repair, or MTTR, is the average time it takes to repair a system or device. The mean time between failures (MT8F) is a measure of the reliability of a system. It is the expected amount of time that will elapse between system failures. QUESTION CONTENT FEEDBACK 104 of 227 PREVIOUS N EXT",
+      "prompt": "Dani's organization relies on journaling to help protect transactions that occur through its database. Which of the following does journaling impact the most?",
+      "choices": {
+        "A": "An RTO",
+        "B": "An MTTR",
+        "C": "An RPO",
+        "D": "An MTBF"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "A recovery point objective, or RPO, describes how much data can be lost in the event of an outage or issue, and journaling allows recovery of database transactions by replaying them against the database once it is restored. Journaling may slow down recovery time objectives as the actions are replayed. A recovery time objectiva or RTO, is set by organizations to describe how long restoring systems or services to normal function after a disruption can take. Mean time to repair, or MTTR, is the average time it takes to repair a system or device. The mean time between failures (MTBF) is a measure of the reliability of a system. It is the expected amount of time that will elapse between system failures.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 03-55-39 Question 105 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 03-55-39 Question 105 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 105,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Henrys organization has set their RTOto 12 hours. What does this mean? C) A Outages must be less than 6 hours long. O B. Recovery from outages should take less than 12 hours. @ C. Outages longer than 12 hours will require fail overto a warm site. O D. SLAS for third-party services should specify a 12 hour MTBF. Explanation Overall Time spent: QUESTION 105 of 227 A recovery time objective, or RTO, is set by organizations to describe how long restoring systems or services to normal function after a disruption can take. A 12-hour RTO means that recovery from outages should take less than 12 hours. Failing over to a warm site will typically take a while, meaning that starting to fail over after 12 hours will miss the RTO, and MTBF is the mean time between failures, not a recovery timeframe. Failing every 12 hours on average would be unacceptable for almost any technical service or system! CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Henry's organization has set their RTOto 12 hours. What does this mean?",
+      "choices": {
+        "A": "They have a 12-hour MTBF.",
+        "B": "Recovery from outages should take less than 12 hours.",
+        "C": "Outages longer than 12 hours will require failover to a warm site.",
+        "D": "SLAs for third-party services should specify 12 hours of recovery time."
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Overall Time spent: A recovery time objective, or RTO, is set by organizations to describe how long restoring systems or services to normal function after a disruption can take. A 12-hour RTO means that recovery from outages should take less than 12 hours. Failing over to a warm site will typically take a while, meaning that starting to fail over after 12 hours will miss the RTO, and MTBF is the mean time between failures, not a recovery timeframe. Failing every 12 hours on average would be unacceptable for almost any technical service or system!",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 04-02-20 Question 108 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 04-02-20 Question 108 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 108,
+      "image_width": 1349,
+      "image_height": 688,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect What organizational document is used to enumerate and rate an organization's risks? C) A A risk appetite plan C) B. A risk register O C. A quantitative register @ D. A qualitative assessment report Explanation Oversll Time spent: QUESTION 108 of 227 Risk registers list organizations risks and their ratings, along with additional information that the organization uses to track or describe risks. Risk appetite plans, quantitative registers, and qualitative assessment reports were made up for this question. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "What organizational document is used to enumerate and rate an organization's risks?",
+      "choices": {
+        "A": "A risk appetite plan",
+        "B": "A risk register",
+        "C": "A quantitative register",
+        "D": "A qualitative assessment report"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Oversll Time spent: Risk registers list organizations risks and their ratings, along with additional information that the organization uses to track or describe risks. Risk appetite plans, quantitative registers, and qualitative assessment reports were made up for this question.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 04-07-58 Question 112 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 04-07-58 Question 112 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 112,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Jeremy knows that his customer data is worth $500,000, and that the value of the data would be reduced by 25 percent if it was exposed. What is the SLE for this data? O A 525,000 O B. S125,ooo O c. S250,ooo @ D. $375,000 Explanation Single loss expectancy, or SLE, is calculated by multiplying the asset value (AV) by the exposure factor (EF). In this case, that means that the QUESTION 1120f227 potential loss during a loss event would be 5125,01N. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Jeremy knows that his customer data is worth $500,000, and that the value of the data would be reduced by 25 percent if it was exposed. What is the SLE for this data?",
+      "choices": {
+        "A": "$25,000",
+        "B": "$125,000",
+        "C": "$250,000",
+        "D": "$375,000"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Single loss expectancy, or SLE, is calculated by multiplying the asset value (AV) by the exposure factor (EF). In this case, that means that the QUESTION 1120f227 potential loss during a loss event would be 5125,01N.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 04-10-49 Question 114 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 04-10-49 Question 114 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 114,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Waylon is charged with ensuring that risks related to customer data used as part of his organization's primary application are managed appropriately. What is his role? O A Board member C) B. Data processor @ C. Auditor D. Risk owner Explanation Waylon is a risk owner. He is responsible for ensuring that the risks related to data and the application are managed appropriately. Board members have overall responsibility for an organization. Data processors have a data role, not a risk ownership role, and auditors assess organizations against standards and practices rather than owning risk. QUESTION CONTENT FEEDBACK 114 of227 PREVIOUS N EXT",
+      "prompt": "Waylon is charged with ensuring that risks related to customer data used as part of his organization's primary application are managed appropriately. What is his role?",
+      "choices": {
+        "A": "Board member",
+        "B": "Data processor",
+        "C": "Auditor",
+        "D": "Risk owner"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Waylon is a risk owner. He is responsible for ensuring that the risks related to data and the application are managed appropriately. Board members have overall responsibility for an organization. Data processors have a data role, not a risk ownership role, and auditors assess organizations against standards and practices rather than owning risk.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 04-52-55 Question 122 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 04-52-55 Question 122 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 122,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect The type and scope of testing, client contact details, how sensitive data will be handled, and the type and frequency of status meetings and reports are all common elements of what artifact of a penetration test? C) A The unknown environment (black-box) outline O B. The rules of engagement @ C. The known environment (white-box) outline C) D. The close-out report Explanation The rules of engagement for a penetration test typically include the type and scope of testing, client contact information and requirements for when the team should be notified, sensitive data handling requirements, and details of regular status meetings and reports. The remaining options were made up for this question. QUESTION CONTENT FEEDBACK 122 of 227 PREVIOUS N EXT",
+      "prompt": "The type and scope of testing, client contact details, how sensitive data will be handled, and the type and frequency of status meetings and reports are all common elements of what artifact of a penetration test?",
+      "choices": {
+        "A": "The unknown environment (black-box) outline",
+        "B": "The rules of engagement",
+        "C": "The known environment (white-box) outline",
+        "D": "The close-out report"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "The rules of engagement for a penetration test typically include the type and scope of testing, client contact information and requirements for when the team should be notified, sensitive data handling requirements, and details of regular status meetings and reports. The remaining options were made up for this question.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 04-57-22 Question 128 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 04-57-22 Question 128 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 128,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Caroline has been asked to find an international standard to guide her company's choices in implementing information security management systems. Which of the following would be the best choice for her? O A \u2022SO 27002 @ B. 27701 O C. NIST800-12 O D. NIST 800-53 Explanation QUESTION 128 of 227 Caroline should select ISO 27002. ISO 27002 is an international standard for implementing and maintaining information security systems. ISO 27701 is an international standard security technique for privaoy information management systems; NIST 800-12 is a general security standard and it is a LIS standard, not an international one; and NIST 800-53 is a collection of security and privacy controls for information systems and organizations. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Caroline has been asked to find an international standard to guide her company's choices in implementing information security management systems. Which of the following would be the best choice for her?",
+      "choices": {
+        "A": "ISO 27002",
+        "B": "ISO 27701",
+        "C": "NIST 800-12",
+        "D": "NIST 800-53"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Caroline should select ISO 27002. ISO 27002 is an international standard for implementing and maintaining information security systems. ISO 27701 is an international standard security technique for privacy information management systems; NIST 800-12 is a general security standard and it is a LIS standard, not an international one; and NIST 800-53 is a collection of security and privacy controls for information systems and organizations.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 05-00-29 Question 132 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 05-00-29 Question 132 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 132,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Which of the following techniques attempts to predict the likelihood a threat will occur and assigns monetary values should a loss occur? C) A Change management @ B. Vulnerability assessment O C. Qualitative risk assessment C) D. Quantitative risk assessment Explanation Quantitative risk assessment is the process of assigning numerical values to the probability an event will occur and what the impact of the event will have. Change management is the pruess of managing configuration changes made to a network. Vulnerability assessment attempts to identify, quantify, and rank the weaknesses in a system. Qualitative risk assessment is the pruess of ranking which risk poses the most danger using ratings like low, medium, and high. QUESTION CONTENT FEEDBACK 132 of 227 PREVIOUS N EXT",
+      "prompt": "Which of the following techniques attempts to predict the likelihood a threat will occur and assigns monetary values should a loss occur?",
+      "choices": {
+        "A": "Change management",
+        "B": "Vulnerability assessment",
+        "C": "Qualitative risk assessment",
+        "D": "Quantitative risk assessment"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Quantitative risk assessment is the process of assigning numerical values to the probability an event will occur and what the impact of the event will have. Change management is the process of managing configuration changes made to a network. Vulnerability assessment attempts to identify, quantify, and rank the weaknesses in a system. Qualitative risk assessment is the process of ranking which risk poses the most danger using ratings like low, medium, and high.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 05-03-55 Question 134 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 05-03-55 Question 134 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 134,
+      "image_width": 1349,
+      "image_height": 688,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight Oversll Time Spent: O Incorrect You have an asset that is valued at 516,000, the exposure factor of a risk affecting that asset is 35 percent, and the annualized rate of occurrence is 75 percent. What is the SLE? O A 55,600 O B. 55,000 @ c 54,200 O D. 53,000 Explanation QUESTION 134 of 227 The single loss expectancy (SLE) is the pruiuct of the asset value (Sl 6,000) and the exposure factor (.35), or 55,600. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "You have an asset that is valued at $16,000, and the exposure factor is 35%. What is the SLE?",
+      "choices": {
+        "A": "$5,600",
+        "B": "$5,000",
+        "C": "$4,200",
+        "D": "$3,000"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "The single loss expectancy (SLE) is the pruiuct of the asset value (Sl 6,000) and the exposure factor (.35), or 55,600.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 05-06-56 Question 140 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 05-06-56 Question 140 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 140,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect A security administrator is reviewing the companys continuity plan, and it specifies an RTO of four hours and an RPO of one day. Which of the following is the plan describing? O A Systems should be restored within one day and should remain operational for at least four hours. @ B. Systems should be restored within four hours and no later than one day after the incident. O C. Systems should be restored within one day and lose, at most, four hours' worth of data. O D. Systems should be restored within four hours with a loss of one days worth of data at most. Explanation Systems should be restored within four hours with a minimum loss of one days worth of data. The RTO (recovery time objective) is the amount of time within which a pruess or service must be restored after a disaster to meet business continuity. It defines how much time it takes to recover after notification of process disruption. The recovery point objective, or RPO, specifies the amount of time that can pass before the amount of data lost may exceed the organization's maximum tolerance for data loss. QUESTION CONTENT FEEDBACK of 227 PREVIOUS N EXT",
+      "prompt": "A security administrator is reviewing the company's continuity plan, and it specifies an RTO of four hours and an RPO of one day. Which of the following is the plan describing?",
+      "choices": {
+        "A": "Systems should be restored within one day and should remain operational for at least four hours.",
+        "B": "Systems should be restored within four hours and no later than one day after the incident.",
+        "C": "Systems should be restored within one day and lose, at most, four hours' worth of data.",
+        "D": "Systems should be restored within four hours with a loss of one day's worth of data at most."
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Systems should be restored within four hours with a minimum loss of one days worth of data. The RTO (recovery time objective) is the amount of time within which a process or service must be restored after a disaster to meet business continuity. It defines how much time it takes to recover after notification of process disruption. The recovery point objective, or RPO, specifies the amount of time that can pass before the amount of data lost may exceed the organization's maximum tolerance for data loss. QUESTION of 227",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 05-08-23 Question 141 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 05-08-23 Question 141 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 141,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Which of the following statements is true regarding a data retention policy? O A Regulations require financial transactions to be stored for seven years. @ B. Employees must remove and lock up all sensitive and confidential documents when not in use. O C. It describes a formal process of managing configuration changes made to a network. O D. It is a legal document that describes a mutual agreement between parties. Explanation QUESTION 141 of227 A data retention policy defines how long an organization will keep data. Removing sensitive documents not in use is a clean desk policy. A formal process for managing configuration changes is change management, and a memorandum of understanding consists of legal documents that describe mutual agreement between two parties. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Which of the following statements is true regarding a data retention policy?",
+      "choices": {
+        "A": "Regulations require financial transactions to be stored for seven years.",
+        "B": "Employees must remove and lock up all sensitive and confidential documents when not in use.",
+        "C": "It describes a formal process of managing configuration changes made to a network.",
+        "D": "It is a legal document that describes a mutual agreement between parties."
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "A data retention policy defines how long an organization will keep data. Removing sensitive documents not in use is a clean desk policy. A formal process for managing configuration changes is change management, and a memorandum of understanding consists of legal documents that describe mutual agreement between two parties.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 05-12-21 Question 144 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 05-12-21 Question 144 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 144,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect You are a server administrator for your companys private cloud. To provide service to employees, you are instructed to use reliable hard disks in the server to host a virtual environment. Which of the following best describes the reliability of hard drives? O A MTTR @ B. RPO O C. MTBF O D. ALE Explanation The mean time between failures (MT8F) is a measure of the reliability of a system or component. It is the expected amount of time that will elapse between system or device failures. MTTR (mean time to repair) is the average time it takes for a failed device or component to be repaired or replaced. An RPO (recovery point objective) is the of time a company can tolerate lost data being unrecoverable between backups. ALE (annual loss expectancy) is the product of the annual rate of ucurrence (ARO) and the single loss expectancy (SLE). QUESTION CONTENT FEEDBACK 144 of 227 PREVIOUS N EXT",
+      "prompt": "You are a server administrator for your company's private cloud. To provide service to employees, you are instructed to use reliable hard disks in the server to host a virtual environment. Which of the following best describes the reliability of hard drives?",
+      "choices": {
+        "A": "MTTR",
+        "B": "RPO",
+        "C": "MTBF",
+        "D": "ALE"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "The mean time between failures (MTBF) is a measure of the reliability of a system or component. It is the expected amount of time that will elapse between system or device failures. MTTR (mean time to repair) is the average time it takes for a failed device or component to be repaired or replaced. An RPO (recovery point objective) is the of time a company can tolerate lost data being unrecoverable between backups. ALE (annual loss expectancy) is the product of the annual rate of occurrence (ARO) and the single loss expectancy (SLE).",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-21 at 05-22-22 Question 149 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-21 at 05-22-22 Question 149 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 149,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Which of the following concepts defines a company goal for system restoration and acceptable data loss? O A MTBF @ B. MTTR O C. RPO O D. ARO Explanation RPO (recovery point objective) specifies the allowable data loss. It is the amount of time that can pass during an interruption before the quantity of data lost during that period surpasses business continuity' plannings maximum acceptable threshold. MTBF (mean time between failures) is the rating on a device or component that predicts the expected time between failures. MTTR (mean time to repair) is the average time it takes for a failed device or component to be repaired or replaced. ARO (annual rate of ucurrence) is the ratio of an estimated possibility that a threat will take place within a one-year time frame. QUESTION CONTENT FEEDBACK 149 of 227 PREVIOUS N EXT",
+      "prompt": "Which of the following concepts defines a company goal for system restoration and acceptable data loss?",
+      "choices": {
+        "A": "MTBF",
+        "B": "MTTR",
+        "C": "RPO",
+        "D": "ARO"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "RPO (recovery point objective) specifies the allowable data loss. It is the amount of time that can pass during an interruption before the quantity of data lost during that period surpasses business continuity' plannings maximum acceptable threshold. MTBF (mean time between failures) is the rating on a device or component that predicts the expected time between failures. MTTR (mean time to repair) is the average time it takes for a failed device or component to be repaired or replaced. ARO (annual rate of occurrence) is the ratio of an estimated possibility that a threat will take place within a one-year time frame.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-22 at 00-09-49 Question 153 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-22 at 00-09-49 Question 153 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 153,
+      "image_width": 849,
+      "image_height": 778,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Which of the following terms is used to measure how maintainable a system or device is? @ A. MTBF 0 8. MTTF O C. MTTR O D. MITM Explanation The mean time to repair (MTTR) for a system or devices is the average time that it will take to repair it if it fails. The MTTR is used as part of business continuity planning to determine if a system needs additional redundancy or other options put in place if a failure and repair would exceed the maximum tolerable outage. It is calculated by dividing the total maintenance time by the total number of repairs. MTBF is the mean time between failures, MTTF the mean time to failure, and MITM is an on-path attack. QUESTION CONTENT FEEDBACK 153 of 227 PREVIOUS N EXT",
+      "prompt": "Which of the following terms is used to measure how maintainable a system or device is?",
+      "choices": {
+        "A": "MTBF",
+        "B": "MTTF",
+        "C": "MTTR",
+        "D": "MITM"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "The mean time to repair (MTTR) for a system or devices is the average time that it will take to repair it if it fails. The MTTR is used as part of business continuity planning to determine if a system needs additional redundancy or other options put in place if a failure and repair would exceed the maximum tolerable outage. It is calculated by dividing the total maintenance time by the total number of repairs. MTBF is the mean time between failures, MTTF the mean time to failure, and MITM is an on-path attack.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-22 at 00-13-30 Question 155 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-22 at 00-13-30 Question 155 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 155,
+      "image_width": 849,
+      "image_height": 755,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Greg has data that is classified as health information that his organization uses as part of their company's HR data. Which of the following statements is true for his company's security policy? C) A. The health information must be encrypted. 8. Greg should review relevant law to ensure the health information is handled o properly. C. Companies are prohibited from storing health information and must o outsource to third parties. @ D. All of the above. Explanation Personal health information (PHI) may be covered by state, or federal law, and Greg's organization should ensure that they understand any applicable laws before storing, processing, or handling health information. QUESTION CONTENT FEEDBACK 155 of 227 PREVIOUS N EXT",
+      "prompt": "Greg has data that is classified as health information that his organization uses as part of their company's HR data. Which of the following statements is true for his company's security policy?",
+      "choices": {
+        "A": "The health information must be encrypted.",
+        "B": "Greg should review relevant law to ensure the health information is handled properly.",
+        "C": "Companies are prohibited from storing health information and must outsource to third parties.",
+        "D": "All of the above."
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Personal health information (PHI) may be covered by state, or federal law, and Greg's organization should ensure that they understand any applicable laws before storing, processing, or handling health information.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-22 at 00-35-03 Question 157 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-22 at 00-35-03 Question 157 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 157,
+      "image_width": 810,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Overall Time S ant: Chapter 5: Domain 5.0: Security Program Management and Oversight Isaac has been asked to write his organization's access control standards. What policy is commonly put in place for service accounts? C) A They must be issued only to system administrators. O B. They must use multifactor authentication. O C. They cannot use interactive logins. @ D. All of the above. Explanation It is common practice to prohibit interactive logins to a GLII or shell for service accounts. use of a service account for interactive logins or attempting to log in as one should be immediately flagged and alerted on as an indicator of compromise (IOC). QUESTION %CONTENT FEEDBACK 157 of 227 PREVIOUS N EXT",
+      "prompt": "Overall Time S ant: Program Management and Oversight Isaac has been asked to write his organization's access control standards. What policy is commonly put in place for service accounts?",
+      "choices": {
+        "A": "They must be issued only to system administrators.",
+        "B": "They must use multifactor authentication.",
+        "C": "They cannot use interactive logins.",
+        "D": "All of the above."
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "It is common practice to prohibit interactive logins to a GUI or shell for service accounts. use of a service account for interactive logins or attempting to log in as one should be immediately flagged and alerted on as an indicator of compromise (IOC). QUESTION % 157 of 227",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-22 at 01-17-54 Question 163 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-22 at 01-17-54 Question 163 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 163,
+      "image_width": 775,
+      "image_height": 726,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight Correct What law or regulation requires a DPO in organizations? O A. FISMA O a. COPPA O C PCl DSS @ D. GDPR Explanation The General Data Protection Regulation, or GDPR, requires a data protection officer (DPO). They oversee the organization's data protection strategy and implementation, and make sure that the organization complies with the GDPR. QUESTION CONTENT FEEDBACK 163 of 227 PREVIOUS N EXT",
+      "prompt": "What law or regulation requires a DPO in organizations?",
+      "choices": {
+        "A": "FISMA",
+        "B": "COPPA",
+        "C": "PCI DSS",
+        "D": "GDPR"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "The General Data Protection Regulation, or GDPR, requires a data protection officer (DPO). They oversee the organization's data protection strategy and implementation, and make sure that the organization complies with the GDPR.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-22 at 01-22-10 Question 167 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-22 at 01-22-10 Question 167 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 167,
+      "image_width": 1329,
+      "image_height": 688,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect What process is used to help identify critical systems? O A. ABIA @ 8. An MTBF O C. An RTO O D. An ICD Explanation A business impact analysis (81A) helps to identify critical systems by determining which systems will create the largest impact if they are not available. MTBF is the mean time between failures, an RTO is a recoverytime objective, and an ICD was made up for this question. QUESTION CONTENT FEEDBACK 167 of227 PREVIOUS N EXT",
+      "prompt": "What process is used to help identify critical systems?",
+      "choices": {
+        "A": "A BIA",
+        "B": "An MTBF",
+        "C": "An RTO",
+        "D": "An ICD"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "A business impact analysis (81A) helps to identify critical systems by determining which systems will create the largest impact if they are not available. MTBF is the mean time between failures, an RTO is a recovery time objective, and an ICD was made up for this question.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-22 at 01-34-14 Question 175 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-22 at 01-34-14 Question 175 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 175,
+      "image_width": 1329,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Nicole determines how her organization processes data that it collects about its customers and also decides how and why personal information should be processed. What role does Nicole play in her organization? O A. Data steward @ 8. Data custodian C) C. Data controller C) D. Data consumer Explanation Nicole is a data controller, sometimes called a data owner. She determines the reasons for processing personal information and how it is processed. A data steward carries out the intents of the data controller, data custodians are charged with safeguarding information, and data consumer is not a common data privacy role. QUESTION CONTENT FEEDBACK 175 of 227 PREVIOUS N EXT",
+      "prompt": "Nicole determines how her organization processes data that it collects about its customers and also decides how and why personal information should be processed. What role does Nicole play in her organization?",
+      "choices": {
+        "A": "Data steward",
+        "B": "Data custodian",
+        "C": "Data controller",
+        "D": "Data consumer"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Nicole is a data controller, sometimes called a data owner. She determines the reasons for processing personal information and how it is processed. A data steward carries out the intents of the data controller, data custodians are charged with safeguarding information, and data consumer is not a common data privacy role.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-22 at 01-35-07 Question 178 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-22 at 01-35-07 Question 178 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 178,
+      "image_width": 1329,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Kellys organization has created an incident response policy that outlines the high-level goals of the IR process. Next, she wants to create detailed documents that describe the steps to handle specific incident types like denial-of-service attacks. What document should she create? O A. Standards C) 8. Playbooks C) C. Regulations @ D. Guidelines Explanation Playbooks provide detailed, step-by-step instructions for how to address specific topics like denial-of-se\u00e6ice attacks. Standards describe the settings or requirements that the organization wishes to use. Regulations are law and are not set by the organization, and guidelines provide advice to organizations seeking to comply with the policy and standards. QUESTION CONTENT FEEDBACK 178 of 227 PREVIOUS N EXT",
+      "prompt": "Kelly's organization has created an incident response policy that outlines the high-level goals of the IR process. , she wants to create detailed documents that describe the steps to handle specific incident types like denial-of-service attacks. What document should she create?",
+      "choices": {
+        "A": "Standards",
+        "B": "Playbooks",
+        "C": "Regulations",
+        "D": "Guidelines"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Playbooks provide detailed, step-by-step instructions for how to address specific topics like denial-of-se\u00e6ice attacks. Standards describe the settings or requirements that the organization wishes to use. Regulations are law and are not set by the organization, and guidelines provide advice to organizations seeking to comply with the policy and standards.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-22 at 01-46-54 Question 183 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-22 at 01-46-54 Question 183 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 183,
+      "image_width": 1329,
+      "image_height": 742,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Overall Time Chapter 5: Domain 5.0: Security Program Management and Oversight Juan's company trains users to be cautious about revealing information about security' controls, practices, configurations, and even the tools and software the company deploys. What is this practice known as? @ A. Awareness training 0 8. Social engineering C. An insider threat C) D. Operational security Explanation Operational security' is the practice of educating users on the importance of protecting sensitive information, including security practices, configurations, and other details. Awareness training is a broad term describing all elements of security' awareness. Social engineering is used by attackers to leverage human behaviors and practices for their own gain. Insider threats are threats created by those inside the organization. QUESTION CONTENT FEEDBACK 183 of 227 PREVIOUS N EXT",
+      "prompt": "Juan's company trains users to be cautious about revealing information about security controls, practices, configurations, and even the tools and software the company deploys. What is this practice known as?",
+      "choices": {
+        "A": "Awareness training",
+        "B": "Social engineering",
+        "C": "An insider threat",
+        "D": "Operational security"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Operational security' is the practice of educating users on the importance of protecting sensitive information, including security practices, configurations, and other details. Awareness training is a broad term describing all elements of security' awareness. Social engineering is used by attackers to leverage human behaviors and practices for their own gain. Insider threats are threats created by those inside the organization.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-22 at 02-23-44 Question 205 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-22 at 02-23-44 Question 205 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 205,
+      "image_width": 1329,
+      "image_height": 688,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect What data role is typically the most senior in an organization? O A. Data processor @ 8. Data controller C) C. Data owner O D. Data steward Explanation Data owners are typically the most senior data-related role in an organization and bear broad responsibility for the data, including oversight roles over stewards, controllers, and processors. QUESTION CONTENT FEEDBACK 20S of 227 PREVIOUS N EXT",
+      "prompt": "What data role is typically the most senior in an organization?",
+      "choices": {
+        "A": "Data processor",
+        "B": "Data controller",
+        "C": "Data owner",
+        "D": "Data steward"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Data owners are typically the most senior data-related role in an organization and bear broad responsibility for the data, including oversight roles over stewards, controllers, and processors. QUESTION 20S of 227",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-22 at 02-28-46 Question 208 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-22 at 02-28-46 Question 208 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 208,
+      "image_width": 1329,
+      "image_height": 706,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Justin wants to have work done by a contractor with whom his organization has a master services agreement. What should he prepare to fully duument the required work? A. A work order @ 8. A service level agreement O C. A memorandum of understanding C) D. A memorandum of agreement Explanation Work orders ONO) and statements of work (SOWS) are used to the specific tasks and deliverables that are performed under an MSA. SLAs, MOUs, and MOAS are not used for this purpose. QUESTION CONTENT FEEDBACK 208 of 227 PREVIOUS N EXT",
+      "prompt": "Justin wants to have work done by a contractor with whom his organization has a master services agreement. What should he prepare to fully document the required work?",
+      "choices": {
+        "A": "A work order",
+        "B": "A service level agreement",
+        "C": "A memorandum of understanding",
+        "D": "A memorandum of agreement"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Work orders ONO) and statements of work (SOWS) are used to the specific tasks and deliverables that are performed under an MSA. SLAs, MOUs, and MOAS are not used for this purpose.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-22 at 02-29-11 Question 210 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-22 at 02-29-11 Question 210 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 210,
+      "image_width": 1329,
+      "image_height": 744,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight Correct Jackie wants to use an ISO standard to help her select and implement information security controls and to develop information security management guidelines. Which ISO standard should she use? O A. ISO 27001 0 8. ISO 27701 @ C. ISO 27002 O D. IS031no Explanation ISO 27002 describes controls and helps select and implement controls while also providing guidance on developing information security management guidelines. ISO 27001 establishes control objectives for 14 different categories, including things like HR security', asset management, and operations security. ISO 27701 focuses on managing privacy controls, and ISO 31 provides guidelines for risk management. QUESTION CONTENT FEEDBACK 210 of 227 PREVIOUS N EXT",
+      "prompt": "Jackie wants to use an ISO standard to help her select and implement information security controls and to develop information security management guidelines. Which ISO standard should she use?",
+      "choices": {
+        "A": "ISO 27001",
+        "B": "ISO 27701",
+        "C": "ISO 27002",
+        "D": "ISO 31000"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "ISO 27002 describes controls and helps select and implement controls while also providing guidance on developing information security management guidelines. ISO 27001 establishes control objectives for 14 different categories, including things like HR security', asset management, and operations security. ISO 27701 focuses on managing privacy controls, and ISO 31 provides guidelines for risk management.",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    },
+    {
+      "filename": "Screenshot 2026-06-22 at 02-41-50 Question 225 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Chapter 5 Domain 5.0 Security Program Management and Oversight\\Screenshot 2026-06-22 at 02-41-50 Question 225 - Chapter 5 Domain 5.0 Security Program Management and Oversight - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 225,
+      "image_width": 1329,
+      "image_height": 724,
+      "domain": "Security Program Management And Oversight",
+      "chapter": "Chapter 5",
+      "topic": "General Review",
+      "domain_code": "5.0",
+      "source_label": "Chapter 5 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 5: Domain 5.0: Security Program Management and Oversight O Incorrect Sabrina wants to train her users on password management best practices. Which of the following options will have the largest impact on her organization's password security? C) A. Implementing biometrics authentication factors @ 8. Conducting annual training on password best practices O C. Adopting NIST password length and complexity standards O D. Requiring staff to use an enterprise password manager Explanation An enterprise password manager can help to make it easier to use appropriate passwords without requiring users to memorize them. This results in less reuse, stronger passwords, and the ability to manage them, including preventing password reuse. Biometrics, training, and adopting NIST password complexity and length standards will not have the same broad impact. QUESTION CONTENT FEEDBACK uS of 227 PREVIOUS N EXT",
+      "prompt": "Sabrina wants to train her users on password management best practices. Which of the following options will have the largest impact on her organization's password security?",
+      "choices": {
+        "A": "Implementing biometrics authentication factors",
+        "B": "Conducting annual training on password best practices",
+        "C": "Adopting NIST password length and complexity standards",
+        "D": "Requiring staff to use an enterprise password manager"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "An enterprise password manager can help to make it easier to use appropriate passwords without requiring users to memorize them. This results in less reuse, stronger passwords, and the ability to manage them, including preventing password reuse. Biometrics, training, and adopting NIST password complexity and length standards will not have the same broad impact. QUESTION uS of 227",
+      "parse_warnings": [],
+      "review_notes": "Verified from Chapter 5 screenshot OCR and answer explanation."
+    }
+  ]
+}

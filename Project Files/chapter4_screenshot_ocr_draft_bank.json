@@ -1,0 +1,278 @@
+{
+  "title": "Screenshot OCR draft bank - review before merge",
+  "questions": [
+    {
+      "question_number": 900000,
+      "source_question_number": 111,
+      "source_image": "Screenshot 2026-06-06 at 05-15-08 Question 111 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 111,
+      "prompt": "Valerie wants to implement an email security framework that will help to ensure that only authorized systems send email on behalf of her domains. Which of the following should she implement? O",
+      "choices": {
+        "A": "DKIM @",
+        "B": "DMARC O",
+        "C": "STP O",
+        "D": "SPF"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "The Sender Policy Framework (SPF) lists IP addresses of systems allowed to send email in DNS TXT records for a domain. DKIM (DomainKeys Identified Mail) validates a domain's identity using a public key pair, validating the authenticity of the sender. DMARC (domain-based message authentication, reporting, and conformance) controls how unauthenticated messages are handled by mailbox providers, including",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 4 screenshot."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900001,
+      "source_question_number": 113,
+      "source_image": "Screenshot 2026-06-06 at 05-18-05 Question 113 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 113,
+      "prompt": "Gary wants to deploy",
+      "choices": {
+        "A": "dashboard-style view of his data. What tool should Gary select to meet this need? O",
+        "B": "NAC O",
+        "C": "DLP @",
+        "D": "EDR"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "Endpoint detection and response (EDR) tools combine behavior-based detection capabilities with centralized dashboards and advanced response capabilities. Intrusion prevention systems (IPSs) can detect network threats but arent well suited to detecting behaviors on endpoint systems. NAC (network access control) is used to limit who can connect to a network. Data loss prevention (DLP) systems monitor for data exfiltration as well as data that is sent both inadvertently and on purpose outside the organization that shouldnt be. QUESTION 1130f215 N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 4 screenshot."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900002,
+      "source_question_number": 128,
+      "source_image": "Screenshot 2026-06-06 at 06-14-08 Question 128 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 128,
+      "prompt": "Jim wants to ensure that users who are located in his organization's London office have access to the building. What type of access control scheme should he select to best fit this specific need? O",
+      "choices": {
+        "A": "Rule O",
+        "B": "ABAC @",
+        "C": "Role BAC O",
+        "D": "MAC"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "QUESTION 1280f215 Attribute-based access control (ABAC) provides access based on attributes like location, age, rank, or other attributes of a user. Rule-based access control uses defined rules to make access decisions. Role-based access control uses a users role in an organization to make access control decisions, and mandatory access control (MAC) enforces access control using centralized control. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 4 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900003,
+      "source_question_number": 139,
+      "source_image": "Screenshot 2026-06-07 at 00-25-55 Question 139 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 139,
+      "prompt": "Operations What tool is commonly used to allow for measurement and monitoring of security' settings to align with NIST 800-53 controls? O",
+      "choices": {
+        "A": "SAML @",
+        "B": "CVE O",
+        "C": "cvss O",
+        "D": "SCAP"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "The Security Content Automation Protuol (SCAP) is frequently used to allow for monitoring and measurement of NIST 800-53-based controls. SAML is used for authorization and authentication, and CVE and CVSS are used to identify and rank vulnerabilities. QUESTION 1390f215 N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 4 screenshot."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900004,
+      "source_question_number": 141,
+      "source_image": "Screenshot 2026-06-07 at 00-29-27 Question 141 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 141,
+      "prompt": "Tom wants to set up an authentication service for network devices. Which of the following is commonly used for authentication to enterprise network devices? @",
+      "choices": {
+        "A": "Kerberos O",
+        "B": "SAML O",
+        "C": "TKIP O",
+        "D": "OpenID"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "Kerberos is one of a small number of commonly used AAA protuols for network devices. SAML and OpenID are more commonly used for federated services, and TKIP is an encryption method.",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 4 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900005,
+      "source_question_number": 143,
+      "source_image": "Screenshot 2026-06-07 at 00-31-01 Question 143 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 143,
+      "prompt": "Tom wants his email servers to reject email that is not authenticated in",
+      "choices": {
+        "A": "SPF @",
+        "B": "DMARC O",
+        "C": "DKIM O",
+        "D": "TLS"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "DMARC, or Domain-based Message Authentication, Reporting, and Conformance, controls how unauthenticated messages are handled by mailbox providers, including quarantining, rejecting, or rejecting messages. SPF (Sender Policy Framework) lists IP addresses of systems allowed to send email in DNS TXT records for a domain. DomainKeys Identified Mail (DKIM) validates a domain's identity using a public key pair, validating the authenticity of the sender. TLS (Transport Layer Security) is used to",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 4 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900006,
+      "source_question_number": 173,
+      "source_image": "Screenshot 2026-06-08 at 00-56-07 Question 173 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 173,
+      "prompt": "Sharon wants to implement WPA3 Enterprise. What technology will she need to use for authorization after wireless devices associate with access points? O",
+      "choices": {
+        "A": "LDAP @",
+        "B": "802.1X O",
+        "C": "Kerberos O",
+        "D": "SAML"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "QUESTION 1730f215 Sharon knows that Enterprise mode authentication is typically done with 802. IX LDAP and Kerberos are not typically used for this, and SAML is more frequently part of federated and cloud services. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 4 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    }
+  ]
+}

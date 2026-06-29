@@ -1,0 +1,538 @@
+{
+  "screenshots": [
+    {
+      "filename": "Screenshot 2026-06-19 at 01-04-26 Question 33 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 01-04-26 Question 33 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 33,
+      "image_width": 807,
+      "image_height": 724,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts O Incorrect Jack knows that there are three common types of database encryption. Which of the following is not a common type of database encryption? C) A. Sensitivity-based encryption 0 8. Transparent data encryption @ C. Field-level encryption C) D. Column-level encryption Explanation Transparent data encryption, field-level, and column-level encryption are all common types of database encryption. Sensitivity-based encryption is not and was made up for this question. QUESTION CONTENT FEEDBACK 33 of 150 PREVIOUS N EXT",
+      "prompt": "Jack knows that there are three common types of database encryption. Which of the following is not a common type of database encryption?",
+      "choices": {
+        "A": "Sensitivity-based encryption",
+        "B": "Transparent data encryption",
+        "C": "Field-level encryption",
+        "D": "Column-level encryption"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Transparent data encryption, field-level, and column-level encryption are all common types of database encryption. Sensitivity-based encryption is not and was made up for this question.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-19 at 01-21-26 Question 38 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 01-21-26 Question 38 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 38,
+      "image_width": 807,
+      "image_height": 778,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts incorrect Isaac wants to deploy sensors to detect intruders in a facility, but he is concerned about the sensors being overly sensitive. What type of sensor is best suited to detecting intruders in an open office environment without significant expense or issues with sensitivity? A. Infrared C) 8. Pressure @ C. Microwave D. ultrasonic Explanation Infrared sensors are commonly used in open spaces. They are well suited to detecting individuals and are less likely to be overly sensitive. They can cover broader fields than a pressure sensor, and ultrasonic sensors are not commonly deployed as facility-level security sensors. QUESTION CONTENT FEEDBACK 38 of 150 PREVIOUS N EXT",
+      "prompt": "Isaac wants to deploy sensors to detect intruders in a facility, but he is concerned about the sensors being overly sensitive. What type of sensor is best suited to detecting intruders in an open office environment without significant expense or issues with sensitivity?",
+      "choices": {
+        "A": "Infrared",
+        "B": "Pressure",
+        "C": "Microwave",
+        "D": "ultrasonic"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Infrared sensors are commonly used in open spaces. They are well suited to detecting individuals and are less likely to be overly sensitive. They can cover broader fields than a pressure sensor, and ultrasonic sensors are not commonly deployed as facility-level security sensors.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-19 at 01-22-21 Question 39 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 01-22-21 Question 39 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 39,
+      "image_width": 807,
+      "image_height": 706,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts O Incorrect Wayne wants to allow systems to claim identities as part of his AAA process. Which of the following is most commonly used to identify both individuals and systems? O A. Tokens @ 8. Smartcards C) C. Certificates D. usernames Explanation Certificates are commonly used to identify both individuals and systems. Tokens, smartcards, and usernames are primarily used by individuals. QUESTION CONTENT FEEDBACK of 150 PREVIOUS N EXT",
+      "prompt": "Wayne wants to allow systems to claim identities as part of his AAA process. Which of the following is most commonly used to identify both individuals and systems?",
+      "choices": {
+        "A": "Tokens",
+        "B": "Smartcards",
+        "C": "Certificates",
+        "D": "usernames"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Certificates are commonly used to identify both individuals and systems. Tokens, smartcards, and usernames are primarily used by individuals. QUESTION of 150",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-19 at 01-26-16 Question 44 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 01-26-16 Question 44 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 44,
+      "image_width": 807,
+      "image_height": 760,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Cn.'erall Time Spent: 01 : 12:56 Chapter 1: Domain 1.0: General Security Concepts What two key features define blockchain ledgers? @ A. They are immutable and nontransferable. 0 8. They are shared and can be modified by a vote among all participants. O C. They are unique to each participant and are atomic. C) D. They are shared and immutable. Explanation Blockchain ledgers are immutable\u2014they cannot be changed after they are recorded, and they are shared, which means that each participant in the blockchain has access to the entire ledger. Transactions are recorded only once and cannot be tampered with\u2014in fact, if an error is made and recorded, a new record has to be created including the fix, and both records will be accessible to show the history of what occurred. QUESTION CONTENT FEEDBACK 44 of 150 PREVIOUS N EXT",
+      "prompt": "Cn.'erall Time Spent: 01 : 12:56 Security Concepts What two key features define blockchain ledgers?",
+      "choices": {
+        "A": "They are immutable and nontransferable.",
+        "B": "They are shared and can be modified by a vote among all participants.",
+        "C": "They are unique to each participant and are atomic.",
+        "D": "They are shared and immutable."
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Blockchain ledgers are immutable-they cannot be changed after they are recorded, and they are shared, which means that each participant in the blockchain has access to the entire ledger. Transactions are recorded only once and cannot be tampered with-in fact, if an error is made and recorded, a new record has to be created including the fix, and both records will be accessible to show the history of what occurred.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-19 at 01-41-06 Question 51 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 01-41-06 Question 51 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 51,
+      "image_width": 807,
+      "image_height": 724,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts O Incorrect Rick's cloud provider offers a dedicated hardware security module. Which of the following capabilities is it unlikely to offer? C) A. Validating secure boot processes @ 8. Key generation O C. Encrypting and decrypting data C) D. Creating digital signatures Explanation A TPM is used to validate secure boot processes. A hardware security module (HSM) is used for key generation, storage, and management as well as for encrypting and decrypting data and creating and validating digital signatures. QUESTION CONTENT FEEDBACK 51 of 150 PREVIOUS N EXT",
+      "prompt": "Rick's cloud provider offers a dedicated hardware security module. Which of the following capabilities is it unlikely to offer?",
+      "choices": {
+        "A": "Validating secure boot processes",
+        "B": "Key generation",
+        "C": "Encrypting and decrypting data",
+        "D": "Creating digital signatures"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "A TPM is used to validate secure boot processes. A hardware security module (HSM) is used for key generation, storage, and management as well as for encrypting and decrypting data and creating and validating digital signatures.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-19 at 01-46-35 Question 55 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 01-46-35 Question 55 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 55,
+      "image_width": 807,
+      "image_height": 868,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "overall Time spent: 0132:07 Chapter 1: Domain 1.0: General Security Concepts Yasmine submits the Windows BitLocker key to a central repository after she encryptions the machine. The central repository allows files to be uploaded, but not read, and is protected with access requiring special permissions. What type of solution is Yasmine's company using? C) A. A hardware security module @ 8. Perfect forward secrecy O C. Key escrow D. Private keys Explanation Yasmine's company has implemented a key escrow process where encryption keys are retained by the organization in case the files on the drive need to be accessed by somu'ne with proper authority. A hardware security module (HSM) is a hardware device used to create and store encryption keys, among other encryption-related functions. Perfect forward secrecy (PFS) is a term used in encryption systems that change keys frequently to ensure that even if a key is hacked, the attacker's access to data will exist in a limited window. Private keys are part of asymmetric encryption schemes and do not reflect the full solution Yasmine's organization is using. QUESTION CONTENT FEEDBACK SS of 150 PREVIOUS N EXT",
+      "prompt": "Yasmine submits the Windows BitLocker key to a central repository after she encryptions the machine. The central repository allows files to be uploaded, but not read, and is protected with access requiring special permissions. What type of solution is Yasmine's company using?",
+      "choices": {
+        "A": "A hardware security module",
+        "B": "Perfect forward secrecy",
+        "C": "Key escrow",
+        "D": "Private keys"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Yasmine's company has implemented a key escrow process where encryption keys are retained by the organization in case the files on the drive need to be accessed by somu'ne with proper authority. A hardware security module (HSM) is a hardware device used to create and store encryption keys, among other encryption-related functions. Perfect forward secrecy (PFS) is a term used in encryption systems that change keys frequently to ensure that even if a key is hacked, the attacker's access to data will exist in a limited window. Private keys are part of asymmetric encryption schemes and do not reflect the full solution Yasmine's organization is using. QUESTION SS of 150",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-19 at 01-55-04 Question 63 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 01-55-04 Question 63 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 63,
+      "image_width": 807,
+      "image_height": 742,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts O Incorrect Scott wants to automate policy creation in his zero-trust environments policy engine. Which of the following is not a typical component for automated data and event-driven policy management? @ A. A SIEM C) 8. Threat feeds C. Infrared sensor data O D. EDR tools Explanation Physical security sensors are not typically part of a zero-trust policy engine feed. Zero-trust environments primarily focus on network and systems access rather than physical security and access. QUESTION CONTENT FEEDBACK 63 of 150 PREVIOUS N EXT",
+      "prompt": "Scott wants to automate policy creation in his zero-trust environments policy engine. Which of the following is not a typical component for automated data and event-driven policy management?",
+      "choices": {
+        "A": "A SIEM",
+        "B": "Threat feeds",
+        "C": "Infrared sensor data",
+        "D": "EDR tools"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Physical security sensors are not typically part of a zero-trust policy engine feed. Zero-trust environments primarily focus on network and systems access rather than physical security and access.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-19 at 02-16-51 Question 69 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 02-16-51 Question 69 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 69,
+      "image_width": 807,
+      "image_height": 778,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts Inco Theresa wants to use a cloud-hosted security solution that will allow her to safely store and manage secrets. What type of solution should she select? @ A. A TPM 0 8. ACA O C. A KMS O D. A CSR Explanation A KMS, or key management system, is a solution that allows you to safely store and manage secrets like keys and certificates. Centralizing a KMS allows organizations to effectively manage their secrets, including tracking their life cycle and rotation. A TPM is used for hardware security' on physical systems, a CA is a certificate authority used to create and sign certificates, and a CSR is a certificate signing request. QUESTION CONTENT FEEDBACK 69 of 150 PREVIOUS N EXT",
+      "prompt": "Inco Theresa wants to use a cloud-hosted security solution that will allow her to safely store and manage secrets. What type of solution should she select?",
+      "choices": {
+        "A": "A TPM",
+        "B": "ACA",
+        "C": "A KMS",
+        "D": "A CSR"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "A KMS, or key management system, is a solution that allows you to safely store and manage secrets like keys and certificates. Centralizing a KMS allows organizations to effectively manage their secrets, including tracking their life cycle and rotation. A TPM is used for hardware security' on physical systems, a CA is a certificate authority used to create and sign certificates, and a CSR is a certificate signing request.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-19 at 02-17-49 Question 70 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 02-17-49 Question 70 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 70,
+      "image_width": 807,
+      "image_height": 796,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Cn.'erall Time S ent: 01 Chapter 1: Domain 1.0: General Security Concepts Joanna is reviewing her account information on an e-commerce website and sees her credit card number displayed as XXXX-XXN-XXXX-1234. What type of data obfuscation is in use? A. Hashing C) 8. Data masking O C. Field encryption @ D. Tokenization Explanation Data masking conceals elements of a data field or entry, preventing all of it from being seen but leaving it accessible through the database when masking is not used. Tokenization replaces values with a reference value\u2014often a hash that can be used to refer to the value without using the actual entry. Hashing is a one-way function that pruiuces an input of arbitrary length. Field encryption is nota common term. QUESTION CONTENT FEEDBACK 70 of 150 PREVIOUS N EXT",
+      "prompt": "01 Security Concepts Joanna is reviewing her account information on an e-commerce website and sees her credit card number displayed as XXXX-XXN-XXXX-1234. What type of data obfuscation is in use?",
+      "choices": {
+        "A": "Hashing",
+        "B": "Data masking",
+        "C": "Field encryption",
+        "D": "Tokenization"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Data masking conceals elements of a data field or entry, preventing all of it from being seen but leaving it accessible through the database when masking is not used. Tokenization replaces values with a reference value-often a hash that can be used to refer to the value without using the actual entry. Hashing is a one-way function that pruiuces an input of arbitrary length. Field encryption is nota common term.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-19 at 02-26-09 Question 79 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 02-26-09 Question 79 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 79,
+      "image_width": 807,
+      "image_height": 760,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts O Incorrect What holds the position of the root of trust in a certificate chain? @ A. A hardened hardware device 0 8. A TPM O C. A root certificate C) D. A wildcard certificate Explanation The rnt certificate, or top certificate for a certificate chain, is the root of trust of the chain, and it must be kept secure so the entire certificate and CA hierarchy can be trusted. Hardened hardware devices may be used to store it, but they are not the actual root itself. A TPM is used to store system-specific security data, and wildcard certificates cover more than one subdomain for an organization. QUESTION CONTENT FEEDBACK 79 of 150 PREVIOUS N EXT",
+      "prompt": "What holds the position of the root of trust in a certificate chain?",
+      "choices": {
+        "A": "A hardened hardware device",
+        "B": "A TPM",
+        "C": "A root certificate",
+        "D": "A wildcard certificate"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "The rnt certificate, or top certificate for a certificate chain, is the root of trust of the chain, and it must be kept secure so the entire certificate and CA hierarchy can be trusted. Hardened hardware devices may be used to store it, but they are not the actual root itself. A TPM is used to store system-specific security data, and wildcard certificates cover more than one subdomain for an organization.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-19 at 02-51-59 Question 83 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 02-51-59 Question 83 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 83,
+      "image_width": 807,
+      "image_height": 742,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts O Incorrect Lucca has implemented an authentication scheme that relies on ticket-granting tickets as part of the authentication process. What common authentication service has he implemented? @ A. TACACS+ C) 8. Kerberos O C. MS-CHAP O D. EAP Explanation Kerberos uses authentication tickets and ticket-granting tickets to grant session keys for services that clients present to services to access them. TACACS+, MS- CHAP, and EAP do not use this ticket-based approach. QUESTION CONTENT FEEDBACK 83 of 150 PREVIOUS N EXT",
+      "prompt": "Lucca has implemented an authentication scheme that relies on ticket-granting tickets as part of the authentication process. What common authentication service has he implemented?",
+      "choices": {
+        "A": "TACACS+",
+        "B": "Kerberos",
+        "C": "MS-CHAP",
+        "D": "EAP"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Kerberos uses authentication tickets and ticket-granting tickets to grant session keys for services that clients present to services to access them. TACACS+, MS- CHAP, and EAP do not use this ticket-based approach.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-19 at 03-17-22 Question 92 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 03-17-22 Question 92 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 92,
+      "image_width": 807,
+      "image_height": 778,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts O Incorrect Mikayla's zero-trust system has received a request for access with an identity, and the basic criteria for access have been met. What should the system do next before providing access to the resource requested? C) A. Check the remote system's security status. 0 8. Require reauthentication using MFA. @ C. Check the user's rights to ensure they can access the resource. O D. Determine its level of confidence in the request. Explanation A zero-trust system should validate its level of confidence in a request that it receives once the basic criteria have been met. This may involve checking the access against known patterns of access by the user, validating current threat feed information, or checking other details that will help ensure the security and authenticity of the request. QUESTION CONTENT FEEDBACK 92 of 150 PREVIOUS N EXT",
+      "prompt": "Mikayla's zero-trust system has received a request for access with an identity, and the basic criteria for access have been met. What should the system do before providing access to the resource requested?",
+      "choices": {
+        "A": "Check the remote system's security status.",
+        "B": "Require reauthentication using MFA.",
+        "C": "Check the user's rights to ensure they can access the resource.",
+        "D": "Determine its level of confidence in the request."
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "A zero-trust system should validate its level of confidence in a request that it receives once the basic criteria have been met. This may involve checking the access against known patterns of access by the user, validating current threat feed information, or checking other details that will help ensure the security and authenticity of the request.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-19 at 03-19-06 Question 94 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 03-19-06 Question 94 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 94,
+      "image_width": 807,
+      "image_height": 796,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts O Inco Lucca is using precomputed rainbow tables to attempt to crack hashed passwords from a data breach. He knows that two users have the same password, but the hashes do not match. What password hash security technique has Lucca most likely encountered? C) A. Password encryption C) 8. Salting @ C. Hash rotation C) D. Password mismatching Explanation Salting uses a unique, randomly generated string that is added to each password before it is hashed. That means that even matching passwords will not have the same hash. This prevents rainbow tables from being effectively used against password hashes due to the added computational load it creates for precomputing hashes. QUESTION CONTENT FEEDBACK 94 of 150 PREVIOUS N EXT",
+      "prompt": "O Inco Lucca is using precomputed rainbow tables to attempt to crack hashed passwords from a data breach. He knows that two users have the same password, but the hashes do not match. What password hash security technique has Lucca most likely encountered?",
+      "choices": {
+        "A": "Password encryption",
+        "B": "Salting",
+        "C": "Hash rotation",
+        "D": "Password mismatching"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Salting uses a unique, randomly generated string that is added to each password before it is hashed. That means that even matching passwords will not have the same hash. This prevents rainbow tables from being effectively used against password hashes due to the added computational load it creates for precomputing hashes.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-19 at 03-23-27 Question 100 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-19 at 03-23-27 Question 100 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 100,
+      "image_width": 807,
+      "image_height": 767,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Cn.\u2022erall Times Chapter 1: Domain 1.0: General Security Concepts Juan's organization is designing their zero-trust model. Which of the following statements is true for network security zones? A. All communication is secured, regardless of the network security zone i o occurs In. 0 8. Communication receives additional security in low-trust zones. O C. Communication receives less security in high-trust zones. @ D. All zero-trust networks are considered secured zones. Explanation One of the basic tenets of zero-trust architecture is that all communication is secured, regardless of the security zone or trust zone that it occurs in. Additional security should not be required, nor should communications receive less security in higher trust zones. All zero-trust networks are considered potential risk areas\u2014thus the zero in zero trust! QUESTION CONTENT FEEDBACK 100 of PREVIOUS N EXT",
+      "prompt": "Cn.\u2022erall Times Security Concepts Juan's organization is designing their zero-trust model. Which of the following statements is true for network security zones?",
+      "choices": {
+        "A": "All communication is secured, regardless of the network security zone i o",
+        "B": "Communication receives additional security in low-trust zones.",
+        "C": "Communication receives less security in high-trust zones.",
+        "D": "All zero-trust networks are considered secured zones."
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "One of the basic tenets of zero-trust architecture is that all communication is secured, regardless of the security zone or trust zone that it occurs in. Additional security should not be required, nor should communications receive less security in higher trust zones. All zero-trust networks are considered potential risk areas-thus the zero in zero trust!",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 02-00-16 Question 81 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-20 at 02-00-16 Question 81 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 81,
+      "image_width": 1349,
+      "image_height": 762,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts Correct Olivia wants to use a self-signed certificate in her test environment for her organization's services to save money on commercial certificates. What warning should her team give her about the use of self-signed certificates in a test environment? @ A. Certificate root of trust validation attempts will fail if implemented. O B. Self-signed certificates cannot be used for external users to support SSC C. Self-signed certificates cannot be used for internal users to support SSC O D. Browsers will not allow self-signed certificates to be used when browsing sites. Explanation Some software may attempt to validate the certificates in use and could fail. This may also lead to unexpected differences between production certificates and test certificates, which is undesirable in a test environment intended to mirror prcduction. 80th internal users and external users can still successfully use self-signed certificates for SSC but they will receive warnings in modern browsers. Browsers can typically be told to bypass warnings, or self-signed certificates can be added to system certificate chains as needed, although this requires additional work from system administration teams and may not be desirable. QUESTION CONTENT FEEDBACK 81 of 150 PREVIOUS N EXT",
+      "prompt": "Olivia wants to use a self-signed certificate in her test environment for her organization's services to save money on commercial certificates. What warning should her team give her about the use of self-signed certificates in a test environment?",
+      "choices": {
+        "A": "Certificate root of trust validation attempts will fail if implemented.",
+        "B": "Self-signed certificates cannot be used for external users to support SSC",
+        "C": "Self-signed certificates cannot be used for internal users to support SSC",
+        "D": "Browsers will not allow self-signed certificates to be used when browsing sites."
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Some software may attempt to validate the certificates in use and could fail. This may also lead to unexpected differences between production certificates and test certificates, which is undesirable in a test environment intended to mirror prcduction. 80th internal users and external users can still successfully use self-signed certificates for SSC but they will receive warnings in modern browsers. Browsers can typically be told to bypass warnings, or self-signed certificates can be added to system certificate chains as needed, although this requires additional work from system administration teams and may not be desirable.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 02-00-39 Question 101 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-20 at 02-00-39 Question 101 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 101,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts O Incorrect What advantage do microwave sensors have over infrared sensors? C) A They can detect heat signatures. @ B. They are cheaper than infrared sensors. O C. They can penetrate some types of walls. C) D. They do not interfere with sensitive equipment. Explanation Microwave sensors work in temperature ranges that infrared sensors do not, and they can penetrate walls and some small spaces allowing more complete coverage. Microwave sensors cannot detect heat signatures, are not cheaper than infrared sensors, and can interfere with QUESTION 101 of ISO some types of sensitive equipment. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "What advantage do microwave sensors have over infrared sensors?",
+      "choices": {
+        "A": "They can detect heat signatures.",
+        "B": "They are cheaper than infrared sensors.",
+        "C": "They can penetrate some types of walls.",
+        "D": "They do not interfere with sensitive equipment."
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Microwave sensors work in temperature ranges that infrared sensors do not, and they can penetrate walls and some small spaces allowing more complete coverage. Microwave sensors cannot detect heat signatures, are not cheaper than infrared sensors, and can interfere with",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 02-07-11 Question 107 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-20 at 02-07-11 Question 107 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 107,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts O Incorrect Michelle wants to store secrets for her organization in a cloud service. She wants to ensure the greatest level of security for her organization, and she is willing to spend more money to provide that security'. What solution should she look for? C) A A shared cloud TPM B. A shared cloud HSM @ C. A dedicated hardware cloud TPM C) D. A dedicated hardware cloud HSM Explanation A dedicated, hardware-based, cloud-hosted hardware security module (HSM) is an appropriate solution for Michelle's needs. Cloud providers often provide shared HSMs as a service, which can increase perceived risk due to the shared underlying hardware. Dedicated hardware is typically available at a higher cost. Trusted platform modules (TPMs) are used to provide secure boot and related services, not to store secrets for an organization. QUESTION CONTENT FEEDBACK 107 of PREVIOUS N EXT",
+      "prompt": "Michelle wants to store secrets for her organization in a cloud service. She wants to ensure the greatest level of security for her organization, and she is willing to spend more money to provide that security'. What solution should she look for?",
+      "choices": {
+        "A": "A shared cloud TPM",
+        "B": "A shared cloud HSM",
+        "C": "A dedicated hardware cloud TPM",
+        "D": "A dedicated hardware cloud HSM"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "A dedicated, hardware-based, cloud-hosted hardware security module (HSM) is an appropriate solution for Michelle's needs. Cloud providers often provide shared HSMs as a service, which can increase perceived risk due to the shared underlying hardware. Dedicated hardware is typically available at a higher cost. Trusted platform modules (TPMs) are used to provide secure boot and related services, not to store secrets for an organization.",
+      "parse_warnings": [
+        "missing inferred correct answer"
+      ],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 02-10-39 Question 113 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-20 at 02-10-39 Question 113 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 113,
+      "image_width": 1349,
+      "image_height": 706,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts O Incorrect Jim wants to implement an authentication framework for his wireless network. Which of the following is most commonly used for wireless network authentication? O A EAP O B. MS-CHAP @ C. Kerberos O D. LDAP Explanation EAP is commonly used for authentication to wireless networks. MS-CHAP is used with PPTP-based VPNs, Kerberos is used for organizationwide authentication, and LDAP is used as part of authentication in Microsoft Active Directory domains, among other uses. QUESTION 113 of ISO CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Jim wants to implement an authentication framework for his wireless network. Which of the following is most commonly used for wireless network authentication?",
+      "choices": {
+        "A": "EAP",
+        "B": "MS-CHAP",
+        "C": "Kerberos",
+        "D": "LDAP"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "EAP is commonly used for authentication to wireless networks. MS-CHAP is used with PPTP-based VPNs, Kerberos is used for organizationwide authentication, and LDAP is used as part of authentication in Microsoft Active Directory domains, among other uses.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-20 at 03-20-17 Question 130 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_1_Domain_1.0_General_Security_Concepts\\Screenshot 2026-06-20 at 03-20-17 Question 130 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 130,
+      "image_width": 1349,
+      "image_height": 742,
+      "domain": "General Security Concepts",
+      "chapter": "Chapter 1",
+      "topic": "General Review",
+      "domain_code": "1.0",
+      "source_label": "Chapter 1 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 1: Domain 1.0: General Security Concepts O Incorrect Elaine wants to document the technical concerns that dependencies create as part of her change management process. Which of the following concerns is the most common when dependencies are encountered as part of change management? O A Documenting the dependencies to ensure they are addressed O B. Removing the dependencies as part of the change O C. Patching the dependencies in addition to the main application @ D. Updating diagrams related to the dependencies Explanation Change management processes typically focus on dependencies and ensuring they are met. That may involve ensuring that the appropriate version is installed or that applications are restarted in a specific order, or that a service is available that is needed for a system to successfully function. Removing dependencies is unlikely, patching may or may not be required, and updating diagrams is less important than ensuring the dependencies are understood and met. QUESTION CONTENT FEEDBACK 130 of 150 PREVIOUS N EXT",
+      "prompt": "Elaine wants to document the technical concerns that dependencies create as part of her change management process. Which of the following concerns is the most common when dependencies are encountered as part of change management?",
+      "choices": {
+        "A": "Documenting the dependencies to ensure they are addressed",
+        "B": "Removing the dependencies as part of the change",
+        "C": "Patching the dependencies in addition to the main application",
+        "D": "Updating diagrams related to the dependencies"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Change management processes typically focus on dependencies and ensuring they are met. That may involve ensuring that the appropriate version is installed or that applications are restarted in a specific order, or that a service is available that is needed for a system to successfully function. Removing dependencies is unlikely, patching may or may not be required, and updating diagrams is less important than ensuring the dependencies are understood and met.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    }
+  ]
+}

@@ -1,0 +1,1068 @@
+{
+  "screenshots": [
+    {
+      "filename": "Screenshot 2026-06-08 at 03-56-31 Question 9 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-08 at 03-56-31 Question 9 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 9,
+      "image_width": 798,
+      "image_height": 742,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Which of the following is not an advantage of a serverless architecture? C) A. It does not require a system administrator. @ B. It can scale as function call frequency increases. O C. It can scale as function call frequency decreases. C) D. It is ideal for complex applications. Explanation Serverless architectures do not require a system administrator because the provider manages the underlying function-as-a-service (FaaS) capability. It can also scale up or scale down as needed, allowing it to be very flexible. Serverless architectures are typically not ideal for complex applications and instead tend to work better for microservices. QUESTION %CONTENT FEEDBACK 9 of22S PREVIOUS N EXT",
+      "prompt": "Which of the following is not an advantage of a serverless architecture?",
+      "choices": {
+        "A": "It does not require a system administrator.",
+        "B": "It can scale as function call frequency increases.",
+        "C": "It can scale as function call frequency decreases.",
+        "D": "It is ideal for complex applications."
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Serverless architectures do not require a system administrator because the provider manages the underlying function-as-a-service (FaaS) capability. It can also scale up or scale down as needed, allowing it to be very flexible. Serverless architectures are typically not ideal for complex applications and instead tend to work better for microservices. QUESTION % 9 of22S",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-08 at 03-56-59 Question 10 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-08 at 03-56-59 Question 10 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 10,
+      "image_width": 798,
+      "image_height": 724,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Which of the following is the most important benefit from implementing SDN? C) A. It will stop malware. B. It provides scalability. C. It will detect intrusions. @ D. It will prevent session hijacking. Explanation Software-defined networking (SDN) makes the network very scalable. It is relatively easy to add on new resources or remove unneeded resources, and it helps with high availability efforts. SDN does not stop malware, detect intrusions, or prevent session hijacking. QUESTION %CONTENT FEEDBACK 10 of 226 PREVIOUS N EXT",
+      "prompt": "Which of the following is the most important benefit from implementing SDN?",
+      "choices": {
+        "A": "It will stop malware.",
+        "B": "It provides scalability.",
+        "C": "It will detect intrusions.",
+        "D": "It will prevent session hijacking."
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Software-defined networking (SDN) makes the network very scalable. It is relatively easy to add on new resources or remove unneeded resources, and it helps with high availability efforts. SDN does not stop malware, detect intrusions, or prevent session hijacking. QUESTION % 10 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-12 at 03-08-14 Question 35 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-12 at 03-08-14 Question 35 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 35,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect What IP address does a load balancer provide for external connections to connect to web servers in a load-balanced group? C) A The IP address for each server, in a prioritized order @ B. The load balancers IP address O C. The IP address for each server in a round-robin order C) D. A virtual IP address Explanation Load balancers provide a virtual IP, or VIP. Traffic sent to the VIP is directed to servers in the pool based on the load-balancing scheme that that pool is using\u2014often a round-robin scheme, but other versions that include priority order and capacity' tracking or ratings are also common. The load balancers IP address is normally used to administer the system, and individual IP addresses for the clustered hosts are shielded by the load balancer to prevent traffic from consistently going to those hosts, thus creating a failure or load point. QUESTION CONTENT FEEDBACK 35 of 226 PREVIOUS N EXT",
+      "prompt": "What IP address does a load balancer provide for external connections to connect to web servers in a load-balanced group?",
+      "choices": {
+        "A": "The IP address for each server, in a prioritized order",
+        "B": "The load balancers IP address",
+        "C": "The IP address for each server in a round-robin order",
+        "D": "A virtual IP address"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Load balancers provide a virtual IP, or VIP. Traffic sent to the VIP is directed to servers in the pool based on the load-balancing scheme that that pool is using-often a round-robin scheme, but other versions that include priority order and capacity' tracking or ratings are also common. The load balancers IP address is normally used to administer the system, and individual IP addresses for the clustered hosts are shielded by the load balancer to prevent traffic from consistently going to those hosts, thus creating a failure or load point.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-12 at 03-19-21 Question 38 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-12 at 03-19-21 Question 38 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 38,
+      "image_width": 1349,
+      "image_height": 778,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Abigail is responsible for setting up a network-based intrusion prevention system (NIPS) on her network. The NIPS is located in one particular network segment. She is looking for a passive method to get a copy of all traffic to the NIPS network segment so that it can analyze the traffic. Which of the following would be her best choice? C) A Using a network tap B. using port mirroring @ C. Setting the NIPS on a VLAN that is connected to all other segments C) D. Setting upa NIPS on each segment Explanation Network taps copy all traffic to another destination, allowing traffic visibility without a device inline. They are completely passive methods of getting network traffic to a central location. Port mirroring would get all the traffic to the network-based intrusion prevention system (NIPS) but is not completely passive. It requires the use of resources on switches to route a copy of the traffic. Incorrect switch configurations can cause looping. Configuring loop detection can prevent looped ports. Putting a network NIPS on every segment can be very expensive and require extensive configuration work. Setting up a NIPS on each segment would also dramatically increase administrative efforts. QUESTION CONTENT FEEDBACK 38 of 226 PREVIOUS N EXT",
+      "prompt": "Abigail is responsible for setting up a network-based intrusion prevention system (NIPS) on her network. The NIPS is located in one particular network segment. She is looking for a passive method to get a copy of all traffic to the NIPS network segment so that it can analyze the traffic. Which of the following would be her best choice?",
+      "choices": {
+        "A": "Using a network tap",
+        "B": "using port mirroring",
+        "C": "Setting the NIPS on a VLAN that is connected to all other segments",
+        "D": "Setting upa NIPS on each segment"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Network taps copy all traffic to another destination, allowing traffic visibility without a device inline. They are completely passive methods of getting network traffic to a central location. Port mirroring would get all the traffic to the network-based intrusion prevention system (NIPS) but is not completely passive. It requires the use of resources on switches to route a copy of the traffic. Incorrect switch configurations can cause looping. Configuring loop detection can prevent looped ports. Putting a network NIPS on every segment can be very expensive and require extensive configuration work. Setting up a NIPS on each segment would also dramatically increase administrative efforts.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-12 at 03-21-27 Question 39 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-12 at 03-21-27 Question 39 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 39,
+      "image_width": 1349,
+      "image_height": 724,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Janice is explaining how IPSec works to a new network administrator. She is trying to explain the role of IKE. Which of the following most closely matches the role of IKE in IPSec? C) A It encrypts the packet. O B. It establishes the SAE. @ C. It authenticates the packet. C) D. It establishes the tunnel. Explanation Internet key exchange (IKE) is used to set up security (SAs) on each end of the tunnel. The security' associations have all the settings (i.e., cryptographic algorithms, hashes) for the tunnel. IKE is not directly involved in encrypting or authenticating. IKE itself does not establish the tunnel\u2014it establishes the SAs. QUESTION CONTENT FEEDBACK 39 of 226 PREVIOUS N EXT",
+      "prompt": "Janice is explaining how IPSec works to a new network administrator. She is trying to explain the role of IKE. Which of the following most closely matches the role of IKE in IPSec?",
+      "choices": {
+        "A": "It encrypts the packet.",
+        "B": "It establishes the SAE.",
+        "C": "It authenticates the packet.",
+        "D": "It establishes the tunnel."
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Internet key exchange (IKE) is used to set up security (SAs) on each end of the tunnel. The security' associations have all the settings (i.e., cryptographic algorithms, hashes) for the tunnel. IKE is not directly involved in encrypting or authenticating. IKE itself does not establish the tunnel-it establishes the SAs.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-12 at 03-22-00 Question 40 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-12 at 03-22-00 Question 40 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 40,
+      "image_width": 1349,
+      "image_height": 778,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Overall Time Spent: 01 Chapter 3: Domain 3.0: Security Architecture Emily manages the IDS/IPS for her network. She has a network-based intrusion prevention system (NIPS) installed and properly configured. It is not detecting obvious attacks on one specific network segment. She has verified that the NIPS is properly configured and working properly. What would be the most efficient way for her to address this? O A Implement port mirror/monitor mode for that segment. B. Install a NIPS on that segment. O C. upgrade to a more effective NIPS. @ D. Isolate that segment on its own VLAN. Explanation The NIPS is not seeing the traffic on that network segment. By implementing port mirroring, the traffic from that segment can be copied to the segment where the NIPS is installed. Installing a network IPS on the segment would require additional resources. This would work but is not the most efficient approach. Nothing in this scenario suggests that the NIPS is inadequate. It just is not seeing all the traffic. Finally, isolating the segment to its own VLAN would isolate that network segment but would still not allow the NIPS to analyze the traffic from that segment. QUESTION CONTENT FEEDBACK 40 of 226 PREVIOUS N EXT",
+      "prompt": "Emily manages the IDS/IPS for her network. She has a network-based intrusion prevention system (NIPS) installed and properly configured. It is not detecting obvious attacks on one specific network segment. She has verified that the NIPS is properly configured and working properly. What would be the most efficient way for her to address this?",
+      "choices": {
+        "A": "Implement port mirror/monitor mode for that segment.",
+        "B": "Install a NIPS on that segment.",
+        "C": "upgrade to a more effective NIPS.",
+        "D": "Isolate that segment on its own VLAN."
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "The NIPS is not seeing the traffic on that network segment. By implementing port mirroring, the traffic from that segment can be copied to the segment where the NIPS is installed. Installing a network IPS on the segment would require additional resources. This would work but is not the most efficient approach. Nothing in this scenario suggests that the NIPS is inadequate. It just is not seeing all the traffic. Finally, isolating the segment to its own VLAN would isolate that network segment but would still not allow the NIPS to analyze the traffic from that segment.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-12 at 03-24-02 Question 43 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-12 at 03-24-02 Question 43 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 43,
+      "image_width": 1349,
+      "image_height": 760,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Overall Time Spent: 01 Chapter 3: Domain 3.0: Security Architecture Claire has been notified of a zero-day flaw in a web application. She has the exploit code, including a SQL injection attack that is being actively exploited. How can she quickly react to prevent this issue from impacting her environment if she needs the application to continue to function? C) A Deploy a detection rule to her IDS. O B. Manually update the application code after reverse-engineering it. O C. Deploy a fix via her WAF. @ D. Install the vendor-provided patch. Explanation Claire's best option is to deploy a detection and fix via her web application firewall (WAF) that will detect the SQL injection (SQLi) attempt and prevent it. An intrusion detection system (IOS) only detects attacks and cannot stop them. Manually updating the application code after reverse-engineering it will take time, and she may not even have the source code or the ability to mulify it. Finally, vendor patches for zero days typically take some time to come out even in the best of circumstances, meaning that Claire could be waiting on a patch for quite a while if that is the option she chooses. QUESTION CONTENT FEEDBACK 43 of 226 PREVIOUS N EXT",
+      "prompt": "Claire has been notified of a zero-day flaw in a web application. She has the exploit code, including a SQL injection attack that is being actively exploited. How can she quickly react to prevent this issue from impacting her environment if she needs the application to continue to function?",
+      "choices": {
+        "A": "Deploy a detection rule to her IDS.",
+        "B": "Manually update the application code after reverse-engineering it.",
+        "C": "Deploy a fix via her WAF.",
+        "D": "Install the vendor-provided patch."
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Claire's best option is to deploy a detection and fix via her web application firewall (WAF) that will detect the SQL injection (SQLi) attempt and prevent it. An intrusion detection system (IOS) only detects attacks and cannot stop them. Manually updating the application code after reverse-engineering it will take time, and she may not even have the source code or the ability to mulify it. Finally, vendor patches for zero days typically take some time to come out even in the best of circumstances, meaning that Claire could be waiting on a patch for quite a while if that is the option she chooses.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-12 at 03-33-00 Question 44 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-12 at 03-33-00 Question 44 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 44,
+      "image_width": 1349,
+      "image_height": 688,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Christina wants to ensure that session persistence is maintained by her load balancer. What is she attempting to do? O A Ensure that all of a clients requests go to the same server for the duration ofa given session or transaction. @ B. Assign the same internal IP address to clients whenever they connect through the load balancer. O C. Ensure that all transactions go to the current server in a round-robin during the time it is the primary server. Overall Time Spent: 01 QUESTION 44 of 226 O D. Assign the same external IP address to all servers whenever they are the primary server assigned by the load balancer. Explanation Session persistence makes sure that all of a clients traffic for a transaction or session goes to the same server or service. The remaining options do not properly describe how session persistence works. CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Christina wants to ensure that session persistence is maintained by her load balancer. What is she attempting to do?",
+      "choices": {
+        "A": "Ensure that all of a clients requests go to the same server for the duration of a given session or transaction.",
+        "B": "Assign the same internal IP address to clients whenever they connect through the load balancer.",
+        "C": "Ensure that all transactions go to the current server in a round-robin during the time it is the primary server.verall Time Spent: 01",
+        "D": "Assign the same external IP address to all servers whenever they are the primary server assigned by the load balancer."
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Session persistence makes sure that all of a clients traffic for a transaction or session goes to the same server or service. The remaining options do not properly describe how session persistence works.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-12 at 04-27-25 Question 51 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-12 at 04-27-25 Question 51 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 51,
+      "image_width": 1349,
+      "image_height": 760,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Jason is considering deploying a network intrusion prevention system (IPS) and wants to be able to detect advanced persistent threats (APTs). What type of IPS detection method is most likely to detect the behaviors of an APT after it has gathered baseline information about normal operations? @ A Signature-based IPS detections O B. Heuristic-based IPS detections O C. Malicious tool hash IPS detections C) D. Anomaly-based IPS detections Explanation Anomaly-based detection systems build a behavioral baseline for networks and then assess differences from those baselines. They may use heuristic capabilities on top of those, but the question specifically asks about baselined operations pointing to an anomaly-based system. Heuristic-based detections look for behaviors that are typically malicious, and signature-based or hash-based detections look for known malicious tools or files. QUESTION CONTENT FEEDBACK 51 of 226 PREVIOUS N EXT",
+      "prompt": "Jason is considering deploying a network intrusion prevention system (IPS) and wants to be able to detect advanced persistent threats (APTs). What type of IPS detection method is most likely to detect the behaviors of an APT after it has gathered baseline information about normal operations?",
+      "choices": {
+        "A": "Signature-based IPS detections",
+        "B": "Heuristic-based IPS detections",
+        "C": "Malicious tool hash IPS detections",
+        "D": "Anomaly-based IPS detections"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Anomaly-based detection systems build a behavioral baseline for networks and then assess differences from those baselines. They may use heuristic capabilities on top of those, but the question specifically asks about baselined operations pointing to an anomaly-based system. Heuristic-based detections look for behaviors that are typically malicious, and signature-based or hash-based detections look for known malicious tools or files.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-14 at 00-54-33 Question 86 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-14 at 00-54-33 Question 86 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 86,
+      "image_width": 691,
+      "image_height": 778,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Yasmine wants to ensure that her organization has appropriate connectivity' as part of their infrastructure design for their primary site. Which of the following concerns should she review to ensure that physical disasters do not disable her companfs operations? C) A Service provider path diversity O B. Ensuring both fiber and copper connectivity are used @ C. Implementing SD-WAN C) D. Geographic dispersion Explanation Path diversity ensures that the connectivity' to the facility does not take the same path. This helps to prevent the moment network managers dread when a single accident\u2014or construction equipment in the wrong place\u2014tears up multiple fiber or copper paths, taking organizations offline. Diversity' of the cabling type is not a requirement or need, SD-WAN does not directly address physical disasters, and geographic dispersion is not possible ata single site. QUESTION CONTENT FEEDBACK 86 of 226 PREVIOUS N EXT",
+      "prompt": "Yasmine wants to ensure that her organization has appropriate connectivity' as part of their infrastructure design for their primary site. Which of the following concerns should she review to ensure that physical disasters do not disable her companfs operations?",
+      "choices": {
+        "A": "Service provider path diversity",
+        "B": "Ensuring both fiber and copper connectivity are used",
+        "C": "Implementing SD-WAN",
+        "D": "Geographic dispersion"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Path diversity ensures that the connectivity' to the facility does not take the same path. This helps to prevent the moment network managers dread when a single accident-or construction equipment in the wrong place-tears up multiple fiber or copper paths, taking organizations offline. Diversity' of the cabling type is not a requirement or need, SD-WAN does not directly address physical disasters, and geographic dispersion is not possible ata single site.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-14 at 05-19-00 Question 120 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-14 at 05-19-00 Question 120 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 120,
+      "image_width": 922,
+      "image_height": 814,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture Incorrect Frankie wants to connect two remote sites so that they appear to be on the same local network segment. What type of solution is best suited to this requirement if she wants traffic sent between the locations to be secure despite traversing the public Internet? @ A. Establish a VLAN between the two locations. O B. use TLSto encapsulate each service provided between the two locations. O C. Set upa VPN tunnel between the two O D. Reclassify the data as public and send the data as normal. Explanation VPNs, or virtual private networks, are commonly established between two to provide a secure connection that can make the networks appear to be on the same network segment. A VLAN may then be used if desired, but a VLAN alone does not provide encryption and cannot be set up across a public connection. TLS encapsulating each service would provide security, but that would not make the two sites appear to be on the same network segment. Reclassifying the data does not secure the data or make the networks appear to be on the same segment, either. QUESTION %CONTENT FEEDBACK 120 of 226 PREVIOUS N EXT",
+      "prompt": "Frankie wants to connect two remote sites so that they appear to be on the same local network segment. What type of solution is best suited to this requirement if she wants traffic sent between the locations to be secure despite traversing the public Internet?",
+      "choices": {
+        "A": "Establish a VLAN between the two locations.",
+        "B": "use TLSto encapsulate each service provided between the two locations.",
+        "C": "Set upa VPN tunnel between the two",
+        "D": "Reclassify the data as public and send the data as normal."
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "VPNs, or virtual private networks, are commonly established between two to provide a secure connection that can make the networks appear to be on the same network segment. A VLAN may then be used if desired, but a VLAN alone does not provide encryption and cannot be set up across a public connection. TLS encapsulating each service would provide security, but that would not make the two sites appear to be on the same network segment. Reclassifying the data does not secure the data or make the networks appear to be on the same segment, either. QUESTION % 120 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-14 at 05-28-11 Question 126 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-14 at 05-28-11 Question 126 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 126,
+      "image_width": 922,
+      "image_height": 724,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Ed is building a continuity of operations plan (COOP) for his organization. What three scenarios does a COOP address? O A. Loss of personnel, loss of systems, loss of availability O B. Natural disasters, human-made disasters, mistakes or errors @ C. Loss of access to a facility, damage to a facility, natural disasters O D. Loss of access to a facility, loss of personnel, and loss of services Explanation COOP plans address loss of access to some or all of a facility, personnel, or services. Other items may cause those losses, but the focus is on continued operations addressing the key components of an organization's business or purpose\u2014facilities, staff, and services. QUESTION %CONTENT FEEDBACK 1 26 of 226 PREVIOUS N EXT",
+      "prompt": "Ed is building a continuity of operations plan (COOP) for his organization. What three scenarios does a COOP address?",
+      "choices": {
+        "A": "Loss of personnel, loss of systems, loss of availability",
+        "B": "Natural disasters, human-made disasters, mistakes or errors",
+        "C": "Loss of access to a facility, damage to a facility, natural disasters",
+        "D": "Loss of access to a facility, loss of personnel, and loss of services"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "COOP plans address loss of access to some or all of a facility, personnel, or services.ther items may cause those losses, but the focus is on continued operations addressing the key components of an organization's business or purpose-facilities, staff, and services. QUESTION % 1 26 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-14 at 05-32-42 Question 128 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-14 at 05-32-42 Question 128 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 128,
+      "image_width": 922,
+      "image_height": 796,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Renee wants to choose a control that will protect her organization against SQL injection attacks. Which of the following is likely to be the most effective control for attacks that are announced without prior notice and that require a very quick response? @ A. Web application penetration testing O B. A WAF C) C. Static code review O D. SASE Explanation A major advantage of WAFS is the ability to use thread and rule feeds from vendors that quickly respond to new threats and attacks. At the same time, Renee can also build WAF rules faster than it would take to deploy code fixes in many cases. Penetration testing and static code review are both slow processes and are not suited to the rapid respond described. SASE is used to protect diverse endpoints in many locations, not to counter SQL injection (SQLi) against a web service. QUESTION %CONTENT FEEDBACK 128 of 226 PREVIOUS N EXT",
+      "prompt": "Renee wants to choose a control that will protect her organization against SQL injection attacks. Which of the following is likely to be the most effective control for attacks that are announced without prior notice and that require a very quick response?",
+      "choices": {
+        "A": "Web application penetration testing",
+        "B": "A WAF",
+        "C": "Static code review",
+        "D": "SASE"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "A major advantage of WAFS is the ability to use thread and rule feeds from vendors that quickly respond to new threats and attacks. At the same time, Renee can also build WAF rules faster than it would take to deploy code fixes in many cases. Penetration testing and static code review are both slow processes and are not suited to the rapid respond described. SASE is used to protect diverse endpoints in many locations, not to counter SQL injection (SQLi) against a web service. QUESTION % 128 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-14 at 05-33-22 Question 129 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-14 at 05-33-22 Question 129 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 129,
+      "image_width": 922,
+      "image_height": 814,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Maria wants to deploy a web application firewall that will stop new attacks against her organization. What should she do to make sure that her web application firewall rules are as current as possible? C) A Manually add new rules based on email updates. O B. Deploy rules based on the OWASP Top 10. @ C. Subscribe to a threat feed and deploy rules based on the feed. O D. Subscribe to the vendors managed WAF rule service. Explanation Many vendors offer a managed service that provides rules that stop trending and new attacks. Maria can subscribe to the service, but needs to be aware that sometimes rules may cause outages or issues if they block legitimate traffic accidentally. Manually deploying rules is slow and requires careful crafting. The Open Worldwide Application Security Project (OWASP) Top 10 is a short list and it is not updated quickly. Threat feeds are useful as a way to write rules but will be less effective than a managed service in most cases due to the variety of attacks and new threats. QUESTION %CONTENT FEEDBACK 129 of 226 PREVIOUS N EXT",
+      "prompt": "Maria wants to deploy a web application firewall that will stop new attacks against her organization. What should she do to make sure that her web application firewall rules are as current as possible?",
+      "choices": {
+        "A": "Manually add new rules based on email updates.",
+        "B": "Deploy rules based on theWASP Top 10.",
+        "C": "Subscribe to a threat feed and deploy rules based on the feed.",
+        "D": "Subscribe to the vendors managed WAF rule service."
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Many vendors offer a managed service that provides rules that stop trending and new attacks. Maria can subscribe to the service, but needs to be aware that sometimes rules may cause outages or issues if they block legitimate traffic accidentally. Manually deploying rules is slow and requires careful crafting. Thepen Worldwide Application Security Project (OWASP) Top 10 is a short list and it is not updated quickly. Threat feeds are useful as a way to write rules but will be less effective than a managed service in most cases due to the variety of attacks and new threats. QUESTION % 129 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-14 at 05-48-06 Question 134 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-14 at 05-48-06 Question 134 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 134,
+      "image_width": 922,
+      "image_height": 814,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "overall Time spent: Chapter 3: Domain 3.0: Security Architecture Servers in redundant clusters are typically not placed in the same server rack in case of a water leak or other issue that impacts the rack. What consideration describes this type of design decision? O A. Connectivity @ B. Geographic dispersion C) C. Device placement O D. Attack surface Explanation Device placement can matter due to physical risks or because of concerns about latency, access to services, or other considerations. Connectivity concerns fuus on whether an organization can obtain a network connection and whether it meets the organization's needs, including throughput and reliability. Geographic dispersion refers to the distance between locations that helps to ensure that a single disaster does not take an organization offline. Attack surface is the set of services, ports, and physical access that an attacker could leverage. QUESTION %CONTENT FEEDBACK 134 of 226 PREVIOUS N EXT",
+      "prompt": "Servers in redundant clusters are typically not placed in the same server rack in case of a water leak or other issue that impacts the rack. What consideration describes this type of design decision?",
+      "choices": {
+        "A": "Connectivity",
+        "B": "Geographic dispersion",
+        "C": "Device placement",
+        "D": "Attack surface"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Device placement can matter due to physical risks or because of concerns about latency, access to services, or other considerations. Connectivity concerns fuus on whether an organization can obtain a network connection and whether it meets the organization's needs, including throughput and reliability. Geographic dispersion refers to the distance between locations that helps to ensure that a single disaster does not take an organization offline. Attack surface is the set of services, ports, and physical access that an attacker could leverage. QUESTION % 134 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-14 at 05-53-21 Question 138 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-14 at 05-53-21 Question 138 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 138,
+      "image_width": 922,
+      "image_height": 706,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Which of the following is not a common consideration for legacy devices? C) A. Cost B. Ease of recovery @ C. Patch availability C) D. Inability to patch Explanation QUESTION 138 of 226 Legacy devices typically cannot be purchased, so their cost becomes irrelevant. Whether they can be recovered, if patches are available, and the issues that lack of patching may cause are all common issues for legacy devices. %CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Which of the following is not a common consideration for legacy devices?",
+      "choices": {
+        "A": "Cost",
+        "B": "Ease of recovery",
+        "C": "Patch availability",
+        "D": "Inability to patch"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Legacy devices typically cannot be purchased, so their cost becomes irrelevant. Whether they can be recovered, if patches are available, and the issues that lack of patching may cause are all common issues for legacy devices. %",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-14 at 05-53-43 Question 139 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-14 at 05-53-43 Question 139 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 139,
+      "image_width": 922,
+      "image_height": 708,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture Correct Which of the following is not a common service provided by a UTM device? O A. Firewall @ B. SD-WAN O C. IPS C) D. Antivirus,'antimalware Explanation UTM devices commonly provide firewall, IPS, antivirus/antimalware, and a variety of other services. They are also commonly part of SD-WAN architectures, but do not themselves provide the SD-WAN service. QUESTION %CONTENT FEEDBACK 139 of 226 PREVIOUS N EXT",
+      "prompt": "Which of the following is not a common service provided by a UTM device?",
+      "choices": {
+        "A": "Firewall",
+        "B": "SD-WAN",
+        "C": "IPS",
+        "D": "Antivirus,'antimalware"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "UTM devices commonly provide firewall, IPS, antivirus/antimalware, and a variety of other services. They are also commonly part of SD-WAN architectures, but do not themselves provide the SD-WAN service. QUESTION % 139 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-14 at 06-03-54 Question 141 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-14 at 06-03-54 Question 141 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 141,
+      "image_width": 922,
+      "image_height": 778,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Jaime has deployed smart lighting and thermostats to her new buildings. What technique will have the largest impact if she wants to harden the devices? @ A. Applying an industry standard baseline configuration O B. Moving the devices to a separate security zone O C. Fully patching the devices when they are deployed O D. Vulnerability scanning, then remediating the devices on a regular basis Explanation Moving devices to an isolated network segment that has appropriate controls in place to protect devices that may not be able to be secured or that may not receive regular patches is the best option available. Baselines, patching, and even scanning and remediation only help if the devices can be secured, patched, and otherwise protected. IoT devices are often not able to be secured this way, particularly as they age and both lighting and thermostats have relatively long useful lifespans. QUESTION %CONTENT FEEDBACK 141 of226 PREVIOUS N EXT",
+      "prompt": "Jaime has deployed smart lighting and thermostats to her new buildings. What technique will have the largest impact if she wants to harden the devices?",
+      "choices": {
+        "A": "Applying an industry standard baseline configuration",
+        "B": "Moving the devices to a separate security zone",
+        "C": "Fully patching the devices when they are deployed",
+        "D": "Vulnerability scanning, then remediating the devices on a regular basis"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Moving devices to an isolated network segment that has appropriate controls in place to protect devices that may not be able to be secured or that may not receive regular patches is the best option available. Baselines, patching, and even scanning and remediation only help if the devices can be secured, patched, and otherwise protected. IoT devices are often not able to be secured this way, particularly as they age and both lighting and thermostats have relatively long useful lifespans. QUESTION % 141 of226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-14 at 06-11-42 Question 143 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-14 at 06-11-42 Question 143 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 143,
+      "image_width": 922,
+      "image_height": 762,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture Correct Lucca wants to fully validate his organization's hot site's ability to perform as needed in the event of an outage. What type oftesting should he run to ensure that the hot site is completely tested as though an actual disaster has occurred? @ A. Fail over C) B. Simulation C. Tabletop C) D. Parallel processing Explanation Fail over testing goes beyond parallel processing and completely takes over running services. This is the most complex and risky testing mode, but also the only one that completely tests failure scenarios in a real-world exercise. Simulations and tabletops are more abstract and would not test the site, instead focusing on practices and behaviors. QUESTION %CONTENT FEEDBACK 143 of 226 PREVIOUS N EXT",
+      "prompt": "Lucca wants to fully validate his organization's hot site's ability to perform as needed in the event of an outage. What type oftesting should he run to ensure that the hot site is completely tested as though an actual disaster has occurred?",
+      "choices": {
+        "A": "Fail over",
+        "B": "Simulation",
+        "C": "Tabletop",
+        "D": "Parallel processing"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Fail over testing goes beyond parallel processing and completely takes over running services. This is the most complex and risky testing mode, but also the only one that completely tests failure scenarios in a real-world exercise. Simulations and tabletops are more abstract and would not test the site, instead focusing on practices and behaviors. QUESTION % 143 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-14 at 06-18-34 Question 142 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-14 at 06-18-34 Question 142 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 142,
+      "image_width": 922,
+      "image_height": 780,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture Correct Chuck has deployed a cloud-based security environment that combines SD-WAN, zero trust, cloud access security' broker (CASS), and firewall services to replace traditional VPNs. What sort of service has Chuck deployed? O A. SaaS @ B. SASE O C. SONET O D. SCM Explanation Secure access service edge (SASE) deployments combine SD-WAN with a variety of cloud- hosted security services, including zero trust and CASB tools to replace VPNs. This provides an edge device\u2014oriented security architecture with end-to-end security. SaaS is involved but is not a specific enough answer. SONET is a communication protuol used for fiber networks. Supply chain management (SCM) is not a term used in this context. QUESTION %CONTENT FEEDBACK 142 of 226 PREVIOUS N EXT",
+      "prompt": "Chuck has deployed a cloud-based security environment that combines SD-WAN, zero trust, cloud access security' broker (CASS), and firewall services to replace traditional VPNs. What sort of service has Chuck deployed?",
+      "choices": {
+        "A": "SaaS",
+        "B": "SASE",
+        "C": "SONET",
+        "D": "SCM"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "Secure access service edge (SASE) deployments combine SD-WAN with a variety of cloud- hosted security services, including zero trust and CASB tools to replace VPNs. This provides an edge device-oriented security architecture with end-to-end security. SaaS is involved but is not a specific enough answer. SONET is a communication protocol used for fiber networks. Supply chain management (SCM) is not a term used in this context. QUESTION % 142 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-14 at 06-32-30 Question 151 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-14 at 06-32-30 Question 151 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 151,
+      "image_width": 922,
+      "image_height": 778,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Overall Time S#nt: 06:34:40 Chapter 3: Domain 3.0: Security Architecture John has deployed three servers that all respond as though they're the same device to provide service he runs. What term best describes this configuration? @ A. Load balancing C) B. Clustering C. Fail-open D. Fail-closed Explanation Clustering involves using two or more systems to provide a service as though theyre a single server. Load balancing spreads workloads across multiple independent systems while front- ending them with a load balancer device or service to distribute load. Fail-open means that if a network device fails, traffic continues to pass through it. Fail-closed devices stop traffic if they fail. Decisions about fail-open and fail-closed are made based on security' in most cases, with fail-closed being more secure if the organization relies on the device for security. QUESTION %CONTENT FEEDBACK 151 of 226 PREVIOUS N EXT",
+      "prompt": "06:34:40 Architecture John has deployed three servers that all respond as though they're the same device to provide service he runs. What term best describes this configuration?",
+      "choices": {
+        "A": "Load balancing",
+        "B": "Clustering",
+        "C": "Fail-open",
+        "D": "Fail-closed"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Clustering involves using two or more systems to provide a service as though theyre a single server. Load balancing spreads workloads across multiple independent systems while front- ending them with a load balancer device or service to distribute load. Fail-open means that if a network device fails, traffic continues to pass through it. Fail-closed devices stop traffic if they fail. Decisions about fail-open and fail-closed are made based on security' in most cases, with fail-closed being more secure if the organization relies on the device for security. QUESTION % 151 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-14 at 06-35-22 Question 154 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-14 at 06-35-22 Question 154 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 154,
+      "image_width": 922,
+      "image_height": 803,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "overall Time spent: Chapter 3: Domain 3.0: Security Architecture What is the primary reason an organization might choose a parallel processing testing scenario over a fail over testing scenario? C) A Parallel processing allows for more throughput. O B. Fail over does not fully test redundant systems. C. Fail over requires organizations to create a significant issue to allow for the fail over to occur. O D. Parallel processing typically handles issues without outages. Explanation Parallel processing allows for systems to be tested without taking them offline. This means that in the event of an issue with the backup systems or facility, the primary facility can continue to operate. Parallel processing does allow for more throughput, but organizations should not rely on this as parallel pruessing environments need to be able to handle the full load for the organization if the primary or backup fails. Fail over does test redundant systems and does not require organizations to create a significant issue. Instead, manual fail over processes are used to conduct fail over tests. QUESTION %CONTENT FEEDBACK 154 of 226 PREVIOUS N EXT",
+      "prompt": "What is the primary reason an organization might choose a parallel processing testing scenario over a fail over testing scenario?",
+      "choices": {
+        "A": "Parallel processing allows for more throughput.",
+        "B": "Fail over does not fully test redundant systems.",
+        "C": "cur.",
+        "D": "Parallel processing typically handles issues without outages."
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Parallel processing allows for systems to be tested without taking them offline. This means that in the event of an issue with the backup systems or facility, the primary facility can continue to operate. Parallel processing does allow for more throughput, but organizations should not rely on this as parallel pruessing environments need to be able to handle the full load for the organization if the primary or backup fails. Fail over does test redundant systems and does not require organizations to create a significant issue. Instead, manual fail over processes are used to conduct fail over tests. QUESTION % 154 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-15 at 01-06-18 Question 166 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-15 at 01-06-18 Question 166 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 166,
+      "image_width": 778,
+      "image_height": 778,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Jules is planning a SCADA deployment for her organization. Which of the following is most likely to be a major concern over the lifetime of the SCADA system? C) A. Cost @ B. Scalability C) C. Inability to patch D. Availability Explanation SCADA and ICS systems often suffer from a lack of patches and updates. Cost is typically amortized over long periods of time, and SCADA and ICS systems are critical to organizational functions. Scalability is rarely a concern for embedded devices, and SCADA and ICS devices are designed for long life cycles and reliability. QUESTION %CONTENT FEEDBACK 166 of 226 PREVIOUS N EXT",
+      "prompt": "Jules is planning a SCADA deployment for her organization. Which of the following is most likely to be a major concern over the lifetime of the SCADA system?",
+      "choices": {
+        "A": "Cost",
+        "B": "Scalability",
+        "C": "Inability to patch",
+        "D": "Availability"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "SCADA and ICS systems often suffer from a lack of patches and updates. Cost is typically amortized over long periods of time, and SCADA and ICS systems are critical to organizational functions. Scalability is rarely a concern for embedded devices, and SCADA and ICS devices are designed for long life cycles and reliability. QUESTION % 166 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-15 at 01-11-52 Question 168 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-15 at 01-11-52 Question 168 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 168,
+      "image_width": 778,
+      "image_height": 778,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect The ability to obtain third-party support for a device or system is an example of which consideration? @ A. Availability B. Risk transference O C. Compute C) D. Responsiveness Explanation Third-party support availability is an example of risk transference where the support contract moves the risk to the contractor. Availability and responsiveness may be considerations for the contractor, but the ability to obtain support doesn't imply either of these. Compute is most commonly a concern where embedded devices or hardware solutions may not have sufficient computational power to meet new needs. QUESTION %CONTENT FEEDBACK 168 of 226 PREVIOUS N EXT",
+      "prompt": "The ability to obtain third-party support for a device or system is an example of which consideration?",
+      "choices": {
+        "A": "Availability",
+        "B": "Risk transference",
+        "C": "Compute",
+        "D": "Responsiveness"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Third-party support availability is an example of risk transference where the support contract moves the risk to the contractor. Availability and responsiveness may be considerations for the contractor, but the ability to obtain support doesn't imply either of these. Compute is most commonly a concern where embedded devices or hardware solutions may not have sufficient computational power to meet new needs. QUESTION % 168 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-15 at 01-13-38 Question 169 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-15 at 01-13-38 Question 169 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 169,
+      "image_width": 778,
+      "image_height": 814,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture \u2022ncorrecl Yarifwants to create security zones in his network. Which ofthe following technologies is best suited to doing this based on roles and user identities? O A. NAC and VLANs B. 802.1X and containerization @ C. SON and MAC address filtering O D. SD-WAN and VLANs Explanation Network access control (NAC) tools that can allow for authentication and authorization based on user groups or roles and VLANs that separate groups based on those roles once theyre on the network exactly fit the needs Yarif has. 802. IX can also be helpful with this, but containerization is used to allow applications to be deployed without worrying about the application environment. SDN and MAC address filtering doesn't account for user authentication and identities, just machine hardware addresses. SD-WAN is for external connectivity, not internal networks. QUESTION %CONTENT FEEDBACK 169 of 226 PREVIOUS N EXT",
+      "prompt": "\u2022ncorrecl Yarifwants to create security zones in his network. Which of the following technologies is best suited to doing this based on roles and user identities?",
+      "choices": {
+        "A": "NAC and VLANs",
+        "B": "802.1X and containerization",
+        "C": "SDN and MAC address filtering",
+        "D": "SD-WAN and VLANs"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Network access control (NAC) tools that can allow for authentication and authorization based on user groups or roles and VLANs that separate groups based on those roles once theyre on the network exactly fit the needs Yarif has. 802. IX can also be helpful with this, but containerization is used to allow applications to be deployed without worrying about the application environment. SDN and MAC address filtering doesn't account for user authentication and identities, just machine hardware addresses. SD-WAN is for external connectivity, not internal networks. QUESTION % 169 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-15 at 01-17-04 Question 170 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-15 at 01-17-04 Question 170 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 170,
+      "image_width": 778,
+      "image_height": 760,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Elle is conducting an exercise for her organization and wants to run an exercise that is as close to an actual event as possible. What type of event should she run to help her organization get this type of real-\u2022world practice? A. A simulation @ B. A tabletop exercise O C. A walk-through O D. A wargame Explanation A simulation is the closest you can get to a real-\u2022world event without having one. A tabletop exercise has personnel discussing scenarios, whereas a walk- QUESTION 1 70 of 226 through goes through checklists and pruedures. A wargame is not a common exercise type. %CONTENT FEEDBACK PREVIOUS N EXT",
+      "prompt": "Elle is conducting an exercise for her organization and wants to run an exercise that is as close to an actual event as possible. What type of event should she run to help her organization get this type of real-\u2022world practice?",
+      "choices": {
+        "A": "A simulation",
+        "B": "A tabletop exercise",
+        "C": "A walk-through",
+        "D": "A wargame"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "A simulation is the closest you can get to a real-\u2022world event without having one. A tabletop exercise has personnel discussing scenarios, whereas a walk-",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-15 at 01-17-24 Question 171 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-15 at 01-17-24 Question 171 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 171,
+      "image_width": 778,
+      "image_height": 706,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture Incorrect What security advantage does a serverless model provide? @ A. Cost savings O B. No need to patch infrastructure C. No vulnerable functions C) D. No need to log events Explanation Serverless deployments remove the need to patch underlying infrastructure. They may still have vulnerable functions and should be logged. Cost savings is not a direct security advantage. QUESTION %CONTENT FEEDBACK 171 of226 PREVIOUS N EXT",
+      "prompt": "What security advantage does a serverless model provide?",
+      "choices": {
+        "A": "Cost savings",
+        "B": "No need to patch infrastructure",
+        "C": "No vulnerable functions",
+        "D": "No need to log events"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "Serverless deployments remove the need to patch underlying infrastructure. They may still have vulnerable functions and should be logged. Cost savings is not a direct security advantage. QUESTION % 171 of226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-15 at 01-23-26 Question 173 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-15 at 01-23-26 Question 173 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 173,
+      "image_width": 778,
+      "image_height": 742,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture Incorrect Which of the following is not a common means of enforcing segmentation on a network? @ A. ACLs O B. VLANs C. Firewalls O D. Airgaps Explanation ACLs, VLANs, and firewalls are all commonly used to implement network segmentation. Due to the operational challenges that air gaps create, they are far less commonly implemented and are only used when absolutely necessary. QUESTION %CONTENT FEEDBACK 173 of 226 PREVIOUS N EXT",
+      "prompt": "Which of the following is not a common means of enforcing segmentation on a network?",
+      "choices": {
+        "A": "ACLs",
+        "B": "VLANs",
+        "C": "Firewalls",
+        "D": "Airgaps"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "ACLs, VLANs, and firewalls are all commonly used to implement network segmentation. Due to the operational challenges that air gaps create, they are far less commonly implemented and are only used when absolutely necessary. QUESTION % 173 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-18 at 00-26-02 Question 175 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-18 at 00-26-02 Question 175 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 175,
+      "image_width": 762,
+      "image_height": 760,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Erin uses a journaling backup scheme for her database. After a system outage she needs to restore from her backups. If her organization uses a daily backup scheme that runs at midnight, and the issue occurred at 2 a.m., how much data is Erin likely to lose? @ A Two hours of data B. One day and two hours of data C) C. One week of data C) D. Little or no data Explanation Journaling tracks transactions as they occur. Unless the journal itself was lost, Melissa should be able to restore the backup, then replay the journal to ensure the organization loses very little data. QUESTION %CONTENT FEEDBACK 1 75 of 226 PREVIOUS N EXT",
+      "prompt": "Erin uses a journaling backup scheme for her database. After a system outage she needs to restore from her backups. If her organization uses a daily backup scheme that runs at midnight, and the issue occurred at 2 a.m., how much data is Erin likely to lose?",
+      "choices": {
+        "A": "Two hours of data",
+        "B": "One day and two hours of data",
+        "C": "One week of data",
+        "D": "Little or no data"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Journaling tracks transactions as they occur. Unless the journal itself was lost, Melissa should be able to restore the backup, then replay the journal to ensure the organization loses very little data. QUESTION % 1 75 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-18 at 00-29-09 Question 178 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-18 at 00-29-09 Question 178 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 178,
+      "image_width": 762,
+      "image_height": 750,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect What two major differences separate backups and replication? A. Replication is periodic, but does not require restoration processes o before data is able to be used. 8. Backups are continuous but require restoration processes before data is able to be used. C. Backups are periodic and do not require restoration before data is o able to be used. D. Replication is continuous and does not require restoration o processes before data is able to be used. Explanation Replication is a continuous process and because of this it does not require restoration processes like restoring differential backups or journals to allow data to be used. Backups are periodic, and they typically require additional restoration work in order to be used. QUESTION %CONTENT FEEDBACK 1 78 of 226 PREVIOUS N EXT",
+      "prompt": "What two major differences separate backups and replication?",
+      "choices": {
+        "A": "ble to be used.",
+        "B": "efore data is able to be used. 8. Backups are continuous but require restoration processes before data is able to be used.",
+        "C": "Backups are periodic and do not require restoration before data is",
+        "D": "Replication is continuous and does not require restoration o processes before data is able to be used."
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Replication is a continuous process and because of this it does not require restoration processes like restoring differential backups or journals to allow data to be used. Backups are periodic, and they typically require additional restoration work in order to be used. QUESTION % 1 78 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-18 at 00-33-08 Question 179 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-18 at 00-33-08 Question 179 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 179,
+      "image_width": 762,
+      "image_height": 573,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture Erin's organization uses a backup schedule that creates a full backup once a week, then creates differential backups once a day on all other days. If the full backup was done four days ago, and Erin needs to restore from it, how many backups will she have to restore in total? @ A. one O B. Two C) C. Three O D. Four Explanation Erin will need to restore the full backup, then apply the differential backups from each of the remaining three days for a total of four backups.",
+      "prompt": "Erin's organization uses a backup schedule that creates a full backup once a week, then creates differential backups once a day on all other days. If the full backup was done four days ago, and Erin needs to restore from it, how many backups will she have to restore in total?",
+      "choices": {
+        "A": "one",
+        "B": "Two",
+        "C": "Three",
+        "D": "Four"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Erin will need to restore the full backup, then apply the differential backups from each of the remaining three days for a total of four backups.",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-18 at 00-35-24 Question 180 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-18 at 00-35-24 Question 180 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 180,
+      "image_width": 762,
+      "image_height": 748,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect What advantage does an IPSec VPN have over a TLS VPN when protecting traffic? O A It operates at the network layer rather than the transport layer. @ B. It supports stronger encryption types. C. It does not rely on tunneling. D. It does not provide advantages over TLS, and TLS should be used o instead when possible. Explanation IPSec VPNs operate at the network layer instead of the transport layer. That means less information is visible to potential attackers. 80th support strong encryption, IPSec VPNs do support tunneling, and not relying on tunneling is not an advantage in most use cases. QUESTION %CONTENT FEEDBACK 180 of 226 PREVIOUS N EXT",
+      "prompt": "What advantage does an IPSec VPN have over a TLS VPN when protecting traffic?",
+      "choices": {
+        "A": "It operates at the network layer rather than the transport layer.",
+        "B": "It supports stronger encryption types.",
+        "C": "It does not rely on tunneling.",
+        "D": "It does not provide advantages over TLS, and TLS should be used o instead when possible."
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "IPSec VPNs operate at the network layer instead of the transport layer. That means less information is visible to potential attackers. 80th support strong encryption, IPSec VPNs do support tunneling, and not relying on tunneling is not an advantage in most use cases. QUESTION % 180 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-18 at 00-38-43 Question 181 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-18 at 00-38-43 Question 181 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 181,
+      "image_width": 762,
+      "image_height": 796,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Overall Times Chapter 3: Domain 3.0: Security Architecture Vera wants to manage multiple commercial Internet services for her organization to ensure connectivity. What technoloy should she select to manage and maintain this? @ A. SASE O B. SON O C. IPSec O D. SD-WAN Explanation Vera can use a SD-WAN, or software-defined wide area network, to manage multiple connections dynamically, ensuring connectivity and performance for her organization. SASE is used to secure networks and device connectivity in modern organizations with complex and mobile boundaries. SON is software-defined networking and manages networks as code. IPSec is a suite of protocols used to secure network traffic. QUESTION %CONTENT FEEDBACK 181 of226 PREVIOUS N EXT",
+      "prompt": "Overall Times Architecture Vera wants to manage multiple commercial Internet services for her organization to ensure connectivity. What technoloy should she select to manage and maintain this?",
+      "choices": {
+        "A": "SASE",
+        "B": "SDN",
+        "C": "IPSec",
+        "D": "SD-WAN"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "Vera can use a SD-WAN, or software-defined wide area network, to manage multiple connections dynamically, ensuring connectivity and performance for her organization. SASE is used to secure networks and device connectivity in modern organizations with complex and mobile boundaries. SDN is software-defined networking and manages networks as code. IPSec is a suite of protocols used to secure network traffic. QUESTION % 181 of226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-18 at 01-09-25 Question 191 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-18 at 01-09-25 Question 191 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 191,
+      "image_width": 762,
+      "image_height": 850,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Overall Time Spent: 12:19:22 Chapter 3: Domain 3.0: Security Architecture Valerie wants to connect one of her companys remote locations back to the organization's main network. What type of solution can she use for a persistent connection between the networks that will securely tunnel data across a commodity Internet connection? @ A. ATLSVPN C) B. A web proxy O c. AnlPSecVPN O D. An 802.1xtunnel Explanation An IPSec VPN is a common option for organizations that need to create a secure VPN tunnel between two locations. A VPN connection is established by network devices at both locations and traffic is able to travel securely over commuiity Internet connections. TLS VPNs are more commonly used for individuals to connect to an organization's network. Web proxies are used to filter and control web traffic, not for this purpose. 802. IX is used to authenticate to networks and protect them from unauthorized connections, not to create secure, multisite tunnels. QUESTION %CONTENT FEEDBACK 191 of 226 PREVIOUS N EXT",
+      "prompt": "Valerie wants to connect one of her companys remote locations back to the organization's main network. What type of solution can she use for a persistent connection between the networks that will securely tunnel data across a commodity Internet connection?",
+      "choices": {
+        "A": "ATLSVPN",
+        "B": "A web proxy",
+        "C": "AnlPSecVPN",
+        "D": "An 802.1xtunnel"
+      },
+      "correct": [
+        "D"
+      ],
+      "general_explanation": "An IPSec VPN is a common option for organizations that need to create a secure VPN tunnel between two locations. A VPN connection is established by network devices at both locations and traffic is able to travel securely over commuiity Internet connections. TLS VPNs are more commonly used for individuals to connect to an organization's network. Web proxies are used to filter and control web traffic, not for this purpose. 802. IX is used to authenticate to networks and protect them from unauthorized connections, not to create secure, multisite tunnels. QUESTION % 191 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-18 at 03-42-59 Question 202 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-18 at 03-42-59 Question 202 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 202,
+      "image_width": 676,
+      "image_height": 760,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Liana wants to deploy a load balancer and wants to ensure that if a session is interrupted users have the highest chance of being reconnected to the same server. What algorithm should she select? O A Round-robin C) B. IP hash @ C. Weighted least connection C) D. Resource-based Explanation IP hash relies on a hash of the client and servers IP addresses to associate them with a server. Even if you're not familiar with load-balancing techniques, you can rule out round-robin, which simply distributes sessions through a list in order; weighted least connection, which looks at which servers have the least traffic and a weight assigned to the server; and resource-based, which looks at how heavily loaded a server is. QUESTION %CONTENT FEEDBACK 202 of 226 PREVIOUS N EXT",
+      "prompt": "Liana wants to deploy a load balancer and wants to ensure that if a session is interrupted users have the highest chance of being reconnected to the same server. What algorithm should she select?",
+      "choices": {
+        "A": "Round-robin",
+        "B": "IP hash",
+        "C": "Weighted least connection",
+        "D": "Resource-based"
+      },
+      "correct": [
+        "B"
+      ],
+      "general_explanation": "IP hash relies on a hash of the client and servers IP addresses to associate them with a server. Even if you're not familiar with load-balancing techniques, you can rule out round-robin, which simply distributes sessions through a list in order; weighted least connection, which looks at which servers have the least traffic and a weight assigned to the server; and resource-based, which looks at how heavily loaded a server is. QUESTION % 202 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-18 at 03-44-23 Question 203 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-18 at 03-44-23 Question 203 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 203,
+      "image_width": 676,
+      "image_height": 742,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture O Incorrect Kyle wants to authenticate users who plug into his network, then assign them to a VLAN based on their role. What technology could he use to do this? O A. 802.1X @ B. Port security O C. VLAN tagging O D. EAP Explanation 802.1 X allows for authentication via EAP, then assignment to a VLAN based on a role or other attributes. EAP alone does not perform this function, port security leverages MAC addresses to determine if a system is allowed to connect, and VLAN tagging is part of how traffic is labeled for a specific VLAN but does not support authentication or role-based labels directly. QUESTION %CONTENT FEEDBACK 203 of 226 PREVIOUS N EXT",
+      "prompt": "Kyle wants to authenticate users who plug into his network, then assign them to a VLAN based on their role. What technology could he use to do this?",
+      "choices": {
+        "A": "802.1X",
+        "B": "Port security",
+        "C": "VLAN tagging",
+        "D": "EAP"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "802.1 X allows for authentication via EAP, then assignment to a VLAN based on a role or other attributes. EAP alone does not perform this function, port security leverages MAC addresses to determine if a system is allowed to connect, and VLAN tagging is part of how traffic is labeled for a specific VLAN but does not support authentication or role-based labels directly. QUESTION % 203 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-18 at 03-51-14 Question 210 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-18 at 03-51-14 Question 210 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 210,
+      "image_width": 838,
+      "image_height": 724,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "Chapter 3: Domain 3.0: Security Architecture Overall Time S#nt: 1 O Incorrect Which of the following is not a common security issue with IoT devices? C) A. Insecure communication @ B. Data leaks O C. Ransomware C) D. Device vulnerabilities Explanation Ransomware concerns are typically found with desktops, laptops, mobile devices, and servers instead of IoT devices. IoT devices often dont have patches or aren't patched, send data to third parties that may not be desired, and may not use secure communications. QUESTION %CONTENT FEEDBACK 210 of 226 PREVIOUS N EXT",
+      "prompt": "Which of the following is not a common security issue with IoT devices?",
+      "choices": {
+        "A": "Insecure communication",
+        "B": "Data leaks",
+        "C": "Ransomware",
+        "D": "Device vulnerabilities"
+      },
+      "correct": [
+        "C"
+      ],
+      "general_explanation": "Ransomware concerns are typically found with desktops, laptops, mobile devices, and servers instead of IoT devices. IoT devices often dont have patches or aren't patched, send data to third parties that may not be desired, and may not use secure communications. QUESTION % 210 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    },
+    {
+      "filename": "Screenshot 2026-06-18 at 04-08-01 Question 216 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "path": "C:\\Users\\14422\\Downloads\\Ch_3_domain_3.0_Security_Architecture\\Screenshot 2026-06-18 at 04-08-01 Question 216 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_question_number": 216,
+      "image_width": 838,
+      "image_height": 760,
+      "domain": "Security Architecture",
+      "chapter": "Chapter 3",
+      "topic": "General Review",
+      "domain_code": "3.0",
+      "source_label": "Chapter 3 screenshot bank",
+      "status": "verified",
+      "ocr_available": true,
+      "ocr_text": "overall Time spent: 1 Chapter 3: Domain 3.0: Security Architecture What three responsibilities are typically shared in PaaS environments according to the cloud responsibility matrix? O A. Identity infrastructure, applications, and network controls O B. Data, devices, and accounts @ C. Physical hosts, physical networks, and physical datacenters O D. Operating systems, applications, and data Explanation In platform-as-a-service (PaaS) environments, customers and providers typically share responsibility for identity and directory infrastructure, applications, and network controls. Customers are responsible for data, devices, and accounts, and the provider is responsible for the underlying systems, including operating systems and physical infrastructure. QUESTION OCONTENT FEEDBACK 216 of 226 PREVIOUS N EXT",
+      "prompt": "What three responsibilities are typically shared in PaaS environments according to the cloud responsibility matrix?",
+      "choices": {
+        "A": "Identity infrastructure, applications, and network controls",
+        "B": "Data, devices, and accounts",
+        "C": "Physical hosts, physical networks, and physical datacenters",
+        "D": "Operating systems, applications, and data"
+      },
+      "correct": [
+        "A"
+      ],
+      "general_explanation": "In platform-as-a-service (PaaS) environments, customers and providers typically share responsibility for identity and directory infrastructure, applications, and network controls. Customers are responsible for data, devices, and accounts, and the provider is responsible for the underlying systems, including operating systems and physical infrastructure. QUESTIONCONTENT FEEDBACK 216 of 226",
+      "parse_warnings": [],
+      "review_notes": "OCR draft requires human verification before merging."
+    }
+  ]
+}

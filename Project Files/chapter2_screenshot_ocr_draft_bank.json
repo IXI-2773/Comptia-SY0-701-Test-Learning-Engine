@@ -1,0 +1,1058 @@
+{
+  "title": "Screenshot OCR draft bank - review before merge",
+  "questions": [
+    {
+      "question_number": 900000,
+      "source_question_number": 8,
+      "source_image": "Screenshot 2026-06-25 at 02-03-55 Question 8 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 8,
+      "prompt": "What type of attack depends on the attacker enteringJavaScript into a text area that is intended for users to enter text that will be viewed by other users? @",
+      "choices": {
+        "A": "SQL injection",
+        "B": "Clickjacking",
+        "C": "Cross-site scripting",
+        "D": "Bluejacking"
+      },
+      "correct": [
+        "C"
+      ],
+      "question_type": "single",
+      "general_explanation": "Cross-site scripting (XSS) involves entering a script into text areas that other users will view. SQL injection (SQLi) is not about entering scripts but rather SQL commands. Clickjacking is about tricking users into clicking on the wrong thing. Bluejacking is a Bluetooth attack. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "C": "Correct answer from verified Chapter 2 screenshot.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: C."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900001,
+      "source_question_number": 18,
+      "source_image": "Screenshot 2026-06-25 at 04-29-36 Question 18 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 18,
+      "prompt": "Adam's organization has deployed RFID badges as part of their access control system. Adam is required to enter a 6-digit PIN when he uses his RFID badge and dislikes the additional step. What type of attack is the PIN intended to stop? @",
+      "choices": {
+        "A": "Piggybacking",
+        "B": "On-path",
+        "C": "Concurrent access",
+        "D": "Badge cloning"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "Radio frequency identification (RFID) badges can be cloned, but adding an additional factor like a PIN means the badge alone is not sufficient to gain access. Pigwbacking involves following an authorized user through a security door or gate. On-path attacks inject an attacker into the middle of a transaction or network connection, allowing them to View and potentially mcdify traffic. Concurrent session usage or access is an indicator of compromise (IOC) that fuuses on multiple systems or users using the same credentials. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 2 screenshot."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900002,
+      "source_question_number": 21,
+      "source_image": "Screenshot 2026-06-25 at 04-39-02 Question 21 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 21,
+      "prompt": "Coleen is the web security administrator for an online auction website.",
+      "choices": {
+        "A": "Typo squatting",
+        "B": "SQL injection",
+        "C": "Cross-site scripting",
+        "D": "Cross-site request forgery"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "e From the description it appears that they are not connecting to the real web server but rather a fake server. That indicates typo squatting: having a URL that is named very similarly to a real site so that when users mistype the real site's URL they will go to the fake site.",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 2 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900003,
+      "source_question_number": 24,
+      "source_image": "Screenshot 2026-06-25 at 04-43-12 Question 24 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 24,
+      "prompt": "Alice wants to prevent server-side request forgery (SSRF) attacks. Which of the following will not be helpful for preventing them? O",
+      "choices": {
+        "A": "Removing all SQL code from submitted HTTP queries",
+        "B": "Blocking hostnames like 127.0.01 and lualhost",
+        "C": "Blocking sensitive URLs like 'admin",
+        "D": "Applying allow list-based input filters"
+      },
+      "correct": [
+        "C"
+      ],
+      "question_type": "single",
+      "general_explanation": "Server-side request forgery (SSRF) attempts typically attempt to get HTTP data passed through and will not include SQL injection. Blocking sensitive hostnames, IP addresses, and URLs are all valid ways to prevent SSRF, as is the use of allow list-based input filters. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "C": "Correct answer from verified Chapter 2 screenshot.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: C."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900004,
+      "source_question_number": 25,
+      "source_image": "Screenshot 2026-06-25 at 04-43-37 Question 25 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 25,
+      "prompt": "Tracy wants to protect desktop and laptop systems in her organization from network attacks. She wants to deploy a tool that can actively stop attacks based on signatures, heuristics, and anomalies. What type of tool should she deploy? @",
+      "choices": {
+        "A": "A firewall",
+        "B": "Antimalware",
+        "C": "HIDS",
+        "D": "HIPS"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "A host-based intrusion prevention system (HIPS) can monitor, identify, and stop network traffic that displays network traffic to identify attacks, suspicious behavior, and known bad patterns using signatures. A firewall stops traffic based on rules; antimalware tools are specifically designed to stop malware, not attacks and suspicious network behavior; and a host-based intrusion detection system (HIDS) can only detect, not stop, these behaviors. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 2 screenshot."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900005,
+      "source_question_number": 47,
+      "source_image": "Screenshot 2026-06-25 at 04-59-21 Question 47 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 47,
+      "prompt": "Naomi is preparing a laptop for a traveling salesperson who frequently needs to connect to untrusted hotel networks. What hardening technique can she use to provide the greatest protection against network-based attacks on untrusted networks? @",
+      "choices": {
+        "A": "Install an endpoint detection and response tool.",
+        "B": "Install a host-based firewall.",
+        "C": "Install an extended detection and response tool.",
+        "D": "Install a disk encryption tool."
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "A host-based firewall is an excellent first line of defense for systems that will be deployed to untrusted networks. EDR and XDR are useful for preventing malicious software installs like ransomware, but they do not directly protect against network-based attacks, and disk encryption is a confidentiality control, not a useful tool to prevent network-based attacks.",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 2 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900006,
+      "source_question_number": 55,
+      "source_image": "Screenshot 2026-06-25 at 05-02-57 Question 55 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 55,
+      "prompt": "Which of the following protocols is most commonly associated with credential relaying attacks? @",
+      "choices": {
+        "A": "RDP",
+        "B": "NTLM",
+        "C": "SQL",
+        "D": "TLS"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "While dated, NTLM was historically one of the most common targets of credential relay attacks. RDP, SQL and TLS are less commonly associated with credential relay attacks. Modern protuols implement encryption, session, IOS, and one-time passwords to prevent this type QUESTION SS of 187 of attack. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 2 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900007,
+      "source_question_number": 58,
+      "source_image": "Screenshot 2026-06-25 at 05-08-50 Question 58 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 58,
+      "prompt": "Ashleys organization has recently come under attack and has suffered a DNS outage. As she investigated, she found that requests to her DNS servers were sent to open DNS resolvers using spoofed IP addresses with requests that would result in very large responses from the DNS resolvers to the IP addresses that appeared to be making the request. What type of attack targeted Ashleys organization?",
+      "choices": {
+        "A": "A reflected DDoS",
+        "B": "A DNS flood",
+        "C": "Amirrored DDoS",
+        "D": "A supersized query attack"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "Ashleys organization was the target of a reflected (and amplified) DDoS where attackers took advantage of DNS queries to make small amounts of spoofed traffic into very large amounts of data sent to her servers. DNS flocKis, mirrored DDoSs, and supersized query attacks were made up for this question.",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 2 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900008,
+      "source_question_number": 70,
+      "source_image": "Screenshot 2026-06-25 at 05-18-14 Question 70 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 70,
+      "prompt": "Pete uses a technique that injects code into memory used by another process to allow him to control what the host program does. What is this technique called for Windows dynamically linked libraries?",
+      "choices": {
+        "A": "Win8uff attacks",
+        "B": "DLL injection",
+        "C": "ASYRINGE attack",
+        "D": "A memory traversal attack"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "DLL injection forces a process to load and run code from a dynamically linked library (DLL) that was not originally used by the application or software. This can be used to modify behaviors of the program or to perform malicious actions through the application. WinBuff, SYRINGE, and memory traversal were all made up for this question.",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 2 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900009,
+      "source_question_number": 84,
+      "source_image": "Screenshot 2026-06-26 at 01-02-24 Question 84 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 84,
+      "prompt": "What technique most effectively prevents resource reuse concerns for storage in a virtual environment?",
+      "choices": {
+        "A": "Firmware updates",
+        "B": "Volume encryption",
+        "C": "Minimizing cluster size",
+        "D": "Reformatting drives"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "Ensuring that any volume that is used in a virtual environment is encrypted when created will prevent reuse concerns because data will be unrecoverable even if encrypted data was accessible when drive space was reallocated. Firmware updates, cluster sizes, and reformatting do not properly address this issue. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 2 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900010,
+      "source_question_number": 90,
+      "source_image": "Screenshot 2026-06-26 at 01-40-04 Question 90 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 90,
+      "prompt": "Erica wants to conduct an amplified DDoS attack against a system. What key step is required as part of her attack?",
+      "choices": {
+        "A": "Reversing the targets IP address",
+        "B": "Spoofing the target's IP address",
+        "C": "Conducting an on-path attack to send traffic to the target",
+        "D": "Spoofing responses from the amplification system to the target"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "Amplification attacks typically use spoofed User Datagram Protocol (UDP) queries sent to servers to increase the volume of traffic sent in response to the target. Erica's process might involve identifying large DNS responses she can get with a small query, then spoofing a target system's IP address in the packets she sends to DNS servers. They would then respond with the large responses, amplifying her requests and creating a distributed denial-of-service attack by using many servers to amplify her traffic. This doesn't require reversing an IP address, conducting an on-path attack, or spoofing the responses from the servers.",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 2 screenshot."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900011,
+      "source_question_number": 106,
+      "source_image": "Screenshot 2026-06-26 at 02-36-54 Question 106 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 106,
+      "prompt": "Susan performs a vulnerability scan of a small business network and discovers that the organization's consumer-grade wireless router has a vulnerability in its web server. What issue should she address in her findings?",
+      "choices": {
+        "A": "Firmware patch management",
+        "B": "Default configuration issues",
+        "C": "An unsecured administrative account",
+        "D": "Weak encryption settings"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "Software updates for consumer-grade wireless routers are typically applied as firmware updates, and Susan should recommend that the business owner regularly upgrade their wireless router firmware. If updates are not available, they may need to purchase a new router that will continue to receive updates and configure it appropriately. This is not a default configuration issue nor an unsecured administrative account-neither is mentioned, nor is encryption. QUESTION IOS of 187 N EXT",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 2 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900012,
+      "source_question_number": 115,
+      "source_image": "Screenshot 2026-06-26 at 05-28-34 Question 115 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 115,
+      "prompt": "Charles sets the permissions on the 'etc directory on a Linux system to 777 using the chmod command. If Alex later discovers this, what should he report his finding as?",
+      "choices": {
+        "A": "Open or weak permissions",
+        "B": "Improper file handling",
+        "C": "A privilege escalation attack",
+        "D": "None ofthe above"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "Linux privileges can be set numerically, and 777 sets user, group, and world to all have read, write, and execute access to the entire 'etc directory-a very insecure, and thus open or weak permission. Setting permissions like this is a common workaround when permissions arent working but can expose data or make binaries executable by users who should not have access to them. When you set permissions for a system, remember to set them according to the rule of least privilege: only the permissions that are required for the role or task should be configured. QUESTION IISof187 N EXT",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 2 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900013,
+      "source_question_number": 126,
+      "source_image": "Screenshot 2026-06-26 at 05-42-51 Question 126 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 126,
+      "prompt": "Neil wants to deploy a host-intrusion prevention system that will use a third-party threat feed to servers in his datacenter. What concern might his system administrators express about the HIPS that he should consider before he makes the decision? O",
+      "choices": {
+        "A": "A HIPS may traffic, causing an outage or disruption.",
+        "B": "A HIPS may prevent least privilege configurations.",
+        "C": "A HIPS may bypass application allow lists.",
+        "D": "A HIPS may make use of segmentation less effective."
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "A HIPS may block legitimate traffic if the traffic matches an existing rule or if a threat feed is used and has a detection that matches that traffic. That means that organizations that deploy HIPS in datacenters where disruptions could cause significant outages are careful about what rules they put in place and how threat feed data is used. A HIPS doesn't prevent least privilege and typically doesn't interact with application allow lists, and segmentation should not impact a HIPS.",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 2 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900014,
+      "source_question_number": 132,
+      "source_image": "Screenshot 2026-06-26 at 05-54-12 Question 132 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 132,
+      "prompt": "What type of virtualization attack can be prevented by encrypting storage volumes when they are created? @",
+      "choices": {
+        "A": "VM escape",
+        "B": "Birthday attacks",
+        "C": "Pass-the-hash",
+        "D": "Resource reuse"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "Encryption prevents resource reuse attacks from occurring because the data will not be accessible to attackers after resources are released and reallocated to third parties. VM escape attacks target the underlying VM infrastructure and could still occur if it was vulnerable. Pass-the- hash attacks are used against authentication systems when a hash can be captured and sent to validate a session, and birthday attacks leverage the likelihood of finding a valid collision more quickly by guessing than by moving linearly through a solution set for a hash.",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 2 screenshot."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900015,
+      "source_question_number": 146,
+      "source_image": "Screenshot 2026-06-27 at 00-28-36 Question 146 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 146,
+      "prompt": "Zoie wants to check for instances of concurrent session usage for her web application. Where should she look for these indicators?",
+      "choices": {
+        "A": "Her firewall logs",
+        "B": "Her antivirus (AV) logs",
+        "C": "Her authentication logs",
+        "D": "Her web application server logs"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "Zoie's best option is to review web application server logs to identify session IDs that are the same coming from different IP addresses. She will not see session IDs in firewall, AV, or authentication logs. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 2 screenshot."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900016,
+      "source_question_number": 148,
+      "source_image": "Screenshot 2026-06-27 at 00-55-12 Question 148 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 148,
+      "prompt": "Casey is worried about downgrade attacks against her Apache web servers. What should she do to most effectively prevent downgrade attacks?",
+      "choices": {
+        "A": "Prevent TLS fallback.",
+        "B": "Require current web browsers.",
+        "C": "Run the most current version of Apache.",
+        "D": "use an IOS."
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "Preventing fallback options from being used for encryption may stop some clients from connecting but will most effectively prevent downgrade attacks. Current browsers may be needed for this, but requiring that does not prevent attackers from using a downgrade attack if fallback options are allowed. Current web server software does not prevent settings from being weak. An IDS can detect downgrade attempts but cannot stop them. N EXT",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 2 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900017,
+      "source_question_number": 150,
+      "source_image": "Screenshot 2026-06-27 at 00-58-29 Question 150 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 150,
+      "prompt": "Which of the following is an attack that seeks to attack a website, based on the website's trust of an authenticated user? @",
+      "choices": {
+        "A": "XSS",
+        "B": "XSRF",
+        "C": "Buffer overflow",
+        "D": "Directory traversal"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "Cross-site request forgery (XSRF or CSRF) sends forged requests to a website, supposedly from a trusted user. Cross-site scripting (XSS) is the injection of scripts into a website to exploit the users. A buffer overflow tries to put more data in a variable than the variable can hold. Directory traversal attempts to change directories through URL manipulation to access files that should not normally be accessible to the web server or application.",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 2 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900018,
+      "source_question_number": 151,
+      "source_image": "Screenshot 2026-06-27 at 01-02-11 Question 151 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 151,
+      "prompt": "Mary wants to harden workstations she is responsible for against malware attacks. Which of the following is not a common solution to this?",
+      "choices": {
+        "A": "Installing EDR",
+        "B": "Limiting administrative access",
+        "C": "Installing antivirus",
+        "D": "Using disk encryption"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "Disk encryption does not prevent malware attacks under most circumstances. use of endpoint detection and response tools, antivirus tools, and limiting administrative access are all common ways to counter malware. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 2 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900019,
+      "source_question_number": 155,
+      "source_image": "Screenshot 2026-06-27 at 01-15-39 Question 155 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 155,
+      "prompt": "Overall Time S ant: Vulnerabilities, and Mitigations",
+      "choices": {
+        "A": "Pretexting",
+        "B": "A watering hole attack",
+        "C": "Phishing",
+        "D": "Shoulder surfing"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "Pretexting is a type of social engineering that involves using a false motive and lying to obtain information. Here, the penetration tester lied about their role and why they are calling (impersonation), and then built some trust with the user before asking for personal information. A watering hole attack leverages a website that the targeted users all use and places malware on it to achieve their purpose. Phishing is the process of attempting to gain credentials or other information, typically via email or similar means. Shoulder surfing involves Inking over an individual's shoulder or otherwise observing them entering sensitive information like passwords.",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 2 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900020,
+      "source_question_number": 157,
+      "source_image": "Screenshot 2026-06-27 at 01-52-10 Question 157 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 157,
+      "prompt": "When a multithreaded application does not properly handle various threads accessing a common value, and one thread can change the data while another thread is relying on it, what flaw is this? O",
+      "choices": {
+        "A": "Memory leak",
+        "B": "Buffer overflow",
+        "C": "Integer overflow",
+        "D": "Time-of-check/time-of-use"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "If access is not handled properly, a time-of-check (TOCVtime-of-use (TOO) condition can exist where the memory is checked, changed, then used. Memory leaks ucur when memory is allocated but not deallocated. A buffer overflow is when more data is put into a variable than it can hold. An integer overflow ucurs when an attempt is made to put an integer that is too large into a variable, such as trying to put a 64-bit integer into a 32-bit variable.",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 2 screenshot."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900021,
+      "source_question_number": 164,
+      "source_image": "Screenshot 2026-06-27 at 02-43-24 Question 164 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 164,
+      "prompt": "Jack wants to sideload applications to his Android phone. What does he need to do first to allow this? @",
+      "choices": {
+        "A": "Jailbreak the phone.",
+        "B": "Transfer the files to the phone.",
+        "C": "Install a package manager.",
+        "D": "Disable antimalware protection."
+      },
+      "correct": [
+        "C"
+      ],
+      "question_type": "single",
+      "general_explanation": "Sideloading can be as simple as loading files on the phone, although some bundles and applications require installers or other tools. Jailbreaking, disabling antimalware protection, or even installing a package manager are not required to sideload applications for Android but may be done. Jailbreaking and package managers are commonly used for iOS devices. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "C": "Correct answer from verified Chapter 2 screenshot.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: C."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900022,
+      "source_question_number": 172,
+      "source_image": "Screenshot 2026-06-27 at 02-45-43 Question 172 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 172,
+      "prompt": "Craig wants to control the applications employees can install on the laptops they are issued. If he wants the greatest level of control and is not concerned about flexibility or overhead to manage his solution, which of the following will best meet his needs? @",
+      "choices": {
+        "A": "An access control list",
+        "B": "Application allow list",
+        "C": "An application deny list",
+        "D": "Segmentation"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "An application allow list provides the greatest control over what applications are installed on devices. Application deny lists are useful for preventing specific software from being installed but cannot handle the breadth of possible applications that users may find and use. Access control lists (ACLs) are used like firewall rules to apply rules to network traffic, and segmentation is used to separate systems based on various factors like data sensitivity or trust levels.",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 2 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900023,
+      "source_question_number": 174,
+      "source_image": "Screenshot 2026-06-27 at 02-47-19 Question 174 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 174,
+      "prompt": "Sam's organization uses a DNS black hole to prevent access to known malicious sites. The organization relies on a reputation service feed that is used to add the known malicious domains and IP addresses. DNS lookups that would go to those sites is sent to an internal redirect site that lets users know the site is inaccessible. Sam reviews the logs to determine if a system is trying to access those bluked sites regularly. What type of indicator of compromise is Sam looking for?",
+      "choices": {
+        "A": "Blocked content",
+        "B": "Resource inaccessibility",
+        "C": "Missing logs",
+        "D": "Published or documented indicators"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "e Sam is using blocked content logging to determine what systems may be compromised and attempting to connect to malicious domains and if users are trying to access those IP addresses or domains. This can help Sam intervene with individual users and can also help identify infected systems. Resource inaccessibility is typically an unintentional indicator rather than a result of a security measure as described here. No logs are missing, and there is not a specific indicator of compromise that was described or published listed in the question.",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 2 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900024,
+      "source_question_number": 178,
+      "source_image": "Screenshot 2026-06-27 at 02-48-23 Question 178 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 178,
+      "prompt": "While reviewing logs, Chris sees an Apache web log that includes the following entry: https : / /www . example . corn/viewer. . . / / . ./etc/passwd%e\u00f8 . png What type of attack has Chris most likely uncovered, and what file will it return? O",
+      "choices": {
+        "A": "A replay attack, password% . png",
+        "B": "A directory traversal attack, passwordee . png",
+        "C": "A replay attack, passwd",
+        "D": "A directory traversal attack, passwd"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "This is a directory traversal attack. The characteristic /.. /.. / is the first indicator you should pay attention to. The is a null byte, meaning that many applications will stop reading when they encounter it. You might not know that detail as you take the exam, but you should know that attackers would look for the passwd file, nota PNG of a password! N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 2 screenshot."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900025,
+      "source_question_number": 180,
+      "source_image": "Screenshot 2026-06-27 at 02-48-53 Question 180 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 180,
+      "prompt": "Mark's coworker recently discovered that he can use the Linux su command to run programs as one of his peers. What type of attack is this? O",
+      "choices": {
+        "A": "A replay attack",
+        "B": "A vertical privilege escalation attack",
+        "C": "A horizontal privilege escalation attack",
+        "D": "A forgery attack"
+      },
+      "correct": [
+        "C"
+      ],
+      "question_type": "single",
+      "general_explanation": "Horizontal privilege escalation occurs when users at a similar level are able to use privileges or accounts belonging to peer users. Here, Mark's coworker is able to act as another similar user. Vertical privilege escalation focuses on greater privileges like administrative rights. Replay attacks re-send traffic to authenticate or otherwise repeat a transaction. Forgery attacks like cross-site request forgery (XSRF) leverage trusted sessions to allow malicious apps to take action due to the trust between a browser and a web application. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "C": "Correct answer from verified Chapter 2 screenshot.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: C."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 900026,
+      "source_question_number": 185,
+      "source_image": "Screenshot 2026-06-27 at 02-51-18 Question 185 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 185,
+      "prompt": "Jill is concerned about supply chain attacks against her organization's service providers. Which of the following should be her most significant concern about her software-as-a-service (SaaS) service provider as she duuments her supply chain risks? O",
+      "choices": {
+        "A": "Compromise ofthe SaaS vendor, leading to access to her data",
+        "B": "Attacks against the SaaS vendor, leading to hours of downtime",
+        "C": "Lack of availability of hardware from her SaaS vendor for delivery",
+        "D": "Software vulnerabilities in tools provided by the vendor"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "Data exposure is typically a more significant risk than downtime, particularly when the downtime is limited to hours. SaaS vendors do not typically sell or deliver hardware, as they provide services. Software vulnerabilities may exist, but without a known impact, compromise leading to data loss remains the most significant issue.",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 2 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    }
+  ]
+}

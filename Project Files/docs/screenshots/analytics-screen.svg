@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="680" viewBox="0 0 1100 680">
+  <rect width="1100" height="680" fill="#ececec"/>
+  <rect width="1100" height="42" fill="#0b4b88"/>
+  <text x="18" y="28" fill="white" font-family="Segoe UI, Arial" font-size="18" font-weight="700">Performance Analytics</text>
+  <rect x="28" y="66" width="500" height="150" fill="white" stroke="#c8c8c8"/>
+  <text x="48" y="96" font-family="Segoe UI, Arial" font-size="15" fill="#1f1f1f">Mode: Practice</text>
+  <text x="48" y="122" font-family="Segoe UI, Arial" font-size="15" fill="#1f1f1f">Answered: 25/25</text>
+  <text x="48" y="148" font-family="Segoe UI, Arial" font-size="15" fill="#1f1f1f">Accuracy: 84%</text>
+  <text x="48" y="174" font-family="Segoe UI, Arial" font-size="15" fill="#1f1f1f">Long-term weak: 4    Due review: 2</text>
+  <rect x="558" y="66" width="170" height="42" fill="#0b4b88"/>
+  <text x="614" y="92" font-family="Segoe UI, Arial" font-size="13" font-weight="700" fill="white">Refresh</text>
+  <rect x="558" y="122" width="170" height="42" fill="#f7f9fc" stroke="#0b4b88"/>
+  <text x="604" y="148" font-family="Segoe UI, Arial" font-size="13" font-weight="700" fill="#0b4b88">Export JSON</text>
+  <rect x="28" y="246" width="1010" height="360" fill="white" stroke="#c8c8c8"/>
+  <rect x="28" y="246" width="1010" height="38" fill="#f8f9fb" stroke="#c8c8c8"/>
+  <text x="48" y="270" font-family="Segoe UI, Arial" font-size="14" font-weight="700" fill="#1f1f1f">Domains</text>
+  <text x="48" y="326" font-family="Segoe UI, Arial" font-size="14" fill="#1f1f1f">Security Architecture</text>
+  <text x="352" y="326" font-family="Segoe UI, Arial" font-size="14" fill="#1f1f1f">Answered 12</text>
+  <text x="520" y="326" font-family="Segoe UI, Arial" font-size="14" fill="#1f1f1f">Accuracy 75%</text>
+  <text x="700" y="326" font-family="Segoe UI, Arial" font-size="14" fill="#1f1f1f">Due 2</text>
+  <text x="48" y="374" font-family="Segoe UI, Arial" font-size="14" fill="#1f1f1f">Threats, Vulnerabilities, and Mitigations</text>
+  <text x="352" y="374" font-family="Segoe UI, Arial" font-size="14" fill="#1f1f1f">Answered 8</text>
+  <text x="520" y="374" font-family="Segoe UI, Arial" font-size="14" fill="#1f1f1f">Accuracy 88%</text>
+  <text x="700" y="374" font-family="Segoe UI, Arial" font-size="14" fill="#1f1f1f">Due 0</text>
+  <text x="48" y="456" font-family="Segoe UI, Arial" font-size="16" font-weight="700" fill="#1f1f1f">Priority targets</text>
+  <text x="48" y="490" font-family="Segoe UI, Arial" font-size="14" fill="#1f1f1f">1. Start Due review with 2 questions due today.</text>
+  <text x="48" y="520" font-family="Segoe UI, Arial" font-size="14" fill="#1f1f1f">2. Run Weak retest for saved misses and flags.</text>
+</svg>

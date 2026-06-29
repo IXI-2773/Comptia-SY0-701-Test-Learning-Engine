@@ -1,0 +1,1307 @@
+{
+  "title": "Screenshot import - quarantined review items",
+  "questions": [
+    {
+      "question_number": 1224,
+      "source_question_number": 8,
+      "source_image": "Screenshot 2026-06-25 at 02-03-55 Question 8 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-25 at 02-03-55 Question 8 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 8,
+      "prompt": "Chapter 2 screenshot Q8 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1225,
+      "source_question_number": 18,
+      "source_image": "Screenshot 2026-06-25 at 04-29-36 Question 18 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-25 at 04-29-36 Question 18 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 18,
+      "prompt": "Chapter 2 screenshot Q18 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1226,
+      "source_question_number": 21,
+      "source_image": "Screenshot 2026-06-25 at 04-39-02 Question 21 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-25 at 04-39-02 Question 21 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 21,
+      "prompt": "Chapter 2 screenshot Q21 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1227,
+      "source_question_number": 24,
+      "source_image": "Screenshot 2026-06-25 at 04-43-12 Question 24 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-25 at 04-43-12 Question 24 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 24,
+      "prompt": "Chapter 2 screenshot Q24 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1228,
+      "source_question_number": 25,
+      "source_image": "Screenshot 2026-06-25 at 04-43-37 Question 25 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-25 at 04-43-37 Question 25 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 25,
+      "prompt": "Chapter 2 screenshot Q25 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1229,
+      "source_question_number": 47,
+      "source_image": "Screenshot 2026-06-25 at 04-59-21 Question 47 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-25 at 04-59-21 Question 47 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 47,
+      "prompt": "Chapter 2 screenshot Q47 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1230,
+      "source_question_number": 53,
+      "source_image": "Screenshot 2026-06-25 at 05-01-51 Question 53 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-25 at 05-01-51 Question 53 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 53,
+      "prompt": "Chapter 2 screenshot Q53 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1231,
+      "source_question_number": 55,
+      "source_image": "Screenshot 2026-06-25 at 05-02-57 Question 55 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-25 at 05-02-57 Question 55 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 55,
+      "prompt": "Chapter 2 screenshot Q55 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1232,
+      "source_question_number": 58,
+      "source_image": "Screenshot 2026-06-25 at 05-08-50 Question 58 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-25 at 05-08-50 Question 58 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 58,
+      "prompt": "Chapter 2 screenshot Q58 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1233,
+      "source_question_number": 70,
+      "source_image": "Screenshot 2026-06-25 at 05-18-14 Question 70 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-25 at 05-18-14 Question 70 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 70,
+      "prompt": "Chapter 2 screenshot Q70 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1234,
+      "source_question_number": 84,
+      "source_image": "Screenshot 2026-06-26 at 01-02-24 Question 84 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-26 at 01-02-24 Question 84 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 84,
+      "prompt": "Chapter 2 screenshot Q84 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1235,
+      "source_question_number": 90,
+      "source_image": "Screenshot 2026-06-26 at 01-40-04 Question 90 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-26 at 01-40-04 Question 90 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 90,
+      "prompt": "Chapter 2 screenshot Q90 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1236,
+      "source_question_number": 99,
+      "source_image": "Screenshot 2026-06-26 at 02-20-00 Question 99 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-26 at 02-20-00 Question 99 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 99,
+      "prompt": "Chapter 2 screenshot Q99 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1237,
+      "source_question_number": 106,
+      "source_image": "Screenshot 2026-06-26 at 02-36-54 Question 106 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-26 at 02-36-54 Question 106 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 106,
+      "prompt": "Chapter 2 screenshot Q106 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1238,
+      "source_question_number": 112,
+      "source_image": "Screenshot 2026-06-26 at 02-43-33 Question 112 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-26 at 02-43-33 Question 112 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 112,
+      "prompt": "Chapter 2 screenshot Q112 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1239,
+      "source_question_number": 115,
+      "source_image": "Screenshot 2026-06-26 at 05-28-34 Question 115 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-26 at 05-28-34 Question 115 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 115,
+      "prompt": "Chapter 2 screenshot Q115 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1240,
+      "source_question_number": 126,
+      "source_image": "Screenshot 2026-06-26 at 05-42-51 Question 126 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-26 at 05-42-51 Question 126 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 126,
+      "prompt": "Chapter 2 screenshot Q126 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1241,
+      "source_question_number": 132,
+      "source_image": "Screenshot 2026-06-26 at 05-54-12 Question 132 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-26 at 05-54-12 Question 132 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 132,
+      "prompt": "Chapter 2 screenshot Q132 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1242,
+      "source_question_number": 146,
+      "source_image": "Screenshot 2026-06-27 at 00-28-36 Question 146 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 00-28-36 Question 146 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 146,
+      "prompt": "Chapter 2 screenshot Q146 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1243,
+      "source_question_number": 148,
+      "source_image": "Screenshot 2026-06-27 at 00-55-12 Question 148 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 00-55-12 Question 148 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 148,
+      "prompt": "Chapter 2 screenshot Q148 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1244,
+      "source_question_number": 150,
+      "source_image": "Screenshot 2026-06-27 at 00-58-29 Question 150 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 00-58-29 Question 150 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 150,
+      "prompt": "Chapter 2 screenshot Q150 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1245,
+      "source_question_number": 151,
+      "source_image": "Screenshot 2026-06-27 at 01-02-11 Question 151 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 01-02-11 Question 151 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 151,
+      "prompt": "Chapter 2 screenshot Q151 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1246,
+      "source_question_number": 155,
+      "source_image": "Screenshot 2026-06-27 at 01-15-39 Question 155 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 01-15-39 Question 155 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 155,
+      "prompt": "Chapter 2 screenshot Q155 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1247,
+      "source_question_number": 157,
+      "source_image": "Screenshot 2026-06-27 at 01-52-10 Question 157 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 01-52-10 Question 157 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 157,
+      "prompt": "Chapter 2 screenshot Q157 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1248,
+      "source_question_number": 164,
+      "source_image": "Screenshot 2026-06-27 at 02-43-24 Question 164 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 02-43-24 Question 164 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 164,
+      "prompt": "Chapter 2 screenshot Q164 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1249,
+      "source_question_number": 172,
+      "source_image": "Screenshot 2026-06-27 at 02-45-43 Question 172 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 02-45-43 Question 172 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 172,
+      "prompt": "Chapter 2 screenshot Q172 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1250,
+      "source_question_number": 174,
+      "source_image": "Screenshot 2026-06-27 at 02-47-19 Question 174 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 02-47-19 Question 174 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 174,
+      "prompt": "Chapter 2 screenshot Q174 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1251,
+      "source_question_number": 178,
+      "source_image": "Screenshot 2026-06-27 at 02-48-23 Question 178 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 02-48-23 Question 178 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 178,
+      "prompt": "Chapter 2 screenshot Q178 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1252,
+      "source_question_number": 180,
+      "source_image": "Screenshot 2026-06-27 at 02-48-53 Question 180 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 02-48-53 Question 180 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 180,
+      "prompt": "Chapter 2 screenshot Q180 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1253,
+      "source_question_number": 182,
+      "source_image": "Screenshot 2026-06-27 at 02-50-07 Question 182 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 02-50-07 Question 182 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 182,
+      "prompt": "Chapter 2 screenshot Q182 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    },
+    {
+      "question_number": 1254,
+      "source_question_number": 185,
+      "source_image": "Screenshot 2026-06-27 at 02-51-18 Question 185 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 02-51-18 Question 185 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 185,
+      "prompt": "Chapter 2 screenshot Q185 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "suspended": true,
+      "import_status": "screenshot_review_needed"
+    }
+  ]
+}

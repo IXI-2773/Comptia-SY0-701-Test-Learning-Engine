@@ -1,0 +1,845 @@
+{
+  "title": "Screenshot OCR draft bank - Chapters 1, 3, and 4 - merged into active bank",
+  "questions": [
+    {
+      "question_number": 1049,
+      "source_question_number": 113,
+      "source_image": "Screenshot 2026-06-20 at 02-10-39 Question 113 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 1 screenshot bank",
+      "source_page": 113,
+      "prompt": "Jim wants to implement an authentication framework for his wireless network. Which of the following is most commonly used for wireless network authentication? O",
+      "choices": {
+        "A": "EAP O",
+        "B": "MS-CHAP @",
+        "C": "Kerberos O",
+        "D": "LDAP"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "EAP is commonly used for authentication to wireless networks. MS-CHAP is used with PPTP-based VPNs, Kerberos is used for organizationwide authentication, and LDAP is used as part of authentication in Microsoft Active Directory domains, among other uses.",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 1 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 1",
+      "subtitle": "Chapter 1 screenshot bank - Domain 1.0",
+      "domain": "General Security Concepts",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "General Security Concepts",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1050,
+      "source_question_number": 43,
+      "source_image": "Screenshot 2026-06-12 at 03-24-02 Question 43 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 3 screenshot bank",
+      "source_page": 43,
+      "prompt": "Claire has been notified of",
+      "choices": {
+        "A": "fix via her WAF. @",
+        "B": "Manually update the application code after reverse-engineering it. O",
+        "C": "Deploy",
+        "D": "Install the vendor-provided patch."
+      },
+      "correct": [
+        "C"
+      ],
+      "question_type": "single",
+      "general_explanation": "Claire's best option is to deploy a detection and fix via her web application firewall (WAF) that will detect the SQL injection (SQLi) attempt and prevent it. An intrusion detection system (IOS) only detects attacks and cannot stop them. Manually updating the application code after reverse-engineering it will take time, and she may not even have the source code or the ability to mulify it. Finally, vendor patches for zero days typically take some time to come out even in the best of circumstances, meaning that Claire could be waiting on a patch for quite a while if that is the option she chooses.",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "C": "Correct answer from verified Chapter 3 screenshot.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: C."
+      },
+      "chapter": "Chapter 3",
+      "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
+      "domain": "Security Architecture",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Architecture",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1051,
+      "source_question_number": 141,
+      "source_image": "Screenshot 2026-06-14 at 06-03-54 Question 141 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 3 screenshot bank",
+      "source_page": 141,
+      "prompt": "Jaime has deployed smart lighting and thermostats to her new buildings. What technique will have the largest impact if she wants to harden the devices? @",
+      "choices": {
+        "A": "regular basis",
+        "B": "Moving the devices to",
+        "C": "Fully patching the devices when they are deployed O",
+        "D": "Vulnerability scanning, then remediating the devices on"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "Moving devices to an isolated network segment that has appropriate controls in place to protect devices that may not be able to be secured or that may not receive regular patches is the best option available. Baselines, patching, and even scanning and remediation only help if the devices can be secured, patched, and otherwise protected. IoT devices are often not able to be secured this way, particularly as they age and both lighting and thermostats have relatively long useful lifespans. QUESTION % 141 of226 N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 3 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 3",
+      "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
+      "domain": "Security Architecture",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Architecture",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1052,
+      "source_question_number": 142,
+      "source_image": "Screenshot 2026-06-14 at 06-18-34 Question 142 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 3 screenshot bank",
+      "source_page": 142,
+      "prompt": "Chuck has deployed",
+      "choices": {
+        "A": "SaaS @",
+        "B": "SASE O",
+        "C": "SONET O",
+        "D": "SCM"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "Secure access service edge (SASE) deployments combine SD-WAN with a variety of cloud- hosted security services, including zero trust and CASB tools to replace VPNs. This provides an edge device-oriented security architecture with end-to-end security. SaaS is involved but is not a specific enough answer. SONET is a communication protuol used for fiber networks. Supply chain management (SCM) is not a term used in this context. QUESTION % 142 of 226 N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 3 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 3",
+      "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
+      "domain": "Security Architecture",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Architecture",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1053,
+      "source_question_number": 154,
+      "source_image": "Screenshot 2026-06-14 at 06-35-22 Question 154 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 3 screenshot bank",
+      "source_page": 154,
+      "prompt": "What is the primary reason an organization might choose",
+      "choices": {
+        "A": "significant issue to allow for the fail over to occur. O",
+        "B": "Fail over does not fully test redundant systems.",
+        "C": "Fail over requires organizations to create",
+        "D": "Parallel processing typically handles issues without outages."
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "Parallel processing allows for systems to be tested without taking them offline. This means that in the event of an issue with the backup systems or facility, the primary facility can continue to operate. Parallel processing does allow for more throughput, but organizations should not rely on this as parallel pruessing environments need to be able to handle the full load for the organization if the primary or backup fails. Fail over does test redundant systems and does not require organizations to create a significant issue. Instead, manual fail over processes are used to conduct fail over tests. QUESTION % 154 of 226 N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 3 screenshot."
+      },
+      "chapter": "Chapter 3",
+      "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
+      "domain": "Security Architecture",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Architecture",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1054,
+      "source_question_number": 155,
+      "source_image": "Screenshot 2026-06-14 at 06-40-16 Question 155 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 3 screenshot bank",
+      "source_page": 155,
+      "prompt": "Overall Time S#nt: 06:42:21 Architecture Brent wants to monitor traffic using an IPS. He needs to prevent attack traffic from impacting his datacenter and wants to minimize the amount of traffic that the IPS device has to filter. Where should he place the device to best match these requirements based on the following figure? firewall",
+      "choices": {
+        "A": "@",
+        "B": "Position 8",
+        "C": "C)",
+        "D": "Position D"
+      },
+      "correct": [
+        "C"
+      ],
+      "question_type": "single",
+      "general_explanation": "Core router lirew81 Datzenter Placing the IPS inline at position D will reduce the amount of traffic it has to filter while still allowing it to filter traffic bound for the datacenter. Points A, 8, and C will all have more traffic, although point A will have the most, with reductions likely at points C and D. QUESTION % 155 of 226 N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "C": "Correct answer from verified Chapter 3 screenshot.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: C."
+      },
+      "chapter": "Chapter 3",
+      "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
+      "domain": "Security Architecture",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Architecture",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1055,
+      "source_question_number": 162,
+      "source_image": "Screenshot 2026-06-14 at 06-58-22 Question 162 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 3 screenshot bank",
+      "source_page": 162,
+      "prompt": "Jill knows that IPSec uses",
+      "choices": {
+        "A": "key IPSec protocol? O",
+        "B": "ISA O",
+        "C": "ESP @",
+        "D": "IKE"
+      },
+      "correct": [
+        "C"
+      ],
+      "question_type": "single",
+      "general_explanation": "AH (Authentication Header), ESP (Encapsulating Security' Payload), and IKE (Internet Key Exchange) are all important IPSec (Internet Protocol Security) protocols. ISA is not an IPSec protocol. QUESTION % 162 of 226 N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: C.",
+        "C": "Correct answer from verified Chapter 3 screenshot.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: C."
+      },
+      "chapter": "Chapter 3",
+      "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
+      "domain": "Security Architecture",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Architecture",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1056,
+      "source_question_number": 169,
+      "source_image": "Screenshot 2026-06-15 at 01-13-38 Question 169 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 3 screenshot bank",
+      "source_page": 169,
+      "prompt": "\u2022ncorrecl Yarifwants to create security zones in his network. Which ofthe following technologies is best suited to doing this based on roles and user identities? O",
+      "choices": {
+        "A": "NAC and VLANs",
+        "B": "802.1X and containerization @",
+        "C": "SON and MAC address filtering O",
+        "D": "SD-WAN and VLANs"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "Network access control (NAC) tools that can allow for authentication and authorization based on user groups or roles and VLANs that separate groups based on those roles once theyre on the network exactly fit the needs Yarif has. 802. IX can also be helpful with this, but containerization is used to allow applications to be deployed without worrying about the application environment. SDN and MAC address filtering doesn't account for user authentication and identities, just machine hardware addresses. SD-WAN is for external connectivity, not internal networks. QUESTION % 169 of 226 N EXT",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 3 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 3",
+      "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
+      "domain": "Security Architecture",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Architecture",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1057,
+      "source_question_number": 170,
+      "source_image": "Screenshot 2026-06-15 at 01-17-04 Question 170 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 3 screenshot bank",
+      "source_page": 170,
+      "prompt": "Elle is conducting an exercise for her organization and wants to run an exercise that is as close to an actual event as possible. What type of event should she run to help her organization get this type of real-\u2022world practice?",
+      "choices": {
+        "A": "A simulation @",
+        "B": "A tabletop exercise O",
+        "C": "A walk-through O",
+        "D": "A wargame"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "A simulation is the closest you can get to a real-\u2022world event without having one. A tabletop exercise has personnel discussing scenarios, whereas a walk-",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 3 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 3",
+      "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
+      "domain": "Security Architecture",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Architecture",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1058,
+      "source_question_number": 173,
+      "source_image": "Screenshot 2026-06-15 at 01-23-26 Question 173 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 3 screenshot bank",
+      "source_page": 173,
+      "prompt": "Which of the following is not",
+      "choices": {
+        "A": "ACLs O",
+        "B": "VLANs",
+        "C": "Firewalls O",
+        "D": "Airgaps"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "ACLs, VLANs, and firewalls are all commonly used to implement network segmentation. Due to the operational challenges that air gaps create, they are far less commonly implemented and are only used when absolutely necessary. QUESTION % 173 of 226 N EXT",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 3 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 3",
+      "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
+      "domain": "Security Architecture",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Architecture",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1059,
+      "source_question_number": 179,
+      "source_image": "Screenshot 2026-06-18 at 00-33-08 Question 179 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 3 screenshot bank",
+      "source_page": 179,
+      "prompt": "Erin's organization uses",
+      "choices": {
+        "A": "one O",
+        "B": "Two",
+        "C": "C. Three O",
+        "D": "Four"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "Erin will need to restore the full backup, then apply the differential backups from each of the remaining three days for a total of four backups.",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 3 screenshot."
+      },
+      "chapter": "Chapter 3",
+      "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
+      "domain": "Security Architecture",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Architecture",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1060,
+      "source_question_number": 181,
+      "source_image": "Screenshot 2026-06-18 at 00-38-43 Question 181 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 3 screenshot bank",
+      "source_page": 181,
+      "prompt": "Overall Times Architecture Vera wants to manage multiple commercial Internet services for her organization to ensure connectivity. What technoloy should she select to manage and maintain this? @",
+      "choices": {
+        "A": "SASE O",
+        "B": "SON O",
+        "C": "IPSec O",
+        "D": "SD-WAN"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "Vera can use a SD-WAN, or software-defined wide area network, to manage multiple connections dynamically, ensuring connectivity and performance for her organization. SASE is used to secure networks and device connectivity in modern organizations with complex and mobile boundaries. SON is software-defined networking and manages networks as code. IPSec is a suite of protocols used to secure network traffic. QUESTION % 181 of226 N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 3 screenshot."
+      },
+      "chapter": "Chapter 3",
+      "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
+      "domain": "Security Architecture",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Architecture",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1061,
+      "source_question_number": 203,
+      "source_image": "Screenshot 2026-06-18 at 03-44-23 Question 203 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 3 screenshot bank",
+      "source_page": 203,
+      "prompt": "Kyle wants to authenticate users who plug into his network, then assign them to",
+      "choices": {
+        "A": "802.1X @",
+        "B": "Port security O",
+        "C": "VLAN tagging O",
+        "D": "EAP"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "802.1 X allows for authentication via EAP, then assignment to a VLAN based on a role or other attributes. EAP alone does not perform this function, port security leverages MAC addresses to determine if a system is allowed to connect, and VLAN tagging is part of how traffic is labeled for a specific VLAN but does not support authentication or role-based labels directly. QUESTION % 203 of 226 N EXT",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 3 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 3",
+      "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
+      "domain": "Security Architecture",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Architecture",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1062,
+      "source_question_number": 216,
+      "source_image": "Screenshot 2026-06-18 at 04-08-01 Question 216 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 3 screenshot bank",
+      "source_page": 216,
+      "prompt": "What three responsibilities are typically shared in PaaS environments according to the cloud responsibility matrix? O",
+      "choices": {
+        "A": "Identity infrastructure, applications, and network controls O",
+        "B": "Data, devices, and accounts @",
+        "C": "Physical hosts, physical networks, and physical datacenters O",
+        "D": "Operating systems, applications, and data"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "In platform-as-a-service (PaaS) environments, customers and providers typically share responsibility for identity and directory infrastructure, applications, and network controls. Customers are responsible for data, devices, and accounts, and the provider is responsible for the underlying systems, including operating systems and physical infrastructure. QUESTION OCONTENT FEEDBACK 216 of 226 N EXT",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 3 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 3",
+      "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
+      "domain": "Security Architecture",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Architecture",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1063,
+      "source_question_number": 111,
+      "source_image": "Screenshot 2026-06-06 at 05-15-08 Question 111 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 111,
+      "prompt": "Valerie wants to implement an email security framework that will help to ensure that only authorized systems send email on behalf of her domains. Which of the following should she implement? O",
+      "choices": {
+        "A": "DKIM @",
+        "B": "DMARC O",
+        "C": "STP O",
+        "D": "SPF"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "The Sender Policy Framework (SPF) lists IP addresses of systems allowed to send email in DNS TXT records for a domain. DKIM (DomainKeys Identified Mail) validates a domain's identity using a public key pair, validating the authenticity of the sender. DMARC (domain-based message authentication, reporting, and conformance) controls how unauthenticated messages are handled by mailbox providers, including",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 4 screenshot."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1064,
+      "source_question_number": 113,
+      "source_image": "Screenshot 2026-06-06 at 05-18-05 Question 113 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 113,
+      "prompt": "Gary wants to deploy",
+      "choices": {
+        "A": "dashboard-style view of his data. What tool should Gary select to meet this need? O",
+        "B": "NAC O",
+        "C": "DLP @",
+        "D": "EDR"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "Endpoint detection and response (EDR) tools combine behavior-based detection capabilities with centralized dashboards and advanced response capabilities. Intrusion prevention systems (IPSs) can detect network threats but arent well suited to detecting behaviors on endpoint systems. NAC (network access control) is used to limit who can connect to a network. Data loss prevention (DLP) systems monitor for data exfiltration as well as data that is sent both inadvertently and on purpose outside the organization that shouldnt be. QUESTION 1130f215 N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 4 screenshot."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1065,
+      "source_question_number": 128,
+      "source_image": "Screenshot 2026-06-06 at 06-14-08 Question 128 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 128,
+      "prompt": "Jim wants to ensure that users who are located in his organization's London office have access to the building. What type of access control scheme should he select to best fit this specific need? O",
+      "choices": {
+        "A": "Rule O",
+        "B": "ABAC @",
+        "C": "Role BAC O",
+        "D": "MAC"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "QUESTION 1280f215 Attribute-based access control (ABAC) provides access based on attributes like location, age, rank, or other attributes of a user. Rule-based access control uses defined rules to make access decisions. Role-based access control uses a users role in an organization to make access control decisions, and mandatory access control (MAC) enforces access control using centralized control. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 4 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1066,
+      "source_question_number": 139,
+      "source_image": "Screenshot 2026-06-07 at 00-25-55 Question 139 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 139,
+      "prompt": "Operations What tool is commonly used to allow for measurement and monitoring of security' settings to align with NIST 800-53 controls? O",
+      "choices": {
+        "A": "SAML @",
+        "B": "CVE O",
+        "C": "cvss O",
+        "D": "SCAP"
+      },
+      "correct": [
+        "D"
+      ],
+      "question_type": "single",
+      "general_explanation": "The Security Content Automation Protuol (SCAP) is frequently used to allow for monitoring and measurement of NIST 800-53-based controls. SAML is used for authorization and authentication, and CVE and CVSS are used to identify and rank vulnerabilities. QUESTION 1390f215 N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
+        "D": "Correct answer from verified Chapter 4 screenshot."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1067,
+      "source_question_number": 141,
+      "source_image": "Screenshot 2026-06-07 at 00-29-27 Question 141 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 141,
+      "prompt": "Tom wants to set up an authentication service for network devices. Which of the following is commonly used for authentication to enterprise network devices? @",
+      "choices": {
+        "A": "Kerberos O",
+        "B": "SAML O",
+        "C": "TKIP O",
+        "D": "OpenID"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "Kerberos is one of a small number of commonly used AAA protuols for network devices. SAML and OpenID are more commonly used for federated services, and TKIP is an encryption method.",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 4 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1068,
+      "source_question_number": 143,
+      "source_image": "Screenshot 2026-06-07 at 00-31-01 Question 143 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 143,
+      "prompt": "Tom wants his email servers to reject email that is not authenticated in",
+      "choices": {
+        "A": "SPF @",
+        "B": "DMARC O",
+        "C": "DKIM O",
+        "D": "TLS"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "DMARC, or Domain-based Message Authentication, Reporting, and Conformance, controls how unauthenticated messages are handled by mailbox providers, including quarantining, rejecting, or rejecting messages. SPF (Sender Policy Framework) lists IP addresses of systems allowed to send email in DNS TXT records for a domain. DomainKeys Identified Mail (DKIM) validates a domain's identity using a public key pair, validating the authenticity of the sender. TLS (Transport Layer Security) is used to",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 4 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    },
+    {
+      "question_number": 1069,
+      "source_question_number": 173,
+      "source_image": "Screenshot 2026-06-08 at 00-56-07 Question 173 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 4 screenshot bank",
+      "source_page": 173,
+      "prompt": "Sharon wants to implement WPA3 Enterprise. What technology will she need to use for authorization after wireless devices associate with access points? O",
+      "choices": {
+        "A": "LDAP @",
+        "B": "802.1X O",
+        "C": "Kerberos O",
+        "D": "SAML"
+      },
+      "correct": [
+        "B"
+      ],
+      "question_type": "single",
+      "general_explanation": "QUESTION 1730f215 Sharon knows that Enterprise mode authentication is typically done with 802. IX LDAP and Kerberos are not typically used for this, and SAML is more frequently part of federated and cloud services. N EXT",
+      "choice_explanations": {
+        "A": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "B": "Correct answer from verified Chapter 4 screenshot.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: B.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: B."
+      },
+      "chapter": "Chapter 4",
+      "subtitle": "Chapter 4 screenshot bank - Domain 4.0",
+      "domain": "Security Operations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Security Operations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging.",
+        "Screenshot OCR import - verify against source image if wording or keyed answer looks suspicious."
+      ],
+      "duplicate_of": []
+    }
+  ]
+}

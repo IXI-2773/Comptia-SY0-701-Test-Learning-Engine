@@ -1,0 +1,72 @@
+[tool.black]
+line-length = 120
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+  "app",
+  "app_analytics_mixin",
+  "app_constants",
+  "app_game_mixin",
+  "app_info",
+  "app_question_flow_mixin",
+  "app_question_render_mixin",
+  "app_session_builder_mixin",
+  "app_session_persistence_mixin",
+  "analytics_models",
+  "analytics_summary",
+  "bank_models",
+  "config_store",
+  "progress_models",
+  "progress_store",
+  "question_bank",
+  "question_widgets",
+  "render_cache",
+  "runtime_persistence",
+  "save_queue",
+  "session_models",
+  "session_store",
+  "smart_practice_profile",
+  "smart_practice_cache",
+  "source_trust",
+  "storage_utils",
+  "ui_theme",
+  "ui_typography",
+  "widget_models",
+]
+
+[tool.mypy]
+python_version = "3.11"
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unused_ignores = true
+check_untyped_defs = true
+no_implicit_optional = true
+pretty = true
+show_error_codes = true
+follow_imports = "silent"
+files = [
+  "analytics_models.py",
+  "analytics_summary.py",
+  "bank_models.py",
+  "progress_models.py",
+  "progress_store.py",
+  "question_bank.py",
+  "runtime_persistence.py",
+  "save_queue.py",
+  "render_cache.py",
+  "session_models.py",
+  "session_store.py",
+  "smart_practice_profile.py",
+  "smart_practice_cache.py",
+  "source_trust.py",
+  "tools/run_quality_checks.py",
+]

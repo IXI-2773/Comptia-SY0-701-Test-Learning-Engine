@@ -1,0 +1,44 @@
+{
+  "title": "Screenshot OCR draft bank - review before merge",
+  "questions": [
+    {
+      "question_number": 900000,
+      "source_question_number": 113,
+      "source_image": "Screenshot 2026-06-20 at 02-10-39 Question 113 - Chapter 1 Domain 1.0 General Security Concepts - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 1 screenshot bank",
+      "source_page": 113,
+      "prompt": "Jim wants to implement an authentication framework for his wireless network. Which of the following is most commonly used for wireless network authentication? O",
+      "choices": {
+        "A": "EAP O",
+        "B": "MS-CHAP @",
+        "C": "Kerberos O",
+        "D": "LDAP"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "EAP is commonly used for authentication to wireless networks. MS-CHAP is used with PPTP-based VPNs, Kerberos is used for organizationwide authentication, and LDAP is used as part of authentication in Microsoft Active Directory domains, among other uses.",
+      "choice_explanations": {
+        "A": "Correct answer from verified Chapter 1 screenshot.",
+        "B": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "C": "Not keyed as correct in the verified screenshot. Compare against: A.",
+        "D": "Not keyed as correct in the verified screenshot. Compare against: A."
+      },
+      "chapter": "Chapter 1",
+      "subtitle": "Chapter 1 screenshot bank - Domain 1.0",
+      "domain": "General Security Concepts",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "General Security Concepts",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "OCR draft from screenshot - verify prompt, choices, correct answer, and explanation before merging."
+      ],
+      "duplicate_of": []
+    }
+  ]
+}
