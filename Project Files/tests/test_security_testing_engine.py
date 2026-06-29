@@ -1165,6 +1165,28 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         finish_mock.assert_called_once_with(force=True)
         analytics_mock.assert_called_once()
 
+    def test_finished_smart_practice_does_not_remain_resumable(self):
+        app = self.make_app(start_session=False)
+        app.session_mode_var.set(app_module.MODE_SMART_PRACTICE)
+        app.session_count_var.set("2")
+        app.session_source_var.set("All")
+        app.session_random_var.set(False)
+
+        app.start_custom_session()
+        session_path = app.session_path
+
+        app.toggle_choice("A")
+        app.toggle_choice("A")
+
+        self.assertFalse(session_path.exists())
+        builder_context = app.current_builder_context(
+            mode=app_module.MODE_SMART_PRACTICE,
+            count=app.session_count_var.get(),
+            randomize=False,
+            source_label=app.current_builder_source_label(app_module.MODE_SMART_PRACTICE),
+        )
+        self.assertIsNone(app.find_resumable_session_for_builder(builder_context))
+
     def test_starting_a_set_collapses_sidebar_and_toggle_reopens_it(self):
         app = self.make_app()
 
