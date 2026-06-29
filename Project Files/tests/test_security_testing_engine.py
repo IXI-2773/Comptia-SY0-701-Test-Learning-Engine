@@ -1139,6 +1139,32 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertEqual("Smart Practice", app.session_mode_var.get())
         self.assertTrue(app.sidebar.winfo_manager())
 
+    def test_smart_practice_finish_set_enables_after_all_questions_answered(self):
+        app = self.make_app()
+        app.active_session_mode = app_module.MODE_SMART_PRACTICE
+        for question in app.questions:
+            question["answered"] = False
+
+        app.render_question()
+
+        self.assertEqual("FINISH SET", app.finish_btn.cget("text"))
+        self.assertEqual("disabled", str(app.finish_btn.cget("state")))
+
+        for question in app.questions:
+            question["answered"] = True
+
+        app.render_question()
+
+        self.assertEqual("normal", str(app.finish_btn.cget("state")))
+        with (
+            mock.patch.object(app, "maybe_finish_session") as finish_mock,
+            mock.patch.object(app, "open_analytics_window") as analytics_mock,
+        ):
+            app.finish_exam()
+
+        finish_mock.assert_called_once_with(force=True)
+        analytics_mock.assert_called_once()
+
     def test_starting_a_set_collapses_sidebar_and_toggle_reopens_it(self):
         app = self.make_app()
 
