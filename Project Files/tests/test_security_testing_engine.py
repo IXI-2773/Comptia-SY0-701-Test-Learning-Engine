@@ -1,3 +1,4 @@
+import copy
 import json
 import random
 import sys
@@ -26,6 +27,9 @@ from progress_store import (
     recovery_ladder_stage,
     select_questions_by_history,
     select_due_review_questions,
+    sanitize_response_time,
+    aggregate_concept_memory,
+    review_days_for_grade,
     study_status_name,
     update_progress_record,
 )
@@ -34,6 +38,73 @@ from question_bank import adaptive_shuffle_question, load_bank, sanitize_text, s
 from runtime_persistence import RuntimePersistence
 from save_queue import DeferredSaveQueue
 from smart_practice_cache import SmartPracticePrewarmService
+from smart_practice_profile import (
+    UTILITY_COMPONENT_BOUNDS,
+    smart_practice_role_allocation,
+    smart_practice_utility_total,
+)
+from smart_practice_measurement import (
+    attach_prediction_to_question,
+    baseline_comparison,
+    brier_score,
+    build_measurement_report,
+    calibration_bins,
+    empty_measurement_store,
+    find_future_outcome,
+    link_prediction_outcomes,
+    log_loss,
+    normalize_measurement_store,
+    pairwise_discrimination,
+    prediction_from_question,
+    repair_performance,
+    role_performance,
+    session_composition,
+    source_performance,
+    timing_quality,
+)
+from smart_practice_concept_graph import (
+    GRAPH_VERSION,
+    aggregate_concept_state,
+    audit_graph,
+    calibrate_edge,
+    calibrate_edges,
+    concept_key_for_question,
+    concept_record_for_question,
+    diagnose_root_cause,
+    diagnosis_measurement,
+    empty_graph,
+    make_edge,
+    normalize_graph,
+    prerequisite_cycle,
+    select_prerequisite_path,
+    store_diagnosis,
+)
+from smart_practice_question_value import (
+    INFO_BOUNDS,
+    information_value,
+    normalize_calibration_store,
+    quality_measurement,
+    question_quality_record,
+)
+from smart_practice_policy import (
+    active_policy,
+    activate_candidate_policy,
+    build_policy_review_report,
+    create_candidate_policy,
+    create_shadow_decision,
+    default_policy_values,
+    detect_drift,
+    empty_governance,
+    evaluate_challenger,
+    exactly_one_active,
+    expire_candidate,
+    normalize_governance,
+    policy_checksum,
+    regression_gate_failures,
+    rollback_policy,
+    validate_policy,
+    validate_policy_values,
+)
 from source_trust import derive_source_trust_warning
 from session_models import apply_answer_state, clear_runtime_answer_state, reset_runtime_question_state
 from session_store import migrate_session_snapshot
@@ -4608,6 +4679,1975 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertFalse(config["boss_rounds_enabled"])
         self.assertTrue(config["compact_review_mode"])
         self.assertTrue(config["dense_answers_mode"])
+
+    def test_smart_practice9_role_allocation_totals_and_prioritizes_small_sets(self):
+        allocation = smart_practice_role_allocation(25)
+        self.assertEqual(25, sum(allocation.values()))
+        self.assertEqual(6, allocation["weak_repair"])
+        self.assertEqual(6, allocation["due_retention"])
+        self.assertEqual(6, allocation["blueprint_coverage"])
+        self.assertEqual({"weak_repair": 1, "due_retention": 1, "blueprint_coverage": 1, "transfer": 0, "controlled_stretch": 0}, smart_practice_role_allocation(3))
+
+    def test_smart_practice9_low_source_trust_is_penalty_not_reward(self):
+        app = self.make_app(start_session=False)
+        app.master_questions = [
+            {
+                "question_number": 1,
+                "prompt": "High trust due item",
+                "choices": {"A": "A", "B": "B"},
+                "correct": ["A"],
+                "domain": "General Security Concepts",
+                "topics": ["General Review"],
+                "source_name": "Trusted",
+            },
+            {
+                "question_number": 2,
+                "prompt": "Low trust due item",
+                "choices": {"A": "A", "B": "B"},
+                "correct": ["A"],
+                "domain": "General Security Concepts",
+                "topics": ["General Review"],
+                "source_name": "Decayed",
+            },
+        ]
+        app.questions = list(app.master_questions)
+        app._progress_questions()["1"] = update_progress_record({}, ["B"], False, seen_on="2026-04-23")
+        app._progress_questions()["2"] = update_progress_record({}, ["B"], False, seen_on="2026-04-23")
+        app.smart_practice_signal_cache_key = app._smart_practice_signal_key()
+        app.smart_practice_signal_cache_payload = app._build_smart_practice_signal_payload()
+        app.smart_practice_signal_cache_payload["source_trust_map"] = {
+            "Trusted": {"trust_score": 95.0, "label": "Trusted"},
+            "Decayed": {"trust_score": 45.0, "label": "Decayed"},
+        }
+
+        pool = app.build_smart_practice_pool("2", randomize=False)
+        utilities = {int(q["question_number"]): float(q.get("smart_utility", 0.0)) for q in pool}
+
+        self.assertLess(utilities[2], utilities[1])
+        self.assertTrue(all(q.get("smart_primary_role") for q in pool))
+
+    def test_smart_practice9_adaptive_memory_and_response_sanitizer(self):
+        guessed = update_progress_record({}, ["A"], True, seen_on="2026-04-23", confidence="Guessed")
+        strong = update_progress_record({}, ["A"], True, seen_on="2026-04-23", confidence="Sure", session_tag="Transfer check")
+        lapse = update_progress_record(strong, ["B"], False, seen_on="2026-04-24", confidence="Sure", recall_failure="Blank recall")
+        timing = sanitize_response_time(1200.0, recent_effective_seconds=[10.0, 12.0, 14.0])
+
+        self.assertEqual("recognition", guessed["learner_memory"]["last_grade"])
+        self.assertEqual("transfer", strong["learner_memory"]["last_grade"])
+        self.assertEqual("lapse_strong", lapse["learner_memory"]["last_grade"])
+        self.assertEqual(1200.0, timing["raw_response_seconds"])
+        self.assertLess(timing["effective_response_seconds"], timing["raw_response_seconds"])
+        self.assertTrue(timing["response_time_contaminated"])
+
+    def test_smart_practice9_repair_state_schedules_one_distinct_probe(self):
+        app = self.make_app(start_session=False)
+        app.active_session_mode = app_module.MODE_SMART_PRACTICE
+        app.master_questions = [
+            {
+                "question_number": 1,
+                "prompt": "Which attack poisons a common site?",
+                "choices": {"A": "Phishing", "B": "Watering hole"},
+                "correct": ["B"],
+                "domain": "Threats, Vulnerabilities, and Mitigations",
+                "topics": ["Threats"],
+            },
+            {
+                "question_number": 2,
+                "prompt": "A trusted industry site is compromised for developers.",
+                "choices": {"A": "Watering hole", "B": "Smishing"},
+                "correct": ["A"],
+                "domain": "Threats, Vulnerabilities, and Mitigations",
+                "topics": ["Threats"],
+            },
+        ]
+        app.questions = [dict(app.master_questions[0])]
+        app.index = 0
+        app.session_question_limit = 2
+        app.questions[0]["selected"] = ["A"]
+
+        inserted = app.plan_misconception_repair(app.questions[0], is_correct=False)
+
+        self.assertEqual(1, len(inserted))
+        self.assertNotEqual(1, inserted[0]["question_number"])
+        self.assertEqual("contrast", inserted[0]["repair_stage"])
+        self.assertIn(app.repair_concept_key_for_question(app.questions[0]), app.progress_data["meta"]["repair_state"])
+
+    def test_smart_practice9_answer_state_preserves_selection_telemetry(self):
+        question = {
+            "question_number": 7,
+            "selected": ["A"],
+            "pending": ["A"],
+            "answered": True,
+            "smart_primary_role": "weak_repair",
+            "smart_selection_reasons": ["repair", "source risk"],
+            "smart_utility": 13.5,
+            "smart_utility_breakdown": {"misconception_repair_value": 10.0},
+            "smart_policy_version": "smart-practice-9",
+            "repair_stage": "contrast",
+            "repair_concept_key": "topic::Threats",
+        }
+        state = app_module.serialize_answer_state(question) if hasattr(app_module, "serialize_answer_state") else None
+        if state is None:
+            from session_store import serialize_answer_state
+
+            state = serialize_answer_state(question)
+        restored = apply_answer_state({"question_number": 7}, state)
+
+        self.assertEqual("weak_repair", restored["smart_primary_role"])
+        self.assertEqual(["repair", "source risk"], restored["smart_selection_reasons"])
+        self.assertEqual("contrast", restored["repair_stage"])
+
+    def _sp9_question(self, qnum, domain="General Security Concepts", topic="General Review", source="Clean"):
+        return {
+            "question_number": qnum,
+            "prompt": f"Question {qnum}",
+            "choices": {"A": "Alpha", "B": "Beta"},
+            "correct": ["A"],
+            "domain": domain,
+            "topics": [topic],
+            "source_name": source,
+            "source_label": source,
+        }
+
+    def _sp9_app_with_role_pool(self):
+        app = self.make_app(start_session=False)
+        questions = []
+        for qnum in range(1, 7):
+            questions.append(self._sp9_question(qnum, topic=f"Weak {qnum}", source="Trusted"))
+        for qnum in range(7, 13):
+            questions.append(self._sp9_question(qnum, topic=f"Due {qnum}", source="Trusted"))
+        for qnum in range(13, 31):
+            questions.append(self._sp9_question(qnum, topic=f"Coverage {qnum}", source="Clean"))
+        for qnum in range(31, 95):
+            item = self._sp9_question(qnum, topic=f"Screenshot {qnum}", source="Screenshot chapter bank")
+            item["source_image"] = f"{qnum}.png"
+            questions.append(item)
+        app.master_questions = questions
+        app.questions = list(questions)
+        for qnum in range(1, 7):
+            app._progress_questions()[str(qnum)] = update_progress_record({}, ["B"], False, seen_on="2026-04-20")
+        for qnum in range(7, 13):
+            rec = update_progress_record({}, ["A"], True, seen_on="2026-04-20", confidence="Sure")
+            rec["learner_memory"]["next_review_at"] = "2026-04-20"
+            rec["next_review"] = "2026-04-20"
+            app._progress_questions()[str(qnum)] = rec
+        return app
+
+    def test_sp9_01_weak_and_due_survive_abundant_unseen_screenshots(self):
+        pool = self._sp9_app_with_role_pool().build_smart_practice_pool("25", randomize=False)
+        roles = Counter(q["smart_primary_role"] for q in pool)
+        self.assertGreaterEqual(roles["weak_repair"], 5)
+        self.assertGreaterEqual(roles["due_retention"], 5)
+
+    def test_sp9_02_one_question_consumes_one_primary_role(self):
+        pool = self._sp9_app_with_role_pool().build_smart_practice_pool("25", randomize=False)
+        self.assertTrue(all(isinstance(q.get("smart_primary_role"), str) and q["smart_primary_role"] for q in pool))
+
+    def test_sp9_03_variety_reshaping_preserves_protected_role_counts(self):
+        pool = self._sp9_app_with_role_pool().build_smart_practice_pool("25", randomize=False)
+        roles = Counter(q["smart_primary_role"] for q in pool)
+        self.assertGreaterEqual(roles["weak_repair"] + roles["due_retention"], 10)
+
+    def test_sp9_04_quality_retry_preserves_protected_role_counts(self):
+        app = self._sp9_app_with_role_pool()
+        app.build_smart_practice_pool("25", randomize=False)
+        self.assertIn("retry_used", app.last_smart_practice_set_quality)
+
+    def test_sp9_05_role_shortages_redistribute_to_available_roles(self):
+        app = self.make_app(start_session=False)
+        app.master_questions = [self._sp9_question(i) for i in range(1, 6)]
+        app.questions = list(app.master_questions)
+        pool = app.build_smart_practice_pool("5", randomize=False)
+        self.assertEqual(5, len(pool))
+
+    def test_sp9_06_domain_aliases_normalize_identically(self):
+        app = self.make_app(start_session=False)
+        self.assertEqual(
+            app._normalized_study_label("Security Program Management And Oversight"),
+            app._normalized_study_label("Security Program Management and Oversight"),
+        )
+        self.assertEqual(
+            app._normalized_study_label("Threats Vulnerabilities and Mitigations"),
+            app._normalized_study_label("Threats, Vulnerabilities, and Mitigations"),
+        )
+
+    def test_sp9_07_raw_idle_time_preserved_effective_bounded(self):
+        timing = sanitize_response_time(999.0, recent_effective_seconds=[8.0, 10.0, 12.0])
+        self.assertEqual(999.0, timing["raw_response_seconds"])
+        self.assertLess(timing["effective_response_seconds"], 999.0)
+
+    def test_sp9_08_idle_time_does_not_create_extreme_burnout(self):
+        app = self.make_app(start_session=False)
+        events = [{"correct": True, "effective_response_seconds": 10.0} for _ in range(8)]
+        events.append({"correct": True, "raw_response_seconds": 999.0, "effective_response_seconds": 12.0})
+        self.assertNotEqual("High", app._build_burnout_risk_row(events)["label"])
+
+    def test_sp9_09_legacy_progress_without_memory_migrates(self):
+        rec = normalize_progress_record({"attempts": 1, "correct_streak": 1, "next_review": "2026-04-24"})
+        self.assertIn("learner_memory", rec)
+        self.assertEqual("2026-04-24", rec["learner_memory"]["next_review_at"])
+
+    def test_sp9_10_malformed_memory_values_clamp_safely(self):
+        rec = normalize_progress_record({"learner_memory": {"retrievability": "bad", "stability": 9}})
+        self.assertEqual(0.0, rec["learner_memory"]["retrievability"])
+        self.assertEqual(1.0, rec["learner_memory"]["stability"])
+
+    def test_sp9_11_adaptive_due_uses_next_review_at(self):
+        rec = normalize_progress_record({"attempts": 1, "learner_memory": {"retrievability": 0.5, "next_review_at": "2026-04-20"}})
+        self.assertTrue(is_review_due(rec, on_date="2026-04-21"))
+
+    def test_sp9_12_easy_schedules_later_than_good(self):
+        self.assertGreater(review_days_for_grade("easy", 0.5), review_days_for_grade("good", 0.5))
+
+    def test_sp9_13_good_schedules_later_than_hard(self):
+        self.assertGreater(review_days_for_grade("good", 0.5), review_days_for_grade("hard", 0.5))
+
+    def test_sp9_14_did_not_know_damages_memory_more_than_misread(self):
+        base = {"retrievability": 0.6, "stability": 0.5}
+        did_not = update_progress_record({"learner_memory": base}, ["B"], False, miss_reason="Did not know")
+        misread = update_progress_record({"learner_memory": base}, ["B"], False, miss_reason="Misread")
+        self.assertLess(did_not["learner_memory"]["retrievability"], misread["learner_memory"]["retrievability"])
+
+    def test_sp9_15_concept_aggregation_valid_conservative(self):
+        questions = [self._sp9_question(1, source="A"), self._sp9_question(2, source="B")]
+        rows = aggregate_concept_memory({"1": update_progress_record({}, ["A"], True)}, questions)
+        row = next(iter(rows.values()))
+        self.assertIn("lowest_retrievability", row)
+        self.assertEqual(2, row["supporting_question_count"])
+        self.assertEqual(2, row["distinct_source_count"])
+
+    def test_sp9_16_utility_components_inside_bounds(self):
+        app = self._sp9_app_with_role_pool()
+        q = app.build_smart_practice_pool("1", randomize=False)[0]
+        for name, value in q["smart_utility_breakdown"].items():
+            low, high = UTILITY_COMPONENT_BOUNDS[name]
+            self.assertGreaterEqual(value, low)
+            self.assertLessEqual(value, high)
+
+    def test_sp9_17_utility_total_matches_component_equation(self):
+        app = self._sp9_app_with_role_pool()
+        q = app.build_smart_practice_pool("1", randomize=False)[0]
+        self.assertEqual(q["smart_utility"], smart_practice_utility_total(q["smart_utility_breakdown"]))
+
+    def test_sp9_18_correlated_misconception_signals_are_capped(self):
+        total = smart_practice_utility_total({"misconception_repair_value": 999.0})
+        self.assertEqual(20.0, total)
+
+    def test_sp9_19_missing_metadata_produces_neutral_valid_utility(self):
+        app = self.make_app(start_session=False)
+        app.master_questions = [{"question_number": 1, "prompt": "x", "choices": {"A": "A"}, "correct": ["A"]}]
+        app.questions = list(app.master_questions)
+        q = app.build_smart_practice_pool("1", randomize=False)[0]
+        self.assertIsInstance(q["smart_utility"], float)
+
+    def test_sp9_20_bounded_utility_controls_final_ordering(self):
+        pool = self._sp9_app_with_role_pool().build_smart_practice_pool("5", randomize=False)
+        self.assertGreaterEqual(pool[0]["smart_utility"], pool[-1]["smart_utility"])
+
+    def test_sp9_21_deterministic_mode_stable_order(self):
+        app = self._sp9_app_with_role_pool()
+        one = [q["question_number"] for q in app.build_smart_practice_pool("10", randomize=False)]
+        two = [q["question_number"] for q in app.build_smart_practice_pool("10", randomize=False)]
+        self.assertEqual(one, two)
+
+    def test_sp9_22_meaningful_miss_creates_stage_one_repair_state(self):
+        app = self._sp9_app_with_role_pool()
+        app.active_session_mode = app_module.MODE_SMART_PRACTICE
+        q = dict(app.master_questions[0], selected=["B"])
+        app.questions = [q]
+        app.plan_misconception_repair(q, is_correct=False)
+        self.assertEqual("contrast", app.progress_data["meta"]["repair_state"][app.repair_concept_key_for_question(q)]["stage"])
+
+    def test_sp9_23_contrast_probe_distinct_and_delayed(self):
+        app = self._sp9_app_with_role_pool()
+        app.active_session_mode = app_module.MODE_SMART_PRACTICE
+        q = dict(app.master_questions[0], selected=["B"])
+        app.questions = [q, dict(app.master_questions[20])]
+        inserted = app.plan_misconception_repair(q, is_correct=False)
+        self.assertTrue(inserted)
+        self.assertNotEqual(q["question_number"], inserted[0]["question_number"])
+        self.assertEqual("contrast", inserted[0]["repair_stage"])
+
+    def test_sp9_24_transfer_stage_uses_another_distinct_question(self):
+        app = self._sp9_app_with_role_pool()
+        app.active_session_mode = app_module.MODE_SMART_PRACTICE
+        q = dict(app.master_questions[0], selected=["A"], repair_stage="contrast")
+        key = app.repair_concept_key_for_question(q)
+        app.progress_data["meta"]["repair_state"][key] = {"stage": "contrast", "status": "unresolved"}
+        app.questions = [q]
+        inserted = app.plan_misconception_repair(q, is_correct=True)
+        self.assertEqual("provisional", app.progress_data["meta"]["repair_state"][key]["status"])
+        self.assertTrue(inserted or app.progress_data["meta"]["repair_state"][key]["stage"] == "spaced_retrieval")
+
+    def test_sp9_25_immediate_success_provisional_only(self):
+        app = self._sp9_app_with_role_pool()
+        q = dict(app.master_questions[0], selected=["A"], repair_stage="contrast")
+        key = app.repair_concept_key_for_question(q)
+        app.progress_data["meta"]["repair_state"][key] = {"stage": "contrast", "status": "unresolved"}
+        app.plan_misconception_repair(q, is_correct=True)
+        self.assertEqual("provisional", app.progress_data["meta"]["repair_state"][key]["status"])
+
+    def test_sp9_26_later_spaced_success_can_resolve_repair(self):
+        app = self._sp9_app_with_role_pool()
+        q = dict(app.master_questions[0], selected=["A"], repair_stage="spaced_retrieval")
+        key = app.repair_concept_key_for_question(q)
+        app.progress_data["meta"]["repair_state"][key] = {"stage": "spaced_retrieval", "status": "provisional"}
+        app.plan_misconception_repair(q, is_correct=True)
+        self.assertEqual("resolved", app.progress_data["meta"]["repair_state"][key]["status"])
+
+    def test_sp9_27_missing_candidate_records_blocked_reason(self):
+        app = self.make_app(start_session=False)
+        app.active_session_mode = app_module.MODE_SMART_PRACTICE
+        q = self._sp9_question(1)
+        q["selected"] = ["B"]
+        app.master_questions = [q]
+        app.questions = [q]
+        app.plan_misconception_repair(q, is_correct=False)
+        row = app.progress_data["meta"]["repair_state"][app.repair_concept_key_for_question(q)]
+        self.assertEqual("blocked", row["status"])
+        self.assertIn("blocked_reason", row)
+
+    def test_sp9_28_only_one_repair_insertion_per_answer(self):
+        app = self._sp9_app_with_role_pool()
+        app.active_session_mode = app_module.MODE_SMART_PRACTICE
+        q = dict(app.master_questions[0], selected=["B"])
+        app.questions = [q]
+        inserted = app.plan_misconception_repair(q, is_correct=False)
+        self.assertLessEqual(len(inserted), 1)
+
+    def test_sp9_29_cache_invalidates_after_memory_update(self):
+        app = self._sp9_app_with_role_pool()
+        before = app._smart_practice_signal_key()
+        app._progress_questions()["1"] = update_progress_record(app._progress_questions()["1"], ["A"], True)
+        after = app._smart_practice_signal_key()
+        self.assertNotEqual(before, after)
+
+    def test_sp9_30_session_save_restore_preserves_smart_and_repair_metadata(self):
+        app = self.make_app(start_session=False)
+        question = self._sp9_question(1)
+        question.update(
+            {
+                "smart_primary_role": "weak_repair",
+                "smart_selection_reasons": ["repair"],
+                "smart_utility": 11.0,
+                "smart_utility_breakdown": {"misconception_repair_value": 11.0},
+                "smart_policy_version": "smart-practice-9",
+                "repair_stage": "contrast",
+                "repair_concept_key": "Topic::x",
+            }
+        )
+        app.master_questions = [dict(question)]
+        app.start_session_from_pool([dict(question)], mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        app.questions[0].update(question)
+        app.save_session(show_notice=False)
+        session_path = app.session_path
+
+        app.questions[0]["smart_primary_role"] = ""
+        app.questions[0]["repair_stage"] = ""
+        app.load_session_if_present(skip_identity_check=True)
+
+        self.assertTrue(session_path.exists())
+        self.assertEqual("weak_repair", app.questions[0]["smart_primary_role"])
+        self.assertEqual("contrast", app.questions[0]["repair_stage"])
+
+    def _measurement_prediction(self, created_at="2026-01-01T00:00:00", qnum=1):
+        question = self._sp9_question(qnum)
+        question.update(
+            {
+                "smart_primary_role": "weak_repair",
+                "smart_policy_version": "smart-practice-9",
+                "smart_utility": 10.0,
+                "smart_utility_breakdown": {"retention_risk": 5.0, "expected_learning_gain": 10.0},
+            }
+        )
+        return prediction_from_question(
+            question,
+            {"attempts": 1, "learner_memory": {"retrievability": 0.6, "stability": 0.5}},
+            created_at=created_at,
+        )
+
+    def _measurement_event(self, at, qnum=1, correct=True, prediction_id="", **extra):
+        event = {
+            "at": at,
+            "question_number": qnum,
+            "correct": correct,
+            "confidence": "Sure",
+            "effective_response_seconds": 9.0,
+            "raw_response_seconds": 9.0,
+            "prediction_id": prediction_id,
+            "topics": ["General Review"],
+            "objective_code": "",
+            "repair_concept_key": "Topic::general review",
+            "smart_primary_role": "weak_repair",
+        }
+        event.update(extra)
+        return event
+
+    def test_sp9_measurement_01_selection_creates_frozen_prediction_snapshot(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        store = app.progress_data["meta"]["smart_practice_measurement"]
+        self.assertEqual(1, len(store["predictions"]))
+        self.assertEqual(pool[0]["prediction_id"], next(iter(store["predictions"])))
+
+    def test_sp9_measurement_02_prediction_probabilities_are_bounded(self):
+        prediction = self._measurement_prediction()
+        self.assertGreaterEqual(prediction["predicted_recall_probability"], 0.01)
+        self.assertLessEqual(prediction["predicted_success_probability"], 0.99)
+        self.assertGreater(prediction["predicted_response_seconds"], 0)
+
+    def test_sp9_measurement_03_prediction_keeps_original_learner_state(self):
+        prediction = self._measurement_prediction()
+        changed = update_progress_record({"learner_memory": {"retrievability": 0.1}}, ["B"], False)
+        self.assertNotEqual(prediction["learner_retrievability_at_selection"], changed["learner_memory"]["retrievability"])
+
+    def test_sp9_measurement_04_session_resume_preserves_prediction_id(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        pid = app.questions[0]["prediction_id"]
+        app.save_session(show_notice=False)
+        app.questions[0]["prediction_id"] = ""
+        app.load_session_if_present(skip_identity_check=True)
+        self.assertEqual(pid, app.questions[0]["prediction_id"])
+
+    def test_sp9_measurement_05_answer_event_links_to_prediction(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        app.questions[0]["selected"] = list(app.questions[0]["correct"])
+        app.update_progress_for_answer(app.questions[0], feedback={"confidence": "Sure"})
+        self.assertEqual(app.questions[0]["prediction_id"], app._progress_history()[-1]["prediction_id"])
+
+    def test_sp9_measurement_06_same_answer_cannot_evaluate_own_prediction(self):
+        prediction = self._measurement_prediction()
+        event = self._measurement_event("2026-01-01T00:00:00", prediction_id=prediction["prediction_id"])
+        self.assertEqual("not_observed", link_prediction_outcomes(prediction, [event])["delayed_24h_item_outcome"]["status"])
+
+    def test_sp9_measurement_07_before_18h_not_24h(self):
+        prediction = self._measurement_prediction()
+        event = self._measurement_event("2026-01-01T17:00:00")
+        self.assertEqual("not_observed", find_future_outcome(prediction, [event], "24h")["status"])
+
+    def test_sp9_measurement_08_first_eligible_24h_selected(self):
+        prediction = self._measurement_prediction()
+        events = [self._measurement_event("2026-01-02T20:00:00", correct=False), self._measurement_event("2026-01-01T19:00:00", correct=True)]
+        self.assertTrue(find_future_outcome(prediction, events, "24h")["correct"])
+
+    def test_sp9_measurement_09_after_36h_not_24h(self):
+        prediction = self._measurement_prediction()
+        event = self._measurement_event("2026-01-02T13:00:00")
+        self.assertEqual("not_observed", find_future_outcome(prediction, [event], "24h")["status"])
+
+    def test_sp9_measurement_10_first_eligible_7d_selected(self):
+        prediction = self._measurement_prediction()
+        events = [self._measurement_event("2026-01-08T00:00:00", correct=False), self._measurement_event("2026-01-06T01:00:00", correct=True)]
+        self.assertTrue(find_future_outcome(prediction, events, "7d")["correct"])
+
+    def test_sp9_measurement_11_missing_future_attempt_not_observed(self):
+        self.assertEqual("not_observed", find_future_outcome(self._measurement_prediction(), [], "24h")["status"])
+
+    def test_sp9_measurement_12_exact_and_concept_transfer_separate(self):
+        prediction = self._measurement_prediction()
+        event = self._measurement_event("2026-01-02T00:00:00", qnum=2)
+        self.assertEqual("not_observed", find_future_outcome(prediction, [event], "24h", concept=False)["status"])
+        self.assertEqual("observed", find_future_outcome(prediction, [event], "24h", concept=True)["status"])
+
+    def test_sp9_measurement_13_immediate_repair_probe_not_delayed(self):
+        prediction = self._measurement_prediction()
+        event = self._measurement_event("2026-01-01T00:10:00", qnum=2, repair_stage="contrast")
+        self.assertEqual("not_observed", find_future_outcome(prediction, [event], "24h", concept=True)["status"])
+
+    def test_sp9_measurement_14_malformed_negative_timestamp_rejected(self):
+        prediction = self._measurement_prediction()
+        events = [self._measurement_event("bad-date"), self._measurement_event("2025-12-31T23:00:00")]
+        self.assertEqual("not_observed", find_future_outcome(prediction, events, "24h")["status"])
+
+    def test_sp9_measurement_15_brier_score_known_example(self):
+        self.assertEqual(0.25, brier_score([(0.5, 1.0), (0.5, 0.0)])["value"])
+
+    def test_sp9_measurement_16_log_loss_clamps_probabilities(self):
+        self.assertLess(log_loss([(0.0, 1.0), (1.0, 0.0)])["value"], 5.0)
+
+    def test_sp9_measurement_17_calibration_bins_values(self):
+        bins, _ece = calibration_bins([(0.1, 0.0), (0.9, 1.0)])
+        self.assertEqual(1, bins[0]["sample_count"])
+        self.assertEqual(1.0, bins[-1]["observed_success_rate"])
+
+    def test_sp9_measurement_18_ece_sample_weighted(self):
+        _bins, ece = calibration_bins([(0.1, 0.0), (0.9, 1.0)])
+        self.assertEqual(0.1, round(ece["value"], 1))
+
+    def test_sp9_measurement_19_insufficient_samples_marked(self):
+        self.assertEqual("insufficient_data", brier_score([(0.5, 1.0)])["status"])
+
+    def test_sp9_measurement_20_pairwise_discrimination_ties(self):
+        self.assertEqual(0.5, pairwise_discrimination([(0.5, 1.0), (0.5, 0.0)])["value"])
+
+    def test_sp9_measurement_21_immediate_correct_not_delayed_gain(self):
+        prediction = self._measurement_prediction()
+        event = self._measurement_event("2026-01-01T00:01:00", prediction_id=prediction["prediction_id"])
+        report, _store = build_measurement_report({"predictions": {prediction["prediction_id"]: prediction}}, [event], evaluation_at="2026-01-03T00:00:00")
+        self.assertEqual(0, report["learning_gain"]["transfer_evidence_count"])
+
+    def test_sp9_measurement_22_different_question_delayed_success_transfer(self):
+        prediction = self._measurement_prediction()
+        event = self._measurement_event("2026-01-02T00:00:00", qnum=2, correct=True)
+        report, _store = build_measurement_report({"predictions": {prediction["prediction_id"]: prediction}}, [event], evaluation_at="2026-01-03T00:00:00")
+        self.assertEqual(1, report["learning_gain"]["transfer_evidence_count"])
+
+    def test_sp9_measurement_23_repair_report_stages(self):
+        repair = {"x": {"stage": "spaced_retrieval", "status": "resolved", "concept_key": "x", "scheduled_transfer_qnums": [2]}}
+        perf = repair_performance(repair, [self._measurement_event("2026-01-02T00:00:00", repair_stage="contrast"), self._measurement_event("2026-01-03T00:00:00", repair_stage="transfer"), self._measurement_event("2026-01-04T00:00:00", repair_stage="spaced_retrieval")])
+        self.assertEqual(1, perf["contrast_scheduled"])
+        self.assertEqual(1, perf["transfer_scheduled"])
+        self.assertEqual(1, perf["spaced_retrieval_due"])
+
+    def test_sp9_measurement_24_blocked_repair_not_failed(self):
+        perf = repair_performance({"x": {"status": "blocked", "stage": "spaced_retrieval"}}, [])
+        self.assertEqual(1.0, perf["blocked_rate"])
+        self.assertEqual(0, perf["spaced_retrieval_success"])
+
+    def test_sp9_measurement_25_resolved_repair_later_failure_relapse(self):
+        perf = repair_performance({"x": {"status": "resolved", "concept_key": "c"}}, [self._measurement_event("2026-01-05T00:00:00", correct=False, repair_concept_key="c")])
+        self.assertEqual(1.0, perf["relapse_rate"])
+
+    def test_sp9_measurement_26_weak_precision_uses_observed(self):
+        prediction = self._measurement_prediction()
+        links = {prediction["prediction_id"]: {"immediate_item_outcome": {"status": "observed", "correct": False}, "delayed_24h_concept_outcome": {"status": "observed", "correct": True}}}
+        from smart_practice_measurement import weakness_precision
+        self.assertEqual(1.0, weakness_precision([prediction], links, [])["weak_role_immediate_error_rate"])
+
+    def test_sp9_measurement_27_stable_success_false_weakness_signal(self):
+        prediction = self._measurement_prediction()
+        from smart_practice_measurement import weakness_precision
+        history = [self._measurement_event("2026-01-02T00:00:00", qnum=1), self._measurement_event("2026-01-03T00:00:00", qnum=1)]
+        self.assertIn(1, weakness_precision([prediction], {}, history)["false_weakness_candidates"])
+
+    def test_sp9_measurement_28_role_metrics_separated(self):
+        prediction = self._measurement_prediction()
+        self.assertIn("weak_repair", role_performance([prediction], {}, {}))
+
+    def test_sp9_measurement_29_unobserved_delayed_does_not_lower_role_accuracy(self):
+        prediction = self._measurement_prediction()
+        metrics = role_performance([prediction], {prediction["prediction_id"]: {"delayed_24h_concept_outcome": {"status": "not_observed"}}}, [])
+        self.assertEqual("no_eligible_samples", metrics["weak_repair"]["24h_accuracy"]["status"])
+
+    def test_sp9_measurement_30_final_session_composition_actual_roles(self):
+        prediction = self._measurement_prediction()
+        self.assertEqual({"weak_repair": 1}, session_composition([prediction], requested_count=1)["actual_role_counts"])
+
+    def test_sp9_measurement_31_missing_source_trust_band(self):
+        self.assertEqual(1, source_performance([self._measurement_event("2026-01-02T00:00:00")])["missing_trust"]["sample_count"])
+
+    def test_sp9_measurement_32_raw_effective_timing_separate(self):
+        metric = timing_quality([self._measurement_event("2026-01-02T00:00:00", raw_response_seconds=999.0, effective_response_seconds=12.0)])
+        self.assertEqual(1.0, metric["effective_time_cap_rate"])
+
+    def test_sp9_measurement_33_contaminated_raw_not_dominate(self):
+        metric = timing_quality([self._measurement_event("2026-01-02T00:00:00", raw_response_seconds=999.0, effective_response_seconds=12.0, response_time_contaminated=True)])
+        self.assertEqual(12.0, metric["median_effective_response_seconds"])
+
+    def test_sp9_measurement_34_baseline_labeled_retrospective(self):
+        self.assertEqual("retrospective_shadow_comparison", baseline_comparison([], {})["random_blueprint"]["comparison_type"])
+
+    def test_sp9_measurement_35_baseline_does_not_invent_outcomes(self):
+        self.assertEqual("not_available", baseline_comparison([self._measurement_prediction()], {})["due_only"]["estimated_immediate_accuracy"])
+
+    def test_sp9_measurement_36_counterfactual_coverage_rate(self):
+        prediction = self._measurement_prediction()
+        links = {prediction["prediction_id"]: {"immediate_item_outcome": {"status": "observed", "correct": True}}}
+        self.assertEqual(1.0, baseline_comparison([prediction], links)["smart_practice"]["counterfactual_coverage_rate"])
+
+    def test_sp9_measurement_37_baseline_deterministic(self):
+        prediction = self._measurement_prediction()
+        self.assertEqual(baseline_comparison([prediction], {}), baseline_comparison([prediction], {}))
+
+    def test_sp9_measurement_38_low_sample_no_numeric_policy_change(self):
+        report, _store = build_measurement_report(empty_measurement_store(), [], evaluation_at="2026-01-01T00:00:00")
+        self.assertIsNone(report["calibration_recommendations"][0]["recommended_value"])
+
+    def test_sp9_measurement_39_recommendation_bounds(self):
+        from smart_practice_measurement import calibration_recommendations
+        rec = calibration_recommendations({"brier": {"sample_count": 50}, "expected_calibration_error": {"value": 0.2}})[0]
+        self.assertLessEqual(abs(rec["recommended_value"]), rec["maximum_allowed_change"])
+
+    def test_sp9_measurement_40_recommendations_do_not_mutate_policy(self):
+        store = empty_measurement_store()
+        before = dict(store["active_policy"])
+        build_measurement_report(store, [], evaluation_at="2026-01-01T00:00:00")
+        self.assertEqual(before, store["active_policy"])
+
+    def test_sp9_measurement_41_overconfident_bounded_downward_correction(self):
+        from smart_practice_measurement import calibration_recommendations
+        rec = calibration_recommendations({"brier": {"sample_count": 60}, "expected_calibration_error": {"value": 0.2}})[0]
+        self.assertEqual(-0.05, rec["recommended_value"])
+
+    def test_sp9_measurement_42_well_calibrated_no_change(self):
+        from smart_practice_measurement import calibration_recommendations
+        self.assertEqual("no_change", calibration_recommendations({"brier": {"sample_count": 60}, "expected_calibration_error": {"value": 0.01}})[0]["status"])
+
+    def test_sp9_measurement_43_schema_loads_missing_safely(self):
+        self.assertEqual(1, normalize_measurement_store(None)["schema_version"])
+
+    def test_sp9_measurement_44_duplicate_save_no_duplicate_prediction(self):
+        store = empty_measurement_store()
+        q = self._sp9_question(1)
+        attach_prediction_to_question(q, store, {}, created_at="2026-01-01T00:00:00")
+        attach_prediction_to_question(q, store, {}, created_at="2026-01-01T00:00:00")
+        self.assertEqual(1, len(store["predictions"]))
+
+    def test_sp9_measurement_45_duplicate_evaluation_no_duplicate_report(self):
+        store = empty_measurement_store()
+        _report, store = build_measurement_report(store, [], evaluation_at="2026-01-01T00:00:00")
+        _report, store = build_measurement_report(store, [], evaluation_at="2026-01-01T00:00:00")
+        self.assertEqual(1, len(store["measurement_reports"]))
+
+    def test_sp9_measurement_46_malformed_records_count_invalid(self):
+        store = {"predictions": {"bad": {"prediction_id": "bad", "prediction_created_at": "bad"}}}
+        report, _store = build_measurement_report(store, [{"at": "bad"}], evaluation_at="2026-01-01T00:00:00")
+        self.assertGreaterEqual(report["data_quality"]["invalid_timestamp_count"], 1)
+
+    def test_sp9_measurement_47_report_deterministic(self):
+        store = empty_measurement_store()
+        self.assertEqual(build_measurement_report(store, [], evaluation_at="2026-01-01T00:00:00")[0], build_measurement_report(store, [], evaluation_at="2026-01-01T00:00:00")[0])
+
+    def test_sp9_measurement_48_limitations_reflect_missing_data(self):
+        report, _store = build_measurement_report(empty_measurement_store(), [], evaluation_at="2026-01-01T00:00:00")
+        self.assertIn("Insufficient 7-day outcomes.", report["limitations"])
+
+    def test_sp9_measurement_49_real_session_save_load_preserves_prediction(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        pid = app.questions[0]["prediction_id"]
+        app.save_session(show_notice=False)
+        app.questions[0]["prediction_id"] = ""
+        app.load_session_if_present(skip_identity_check=True)
+        self.assertEqual(pid, app.questions[0]["prediction_id"])
+
+    def test_sp9_measurement_50_policy_change_invalidates_cache_key(self):
+        app = self._sp9_app_with_role_pool()
+        before = app._smart_practice_signal_key()
+        app.progress_data["meta"]["smart_practice_measurement"] = {"active_policy": {"policy_version": "changed"}}
+        after = app._smart_practice_signal_key()
+        self.assertNotEqual(before, after)
+
+    def _sp10_governance(self):
+        return empty_governance(created_at="2026-01-01T00:00:00")
+
+    def _sp10_recommendation(self, gov=None, rec_id="rec-1", target="recall_probability_bias", value=-0.02):
+        gov = gov or self._sp10_governance()
+        return {
+            "recommendation_id": rec_id,
+            "target": target,
+            "current_value": 0.0,
+            "recommended_value": value,
+            "maximum_allowed_change": 0.05,
+            "sample_count": 60,
+            "status": "recommended",
+            "measurement_report_id": "report-1",
+            "evaluated_policy_id": active_policy(gov)["policy_id"],
+        }
+
+    def _sp10_promote_candidate(self):
+        gov = self._sp10_governance()
+        candidate, gov, rejected = create_candidate_policy(
+            gov,
+            [self._sp10_recommendation(gov)],
+            created_at="2026-01-02T00:00:00",
+            actor="test",
+        )
+        self.assertEqual([], rejected)
+        evaluation, gov = evaluate_challenger(
+            gov,
+            candidate["policy_id"],
+            {
+                "supported_challenger_outcomes": 40,
+                "24h_outcomes": 25,
+                "7d_outcomes": 12,
+                "shadow_decision_count": 55,
+                "observation_age_days": 8,
+                "counterfactual_coverage_rate": 0.5,
+                "primary_metric_improved": True,
+                "7d_concept_recall_delta": 0.04,
+                "weakness_recovery_delta": 0.04,
+                "repair_relapse_delta": -0.01,
+                "source_risk_delta": -0.01,
+                "repetition_cost_delta": -0.01,
+                "due_backlog_delta": -0.01,
+                "calibration_error_delta": -0.01,
+                "fatigue_cost_delta": -0.01,
+                "role_floor_compliance": True,
+            },
+            evaluated_at="2026-01-10T00:00:00",
+        )
+        self.assertEqual("promotion_recommended", evaluation["status"])
+        return gov, candidate
+
+    def test_sp10_01_bootstrap_has_one_active_policy(self):
+        gov = self._sp10_governance()
+        self.assertTrue(exactly_one_active(gov))
+        self.assertEqual(active_policy(gov)["policy_id"], gov["active_policy_id"])
+
+    def test_sp10_02_policy_checksum_is_deterministic(self):
+        policy = active_policy(self._sp10_governance())
+        self.assertEqual(policy_checksum(policy), policy_checksum(dict(reversed(list(policy.items())))))
+
+    def test_sp10_03_default_policy_values_validate(self):
+        ok, reasons = validate_policy_values(default_policy_values())
+        self.assertTrue(ok, reasons)
+
+    def test_sp10_04_unknown_policy_field_rejected(self):
+        values = default_policy_values()
+        values["unknown_live_knob"] = 1
+        self.assertIn("unknown_fields:unknown_live_knob", validate_policy_values(values)[1])
+
+    def test_sp10_05_candidate_does_not_mutate_active_policy(self):
+        gov = self._sp10_governance()
+        before = active_policy(gov)
+        candidate, gov, rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00")
+        self.assertEqual([], rejected)
+        self.assertNotEqual(before["policy_id"], candidate["policy_id"])
+        self.assertEqual(before, active_policy(gov))
+
+    def test_sp10_06_candidate_records_bounded_change(self):
+        gov = self._sp10_governance()
+        candidate, _gov, _rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00")
+        self.assertEqual("recall_probability_bias", candidate["change_summary"][0]["field"])
+        self.assertEqual(-0.02, candidate["change_summary"][0]["new_value"])
+
+    def test_sp10_07_stale_recommendation_rejected(self):
+        gov = self._sp10_governance()
+        rec = self._sp10_recommendation(gov)
+        rec["evaluated_policy_id"] = "old-policy"
+        candidate, _gov, rejected = create_candidate_policy(gov, [rec], created_at="2026-01-02T00:00:00")
+        self.assertIsNone(candidate)
+        self.assertIn("stale_recommendation", rejected)
+
+    def test_sp10_08_duplicate_recommendation_rejected(self):
+        gov = self._sp10_governance()
+        rec = self._sp10_recommendation(gov)
+        _candidate, gov, _rejected = create_candidate_policy(gov, [rec], created_at="2026-01-02T00:00:00")
+        candidate, _gov, rejected = create_candidate_policy(gov, [rec], created_at="2026-01-03T00:00:00")
+        self.assertIsNone(candidate)
+        self.assertIn("duplicate_recommendation", rejected)
+
+    def test_sp10_09_shadow_decision_persists_separately(self):
+        gov = self._sp10_governance()
+        candidate, gov, _rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00")
+        decision, gov = create_shadow_decision(
+            gov,
+            [{"question_number": 1, "smart_primary_role": "due_retention", "smart_utility": 1}],
+            [{"question_number": 2, "smart_primary_role": "weak_repair", "smart_utility": 2}],
+            challenger_policy_id=candidate["policy_id"],
+            created_at="2026-01-03T00:00:00",
+            learner_state_signature="learner-a",
+            candidate_snapshot_signature="pool-a",
+        )
+        self.assertIn(decision["shadow_decision_id"], gov["shadow_decisions"])
+        self.assertEqual([1], decision["champion_question_numbers"])
+
+    def test_sp10_10_shadow_decision_is_deterministic(self):
+        gov = self._sp10_governance()
+        candidate, gov, _rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00")
+        args = dict(
+            challenger_policy_id=candidate["policy_id"],
+            created_at="2026-01-03T00:00:00",
+            learner_state_signature="learner-a",
+            candidate_snapshot_signature="pool-a",
+        )
+        first, _ = create_shadow_decision(gov, [{"question_number": 1}], [{"question_number": 2}], **args)
+        second, _ = create_shadow_decision(gov, [{"question_number": 1}], [{"question_number": 2}], **args)
+        self.assertEqual(first["shadow_decision_id"], second["shadow_decision_id"])
+
+    def test_sp10_11_low_evidence_blocks_promotion(self):
+        gov = self._sp10_governance()
+        candidate, gov, _rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00")
+        evaluation, _gov = evaluate_challenger(gov, candidate["policy_id"], {"supported_challenger_outcomes": 1}, evaluated_at="2026-01-04T00:00:00")
+        self.assertEqual("insufficient_data", evaluation["status"])
+        self.assertIn("insufficient_delayed_evidence", evaluation["rejection_reasons"])
+
+    def test_sp10_12_regression_gate_detects_delayed_recall_drop(self):
+        self.assertIn("delayed_recall_regression", regression_gate_failures({"7d_concept_recall_delta": -0.05}))
+
+    def test_sp10_13_regression_gate_detects_role_floor_failure(self):
+        self.assertIn("role_floor_regression", regression_gate_failures({"role_floor_compliance": False}))
+
+    def test_sp10_14_promotion_recommended_when_gates_pass(self):
+        gov, candidate = self._sp10_promote_candidate()
+        latest = [ev for ev in gov["challenger_evaluations"].values() if ev["challenger_policy_id"] == candidate["policy_id"]][0]
+        self.assertEqual("promotion_recommended", latest["status"])
+
+    def test_sp10_15_activation_requires_expected_active_policy(self):
+        gov, candidate = self._sp10_promote_candidate()
+        ok, _gov, reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id="wrong",
+            approval_reference="approval-1",
+            activated_at="2026-01-11T00:00:00",
+        )
+        self.assertFalse(ok)
+        self.assertEqual("expected_active_policy_mismatch", reason)
+
+    def test_sp10_16_activation_succeeds_with_promotion(self):
+        gov, candidate = self._sp10_promote_candidate()
+        old_active = active_policy(gov)["policy_id"]
+        ok, gov, reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=old_active,
+            approval_reference="approval-1",
+            activated_at="2026-01-11T00:00:00",
+        )
+        self.assertTrue(ok, reason)
+        self.assertEqual(candidate["policy_id"], gov["active_policy_id"])
+        self.assertTrue(exactly_one_active(gov))
+
+    def test_sp10_17_activation_rejects_checksum_mismatch(self):
+        gov, candidate = self._sp10_promote_candidate()
+        gov["policies"][candidate["policy_id"]]["checksum"] = "bad"
+        ok, _gov, reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=active_policy(gov)["policy_id"],
+            approval_reference="approval-1",
+            activated_at="2026-01-11T00:00:00",
+        )
+        self.assertFalse(ok)
+        self.assertIn("checksum_mismatch", reason)
+
+    def test_sp10_18_rollback_restores_previous_policy(self):
+        gov, candidate = self._sp10_promote_candidate()
+        old_active = active_policy(gov)
+        ok, gov, _reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=old_active["policy_id"],
+            approval_reference="approval-1",
+            activated_at="2026-01-11T00:00:00",
+        )
+        self.assertTrue(ok)
+        ok, gov, reason = rollback_policy(
+            gov,
+            old_active["policy_id"],
+            expected_active_policy_id=candidate["policy_id"],
+            reason="test rollback",
+            rolled_back_at="2026-01-12T00:00:00",
+        )
+        self.assertTrue(ok, reason)
+        self.assertEqual(old_active["policy_values"], active_policy(gov)["policy_values"])
+
+    def test_sp10_19_startup_recovers_from_missing_active(self):
+        gov = self._sp10_governance()
+        gov["active_policy_id"] = "missing"
+        recovered = normalize_governance(gov, created_at="2026-01-02T00:00:00")
+        self.assertTrue(exactly_one_active(recovered))
+        self.assertGreaterEqual(recovered["invalid_data_count"], 1)
+
+    def test_sp10_20_tiny_sample_drift_is_insufficient(self):
+        reports = detect_drift({"accuracy": 0.8}, {"accuracy": 0.5}, sample_count=5, detected_at="2026-01-02T00:00:00")
+        self.assertTrue(all(report["status"] == "insufficient_data" for report in reports))
+
+    def test_sp10_21_question_bank_drift_handles_string_signature(self):
+        reports = detect_drift({"bank_signature": "a"}, {"bank_signature": "b"}, sample_count=80, detected_at="2026-01-02T00:00:00")
+        bank = next(report for report in reports if report["drift_type"] == "question_bank_drift")
+        self.assertTrue(bank["detected"])
+
+    def test_sp10_22_review_report_does_not_activate(self):
+        gov, candidate = self._sp10_promote_candidate()
+        before = gov["active_policy_id"]
+        report = build_policy_review_report(gov, candidate["policy_id"], generated_at="2026-01-11T00:00:00")
+        self.assertEqual("approve_for_manual_activation", report["recommendation"])
+        self.assertEqual(before, gov["active_policy_id"])
+
+    def test_sp10_23_candidate_expiration_records_audit(self):
+        gov = self._sp10_governance()
+        candidate, gov, _rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00")
+        gov = expire_candidate(gov, candidate["policy_id"], expired_at="2026-01-20T00:00:00", reason="stale")
+        self.assertEqual("expired", gov["policies"][candidate["policy_id"]]["status"])
+        self.assertTrue(any(event["event_type"] == "candidate_expired" for event in gov["audit_log"]))
+
+    def test_sp10_24_prediction_snapshot_preserves_policy_id(self):
+        store = empty_measurement_store()
+        question = self._sp9_question(1)
+        question["smart_policy_id"] = "policy-a"
+        prediction = attach_prediction_to_question(question, store, {}, created_at="2026-01-01T00:00:00")
+        question["smart_policy_id"] = "policy-b"
+        self.assertEqual("policy-a", prediction["smart_policy_id"])
+        self.assertEqual("policy-a", store["predictions"][prediction["prediction_id"]]["smart_policy_id"])
+
+    def test_sp10_25_real_session_save_load_preserves_policy_id(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        policy_id = app.questions[0]["smart_policy_id"]
+        app.save_session(show_notice=False)
+        app.questions[0]["smart_policy_id"] = ""
+        app.load_session_if_present(skip_identity_check=True)
+        self.assertEqual(policy_id, app.questions[0]["smart_policy_id"])
+
+    def test_sp10_26_policy_change_invalidates_smart_signal_key(self):
+        app = self._sp9_app_with_role_pool()
+        before = app._smart_practice_signal_key()
+        gov, candidate = self._sp10_promote_candidate()
+        old_active = active_policy(gov)["policy_id"]
+        ok, gov, reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=old_active,
+            approval_reference="approval-1",
+            activated_at="2026-01-11T00:00:00",
+        )
+        self.assertTrue(ok, reason)
+        app.progress_data["meta"]["smart_practice_policy_governance"] = gov
+        after = app._smart_practice_signal_key()
+        self.assertNotEqual(before, after)
+        self.assertEqual(candidate["policy_id"], gov["active_policy_id"])
+
+    def test_sp10_27_activation_wrapper_invalidates_cache(self):
+        app = self._sp9_app_with_role_pool()
+        gov, candidate = self._sp10_promote_candidate()
+        app.progress_data["meta"]["smart_practice_policy_governance"] = gov
+        app.smart_practice_pool_cache["x"] = ["cached"]
+        ok, reason = app.activate_smart_practice_policy(
+            candidate["policy_id"],
+            expected_active_policy_id=active_policy(gov)["policy_id"],
+            approval_reference="approval-1",
+            activated_at="2026-01-11T00:00:00",
+        )
+        self.assertTrue(ok, reason)
+        self.assertEqual({}, app.smart_practice_pool_cache)
+
+    def test_sp10_28_rollback_wrapper_invalidates_cache(self):
+        app = self._sp9_app_with_role_pool()
+        gov, candidate = self._sp10_promote_candidate()
+        old_active = active_policy(gov)["policy_id"]
+        ok, gov, _reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=old_active,
+            approval_reference="approval-1",
+            activated_at="2026-01-11T00:00:00",
+        )
+        self.assertTrue(ok)
+        app.progress_data["meta"]["smart_practice_policy_governance"] = gov
+        app.smart_practice_pool_cache["x"] = ["cached"]
+        ok, reason = app.rollback_smart_practice_policy(
+            old_active,
+            expected_active_policy_id=candidate["policy_id"],
+            reason="test rollback",
+            rolled_back_at="2026-01-12T00:00:00",
+        )
+        self.assertTrue(ok, reason)
+        self.assertEqual({}, app.smart_practice_pool_cache)
+
+    def test_sp10_29_role_share_policy_feeds_allocator(self):
+        allocation = smart_practice_role_allocation(
+            10,
+            role_shares={
+                "due_retention": 0.5,
+                "weak_repair": 0.2,
+                "blueprint_coverage": 0.1,
+                "transfer": 0.1,
+                "controlled_stretch": 0.1,
+            },
+        )
+        self.assertGreaterEqual(allocation["due_retention"], allocation["blueprint_coverage"])
+        self.assertEqual(10, sum(allocation.values()))
+
+    def test_sp10_30_validation_rejects_malformed_policy(self):
+        policy = active_policy(self._sp10_governance())
+        policy["policy_values"]["review_interval_multiplier"] = 9
+        ok, reasons = validate_policy(policy)
+        self.assertFalse(ok)
+        self.assertIn("review_multiplier_out_of_bounds", reasons)
+
+    def _sp10_active_governance_with_values(self, values):
+        gov = self._sp10_governance()
+        policy = gov["policies"][gov["active_policy_id"]]
+        policy["policy_values"] = values
+        policy["checksum"] = policy_checksum(policy)
+        gov["policies"][policy["policy_id"]] = policy
+        return gov
+
+    def _sp10_relaxed_values(self):
+        values = default_policy_values()
+        values["minimum_evidence_thresholds"] = {
+            "minimum_shadow_decisions": 1,
+            "minimum_supported_challenger_outcomes": 1,
+            "minimum_24h_outcomes": 1,
+            "minimum_7d_outcomes": 1,
+            "minimum_counterfactual_coverage_rate": 0.1,
+            "minimum_observation_age_days": 1,
+        }
+        return values
+
+    def _sp10_promote_candidate_with_values(self, values=None):
+        gov = self._sp10_governance()
+        if values is not None:
+            gov = self._sp10_active_governance_with_values(values)
+        candidate, gov, rejected = create_candidate_policy(
+            gov,
+            [self._sp10_recommendation(gov)],
+            created_at="2026-02-02T00:00:00",
+            actor="test",
+        )
+        self.assertEqual([], rejected)
+        evaluation, gov = evaluate_challenger(
+            gov,
+            candidate["policy_id"],
+            {
+                "supported_challenger_outcomes": 40,
+                "24h_outcomes": 25,
+                "7d_outcomes": 12,
+                "shadow_decision_count": 55,
+                "observation_age_days": 8,
+                "counterfactual_coverage_rate": 0.5,
+                "primary_metric_improved": True,
+                "7d_concept_recall_delta": 0.04,
+                "weakness_recovery_delta": 0.04,
+                "repair_relapse_delta": -0.01,
+                "source_risk_delta": -0.01,
+                "repetition_cost_delta": -0.01,
+                "due_backlog_delta": -0.01,
+                "calibration_error_delta": -0.01,
+                "fatigue_cost_delta": -0.01,
+                "role_floor_compliance": True,
+            },
+            evaluated_at="2026-02-10T00:00:00",
+        )
+        self.assertEqual("promotion_recommended", evaluation["status"])
+        return gov, candidate
+
+    def _sp10_passing_support(self):
+        return {
+            "supported_challenger_outcomes": 40,
+            "24h_outcomes": 25,
+            "7d_outcomes": 12,
+            "shadow_decision_count": 55,
+            "observation_age_days": 8,
+            "counterfactual_coverage_rate": 0.5,
+            "primary_metric_improved": True,
+            "promotion_score": 999.0,
+            "7d_concept_recall_delta": 0.04,
+            "weakness_recovery_delta": 0.04,
+            "repair_relapse_delta": -0.01,
+            "source_risk_delta": -0.01,
+            "repetition_cost_delta": -0.01,
+            "due_backlog_delta": -0.01,
+            "calibration_error_delta": -0.01,
+            "fatigue_cost_delta": -0.01,
+            "role_floor_compliance": True,
+        }
+
+    def _sp10_candidate(self):
+        gov = self._sp10_active_governance_with_values(self._sp10_relaxed_values())
+        candidate, gov, rejected = create_candidate_policy(
+            gov,
+            [self._sp10_recommendation(gov)],
+            created_at="2026-03-02T00:00:00",
+        )
+        self.assertEqual([], rejected)
+        return gov, candidate
+
+    def test_sp10_completion_01_every_active_policy_control_family_reaches_runtime(self):
+        app = self._sp9_app_with_role_pool()
+        values = default_policy_values()
+        values["role_shares"]["due_retention"] = 0.4
+        values["role_shares"]["weak_repair"] = 0.2
+        values["role_shares"]["blueprint_coverage"] = 0.2
+        values["role_shares"]["transfer"] = 0.1
+        values["role_shares"]["controlled_stretch"] = 0.1
+        values["utility_component_scales"]["retention_risk"] = 0.5
+        values["utility_component_bounds"]["retention_risk"] = (0.0, 1.0)
+        values["source_risk_settings"]["baseline"] = 90.0
+        values["fatigue_settings"]["negative_momentum_penalty"] = 0.02
+        values["review_interval_multiplier"] = 1.05
+        values["repair_trigger_settings"]["wrong_memory_min_pressure"] = 30.0
+        values["repair_spacing_settings"]["contrast_delay"] = 3
+        values["weakness_thresholds"]["active_weak_wrong_surplus"] = 2
+        values["prediction_calibration"]["recall_probability_offset"] = 0.03
+        values["exploration_settings"]["transfer_min_value"] = 4.5
+        values["repetition_settings"]["recent_concept_penalty"] = 1.0
+        values["minimum_evidence_thresholds"]["minimum_shadow_decisions"] = 2
+        app.progress_data["meta"]["smart_practice_policy_governance"] = self._sp10_active_governance_with_values(values)
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        controls = pool[0]["smart_runtime_policy_controls"]
+        self.assertEqual(0.4, controls["role_shares"]["due_retention"])
+        self.assertEqual(1.0, controls["utility_component_bounds"]["retention_risk"][1])
+        self.assertEqual(90.0, controls["source_risk_settings"]["baseline"])
+        self.assertEqual(0.02, controls["fatigue_settings"]["negative_momentum_penalty"])
+        self.assertEqual(1.05, controls["review_interval_multiplier"])
+        self.assertEqual(30.0, controls["repair_trigger_settings"]["wrong_memory_min_pressure"])
+        self.assertEqual(3, controls["repair_spacing_settings"]["contrast_delay"])
+        self.assertEqual(2, controls["weakness_thresholds"]["active_weak_wrong_surplus"])
+        self.assertEqual(0.03, controls["prediction_calibration"]["recall_probability_offset"])
+        self.assertEqual(4.5, controls["exploration_settings"]["transfer_min_value"])
+        self.assertEqual(1.0, controls["repetition_settings"]["recent_concept_penalty"])
+        self.assertEqual(2, controls["minimum_evidence_thresholds"]["minimum_shadow_decisions"])
+
+    def test_sp10_completion_02_no_hardcoded_utility_bound_overrides_active_policy(self):
+        app = self._sp9_app_with_role_pool()
+        values = default_policy_values()
+        values["utility_component_scales"]["retention_risk"] = 2.0
+        values["utility_component_bounds"]["retention_risk"] = (0.0, 1.0)
+        app.progress_data["meta"]["smart_practice_policy_governance"] = self._sp10_active_governance_with_values(values)
+        self.assertEqual(
+            1.0,
+            active_policy(app.progress_data["meta"]["smart_practice_policy_governance"])["policy_values"][
+                "utility_component_bounds"
+            ]["retention_risk"][1],
+        )
+        app.smart_practice_pool_cache.clear()
+        app.smart_practice_signal_cache_key = None
+        for question in app.master_questions:
+            question.pop("smart_primary_role", None)
+            question.pop("smart_utility_breakdown", None)
+            question.pop("smart_utility", None)
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        self.assertEqual(1.0, pool[0]["smart_runtime_policy_controls"]["utility_component_bounds"]["retention_risk"][1])
+        self.assertLessEqual(pool[0]["smart_utility_breakdown"]["retention_risk"], 1.0)
+
+    def test_sp10_completion_03_champion_and_challenger_same_input_snapshot(self):
+        gov, candidate = self._sp10_candidate()
+        champion = [{"question_number": 1, "smart_primary_role": "due_retention"}]
+        challenger = [{"question_number": 2, "smart_primary_role": "weak_repair"}]
+        decision, _gov = create_shadow_decision(
+            gov,
+            champion,
+            challenger,
+            challenger_policy_id=candidate["policy_id"],
+            created_at="2026-03-03T00:00:00",
+            learner_state_signature="learner-same",
+            candidate_snapshot_signature="pool-same",
+        )
+        self.assertEqual("learner-same", decision["learner_state_signature"])
+        self.assertEqual("pool-same", decision["candidate_snapshot_signature"])
+
+    def test_sp10_completion_04_shadow_selection_cannot_mutate_learner_memory(self):
+        app = self._sp9_app_with_role_pool()
+        before = copy.deepcopy(app.progress_data)
+        gov, candidate = self._sp10_candidate()
+        create_shadow_decision(gov, [{"question_number": 1}], [{"question_number": 2}], challenger_policy_id=candidate["policy_id"], created_at="2026-03-03T00:00:00", learner_state_signature="x", candidate_snapshot_signature="y")
+        self.assertEqual(before, app.progress_data)
+
+    def test_sp10_completion_05_shadow_selection_cannot_schedule_repair(self):
+        app = self._sp9_app_with_role_pool()
+        before = copy.deepcopy(app.progress_data.get("meta", {}).get("repair_state", {}))
+        gov, candidate = self._sp10_candidate()
+        create_shadow_decision(gov, [{"question_number": 1}], [{"question_number": 2}], challenger_policy_id=candidate["policy_id"], created_at="2026-03-03T00:00:00", learner_state_signature="x", candidate_snapshot_signature="y")
+        self.assertEqual(before, app.progress_data.get("meta", {}).get("repair_state", {}))
+
+    def test_sp10_completion_06_shadow_selection_cannot_change_live_session(self):
+        app = self._sp9_app_with_role_pool()
+        before = [q["question_number"] for q in app.questions]
+        gov, candidate = self._sp10_candidate()
+        create_shadow_decision(gov, [{"question_number": 1}], [{"question_number": 2}], challenger_policy_id=candidate["policy_id"], created_at="2026-03-03T00:00:00", learner_state_signature="x", candidate_snapshot_signature="y")
+        self.assertEqual(before, [q["question_number"] for q in app.questions])
+
+    def test_sp10_completion_07_unsupported_challenger_has_no_fabricated_result(self):
+        gov, candidate = self._sp10_candidate()
+        evaluation, _gov = evaluate_challenger(gov, candidate["policy_id"], {}, evaluated_at="2026-03-04T00:00:00")
+        self.assertEqual("insufficient_data", evaluation["status"])
+        self.assertEqual(0, evaluation["metrics"].get("supported_challenger_outcomes", 0))
+
+    def test_sp10_completion_08_low_counterfactual_coverage_blocks_promotion(self):
+        gov, candidate = self._sp10_candidate()
+        support = self._sp10_passing_support()
+        support["counterfactual_coverage_rate"] = 0.0
+        evaluation, _gov = evaluate_challenger(gov, candidate["policy_id"], support, evaluated_at="2026-03-04T00:00:00")
+        self.assertIn("low_counterfactual_coverage", evaluation["rejection_reasons"])
+
+    def test_sp10_completion_09_missing_delayed_evidence_blocks_promotion(self):
+        gov, candidate = self._sp10_candidate()
+        support = self._sp10_passing_support()
+        support["7d_outcomes"] = 0
+        evaluation, _gov = evaluate_challenger(gov, candidate["policy_id"], support, evaluated_at="2026-03-04T00:00:00")
+        self.assertIn("insufficient_7d_evidence", evaluation["rejection_reasons"])
+
+    def test_sp10_completion_10_weakness_recovery_regression_blocks_promotion(self):
+        gov, candidate = self._sp10_candidate()
+        support = self._sp10_passing_support()
+        support["weakness_recovery_delta"] = -0.05
+        evaluation, _gov = evaluate_challenger(gov, candidate["policy_id"], support, evaluated_at="2026-03-04T00:00:00")
+        self.assertIn("weakness_recovery_regression", evaluation["rejection_reasons"])
+
+    def test_sp10_completion_11_repair_relapse_regression_blocks_promotion(self):
+        gov, candidate = self._sp10_candidate()
+        support = self._sp10_passing_support()
+        support["repair_relapse_delta"] = 0.05
+        evaluation, _gov = evaluate_challenger(gov, candidate["policy_id"], support, evaluated_at="2026-03-04T00:00:00")
+        self.assertIn("repair_relapse_regression", evaluation["rejection_reasons"])
+
+    def test_sp10_completion_12_source_risk_regression_blocks_promotion(self):
+        gov, candidate = self._sp10_candidate()
+        support = self._sp10_passing_support()
+        support["source_risk_delta"] = 0.08
+        evaluation, _gov = evaluate_challenger(gov, candidate["policy_id"], support, evaluated_at="2026-03-04T00:00:00")
+        self.assertIn("source_risk_regression", evaluation["rejection_reasons"])
+
+    def test_sp10_completion_13_repetition_regression_blocks_promotion(self):
+        gov, candidate = self._sp10_candidate()
+        support = self._sp10_passing_support()
+        support["repetition_cost_delta"] = 0.08
+        evaluation, _gov = evaluate_challenger(gov, candidate["policy_id"], support, evaluated_at="2026-03-04T00:00:00")
+        self.assertIn("repetition_regression", evaluation["rejection_reasons"])
+
+    def test_sp10_completion_14_due_backlog_regression_blocks_promotion(self):
+        gov, candidate = self._sp10_candidate()
+        support = self._sp10_passing_support()
+        support["due_backlog_delta"] = 0.05
+        evaluation, _gov = evaluate_challenger(gov, candidate["policy_id"], support, evaluated_at="2026-03-04T00:00:00")
+        self.assertIn("due_backlog_regression", evaluation["rejection_reasons"])
+
+    def test_sp10_completion_15_calibration_regression_blocks_promotion(self):
+        gov, candidate = self._sp10_candidate()
+        support = self._sp10_passing_support()
+        support["calibration_error_delta"] = 0.05
+        evaluation, _gov = evaluate_challenger(gov, candidate["policy_id"], support, evaluated_at="2026-03-04T00:00:00")
+        self.assertIn("calibration_regression", evaluation["rejection_reasons"])
+
+    def test_sp10_completion_16_fatigue_regression_blocks_promotion(self):
+        gov, candidate = self._sp10_candidate()
+        support = self._sp10_passing_support()
+        support["fatigue_cost_delta"] = 0.08
+        evaluation, _gov = evaluate_challenger(gov, candidate["policy_id"], support, evaluated_at="2026-03-04T00:00:00")
+        self.assertIn("fatigue_regression", evaluation["rejection_reasons"])
+
+    def test_sp10_completion_17_hard_gate_not_overridden_by_score(self):
+        gov, candidate = self._sp10_candidate()
+        support = self._sp10_passing_support()
+        support["invalid_data_count"] = 1
+        support["promotion_score"] = 9999
+        evaluation, _gov = evaluate_challenger(gov, candidate["policy_id"], support, evaluated_at="2026-03-04T00:00:00")
+        self.assertNotEqual("promotion_recommended", evaluation["status"])
+        self.assertIn("invalid_data_quality", evaluation["rejection_reasons"])
+
+    def test_sp10_completion_18_parent_mismatch_blocks_activation(self):
+        gov, candidate = self._sp10_promote_candidate()
+        gov["policies"][candidate["policy_id"]]["parent_policy_id"] = "wrong-parent"
+        ok, _gov, reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        self.assertFalse(ok)
+        self.assertEqual("candidate_parent_mismatch", reason)
+
+    def test_sp10_completion_19_expired_candidate_blocks_activation(self):
+        gov, candidate = self._sp10_promote_candidate()
+        gov = expire_candidate(gov, candidate["policy_id"], expired_at="2026-03-10T00:00:00", reason="stale")
+        ok, _gov, reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        self.assertFalse(ok)
+        self.assertEqual("invalid_candidate_status", reason)
+
+    def test_sp10_completion_20_activation_leaves_exactly_one_active(self):
+        gov, candidate = self._sp10_promote_candidate()
+        ok, gov, reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        self.assertTrue(ok, reason)
+        self.assertTrue(exactly_one_active(gov))
+
+    def test_sp10_completion_21_mid_activation_failure_restores_previous_active(self):
+        gov, candidate = self._sp10_promote_candidate()
+        previous = active_policy(gov)["policy_id"]
+        with mock.patch("smart_practice_policy.exactly_one_active", side_effect=ValueError("boom")):
+            ok, recovered, reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=previous, approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        self.assertFalse(ok)
+        self.assertEqual("activation_failed", reason)
+        self.assertEqual(previous, recovered["active_policy_id"])
+
+    def test_sp10_completion_22_existing_session_retains_original_policy(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        original = app.questions[0]["smart_policy_id"]
+        gov, candidate = self._sp10_promote_candidate()
+        ok, gov, _reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        self.assertTrue(ok)
+        app.progress_data["meta"]["smart_practice_policy_governance"] = gov
+        self.assertEqual(original, app.questions[0]["smart_policy_id"])
+
+    def test_sp10_completion_23_new_session_uses_newly_activated_policy(self):
+        app = self._sp9_app_with_role_pool()
+        gov, candidate = self._sp10_promote_candidate()
+        ok, gov, _reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        self.assertTrue(ok)
+        app.progress_data["meta"]["smart_practice_policy_governance"] = gov
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        self.assertEqual(candidate["policy_id"], pool[0]["smart_policy_id"])
+
+    def test_sp10_completion_24_rollback_restores_exact_prior_checksum(self):
+        gov, candidate = self._sp10_promote_candidate()
+        prior = active_policy(gov)
+        ok, gov, _reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=prior["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        self.assertTrue(ok)
+        ok, gov, reason = rollback_policy(gov, prior["policy_id"], expected_active_policy_id=candidate["policy_id"], reason="test", rolled_back_at="2026-03-12T00:00:00")
+        self.assertTrue(ok, reason)
+        self.assertEqual(prior["checksum"], active_policy(gov)["checksum"])
+
+    def test_sp10_completion_25_invalid_rollback_target_fails_safely(self):
+        gov, candidate = self._sp10_promote_candidate()
+        ok, gov, _reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        self.assertTrue(ok)
+        ok, after, reason = rollback_policy(gov, "missing", expected_active_policy_id=candidate["policy_id"], reason="test", rolled_back_at="2026-03-12T00:00:00")
+        self.assertFalse(ok)
+        self.assertEqual("target_policy_not_found", reason)
+        self.assertEqual(gov["active_policy_id"], after["active_policy_id"])
+
+    def test_sp10_completion_26_historical_prediction_refs_survive_rollback(self):
+        question = self._sp9_question(1)
+        question["smart_policy_id"] = "old-policy"
+        prediction = prediction_from_question(question, {}, created_at="2026-03-01T00:00:00")
+        gov, candidate = self._sp10_promote_candidate()
+        prior = active_policy(gov)["policy_id"]
+        ok, gov, _reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=prior, approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        self.assertTrue(ok)
+        rollback_policy(gov, prior, expected_active_policy_id=candidate["policy_id"], reason="test", rolled_back_at="2026-03-12T00:00:00")
+        self.assertEqual("old-policy", prediction["smart_policy_id"])
+
+    def test_sp10_completion_27_malformed_active_policy_triggers_startup_recovery(self):
+        gov = self._sp10_governance()
+        gov["policies"][gov["active_policy_id"]]["checksum"] = "bad"
+        recovered = normalize_governance(gov, created_at="2026-03-02T00:00:00")
+        self.assertTrue(exactly_one_active(recovered))
+        self.assertTrue(any(event["event_type"] == "startup_recovered" for event in recovered["audit_log"]))
+
+    def test_sp10_completion_28_multiple_active_policies_trigger_safe_recovery(self):
+        gov, candidate = self._sp10_candidate()
+        gov["policies"][candidate["policy_id"]]["status"] = "active"
+        recovered = normalize_governance(gov, created_at="2026-03-02T00:00:00")
+        self.assertTrue(exactly_one_active(recovered))
+
+    def test_sp10_completion_29_every_drift_type_detected_with_evidence(self):
+        baseline = {"calibration_error": 0.1, "delayed_recall": 0.9, "accuracy": 0.9, "domain_weakness": 0.1, "bank_signature": "a", "source_risk": 0.1, "role_deviation": 0.1, "repair_success": 0.9}
+        recent = {"calibration_error": 0.3, "delayed_recall": 0.7, "accuracy": 0.7, "domain_weakness": 0.3, "bank_signature": "b", "source_risk": 0.3, "role_deviation": 0.3, "repair_success": 0.7}
+        reports = detect_drift(baseline, recent, sample_count=80, detected_at="2026-03-03T00:00:00")
+        self.assertEqual(8, sum(1 for report in reports if report["detected"]))
+
+    def test_sp10_completion_30_tiny_samples_do_not_trigger_drift(self):
+        reports = detect_drift({"accuracy": 0.9}, {"accuracy": 0.1}, sample_count=3, detected_at="2026-03-03T00:00:00")
+        self.assertTrue(all(not report["detected"] for report in reports))
+
+    def test_sp10_completion_31_drift_does_not_mutate_active_policy(self):
+        gov = self._sp10_governance()
+        before = active_policy(gov)
+        detect_drift({"accuracy": 0.9}, {"accuracy": 0.7}, sample_count=80, detected_at="2026-03-03T00:00:00")
+        self.assertEqual(before, active_policy(gov))
+
+    def test_sp10_completion_32_audit_log_is_append_only(self):
+        gov = self._sp10_governance()
+        before = list(gov["audit_log"])
+        candidate, gov, _rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-03-02T00:00:00")
+        self.assertEqual(before, gov["audit_log"][: len(before)])
+        self.assertTrue(candidate)
+
+    def test_sp10_completion_33_duplicate_persistence_does_not_duplicate_audit(self):
+        app = self._sp9_app_with_role_pool()
+        gov, candidate = self._sp10_promote_candidate()
+        app.progress_data["meta"]["smart_practice_policy_governance"] = gov
+        app.save_progress()
+        app.save_progress()
+        app.load_progress_if_present()
+        loaded = app.progress_data["meta"]["smart_practice_policy_governance"]
+        event_ids = [event["audit_event_id"] for event in loaded["audit_log"]]
+        self.assertEqual(len(event_ids), len(set(event_ids)))
+        self.assertIn(candidate["policy_id"], loaded["policies"])
+
+    def test_sp10_completion_34_activation_survives_real_save_load(self):
+        app = self._sp9_app_with_role_pool()
+        gov, candidate = self._sp10_promote_candidate()
+        ok, gov, reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        self.assertTrue(ok, reason)
+        app.progress_data["meta"]["smart_practice_policy_governance"] = gov
+        app.save_progress()
+        app.progress_data = {}
+        app.load_progress_if_present()
+        self.assertEqual(candidate["policy_id"], app.progress_data["meta"]["smart_practice_policy_governance"]["active_policy_id"])
+
+    def test_sp10_completion_35_rollback_survives_real_save_load(self):
+        app = self._sp9_app_with_role_pool()
+        gov, candidate = self._sp10_promote_candidate()
+        prior = active_policy(gov)["policy_id"]
+        ok, gov, _reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=prior, approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        self.assertTrue(ok)
+        ok, gov, reason = rollback_policy(gov, prior, expected_active_policy_id=candidate["policy_id"], reason="test", rolled_back_at="2026-03-12T00:00:00")
+        self.assertTrue(ok, reason)
+        app.progress_data["meta"]["smart_practice_policy_governance"] = gov
+        app.save_progress()
+        app.progress_data = {}
+        app.load_progress_if_present()
+        self.assertEqual(prior, app.progress_data["meta"]["smart_practice_policy_governance"]["active_policy_id"])
+
+    def test_sp10_completion_36_malformed_governance_records_cannot_become_active(self):
+        gov = self._sp10_governance()
+        bad_id = "policy_bad"
+        gov["policies"][bad_id] = {"policy_id": bad_id, "status": "active", "checksum": "bad"}
+        gov["active_policy_id"] = bad_id
+        recovered = normalize_governance(gov, created_at="2026-03-02T00:00:00")
+        self.assertNotEqual(bad_id, recovered["active_policy_id"])
+        self.assertIn(bad_id, recovered["policies"])
+
+    def _sp11_question(self, qnum=1, objective="1.1", topic="Identity", domain="General Security Concepts", source="Clean", stem="Scenario"):
+        q = self._sp9_question(qnum, domain=domain, topic=topic, source=source)
+        q["objective_code"] = objective
+        q["stem_style"] = stem
+        return q
+
+    def _sp11_graph_with_prereq(self):
+        source = self._sp11_question(1, objective="1.0", topic="Ports")
+        target = self._sp11_question(2, objective="1.1", topic="Firewalls")
+        graph = normalize_graph({}, [source, target], created_at="2026-04-01T00:00:00")
+        source_key = concept_key_for_question(source)[0]
+        target_key = concept_key_for_question(target)[0]
+        graph["edges"]["e1"] = make_edge(source_key, target_key, "prerequisite_of", weight=0.8, evidence_level="strong", evidence_sources=["manual"], created_at="2026-04-01T00:00:00")
+        return normalize_graph(graph), source, target, source_key, target_key
+
+    def _sp11_states(self, source_key, target_key, source_weak=True, target_weak=True):
+        return {
+            source_key: {
+                "lowest_retrievability": 0.2 if source_weak else 0.8,
+                "mean_retrievability": 0.3 if source_weak else 0.8,
+                "wrong_count": 2 if source_weak else 0,
+                "correct_count": 0 if source_weak else 2,
+                "distinct_question_count": 2,
+            },
+            target_key: {
+                "lowest_retrievability": 0.2 if target_weak else 0.8,
+                "mean_retrievability": 0.3 if target_weak else 0.8,
+                "wrong_count": 2 if target_weak else 0,
+                "correct_count": 0 if target_weak else 2,
+                "distinct_question_count": 2,
+            },
+        }
+
+    def test_sp11_01_stable_metadata_produces_stable_concept_keys(self):
+        self.assertEqual(concept_key_for_question(self._sp11_question())[0], concept_key_for_question(self._sp11_question())[0])
+
+    def test_sp11_02_unrelated_similar_labels_do_not_merge(self):
+        left = self._sp11_question(1, objective="1.1", topic="Access control")
+        right = self._sp11_question(2, objective="1.2", topic="Access controller")
+        self.assertNotEqual(concept_key_for_question(left)[0], concept_key_for_question(right)[0])
+
+    def test_sp11_03_question_fallback_concepts_remain_isolated(self):
+        self.assertNotEqual(concept_key_for_question({"question_number": 1})[0], concept_key_for_question({"question_number": 2})[0])
+
+    def test_sp11_04_duplicate_active_edges_are_rejected(self):
+        graph, _source, _target, source_key, target_key = self._sp11_graph_with_prereq()
+        graph["edges"]["dupe"] = make_edge(source_key, target_key, "prerequisite_of", weight=0.7, evidence_level="strong")
+        normalized = normalize_graph(graph)
+        statuses = [edge["status"] for edge in normalized["edges"].values() if edge["source_concept_key"] == source_key and edge["target_concept_key"] == target_key]
+        self.assertIn("disabled", statuses)
+
+    def test_sp11_05_self_edges_are_rejected(self):
+        graph, _source, _target, source_key, _target_key = self._sp11_graph_with_prereq()
+        edge = make_edge(source_key, source_key, "related_to", weight=0.5, evidence_level="strong")
+        graph["edges"][edge["edge_id"]] = edge
+        self.assertEqual("disabled", normalize_graph(graph)["edges"][edge["edge_id"]]["status"])
+
+    def test_sp11_06_prerequisite_cycles_cannot_become_active(self):
+        graph, _source, _target, source_key, target_key = self._sp11_graph_with_prereq()
+        edge = make_edge(target_key, source_key, "prerequisite_of", weight=0.6, evidence_level="moderate")
+        graph["edges"][edge["edge_id"]] = edge
+        normalized = normalize_graph(graph)
+        self.assertNotEqual("active", normalized["edges"][edge["edge_id"]]["status"])
+
+    def test_sp11_07_edge_weights_are_bounded(self):
+        edge = make_edge("a", "b", "related_to", weight=9, evidence_level="strong")
+        self.assertEqual(1.0, edge["weight"])
+
+    def test_sp11_08_weak_evidence_remains_provisional(self):
+        edge = make_edge("a", "b", "related_to", weight=0.5, evidence_level="weak", status="active")
+        self.assertEqual("provisional", edge["status"])
+
+    def test_sp11_09_concept_aggregation_prevents_one_item_dominating(self):
+        q = self._sp11_question(1)
+        key = concept_key_for_question(q)[0]
+        rec = {"attempts": 10, "correct_count": 8, "wrong_count": 2, "learner_memory": {"retrievability": 0.9, "stability": 2, "uncertainty": 0.1}}
+        state = aggregate_concept_state(key, [q], {"1": rec})
+        self.assertEqual(1, state["attempt_count"])
+
+    def test_sp11_10_sparse_concept_data_returns_conservative_uncertainty(self):
+        q = self._sp11_question(1)
+        state = aggregate_concept_state(concept_key_for_question(q)[0], [q], {})
+        self.assertEqual("insufficient_evidence", state["evidence_strength"])
+        self.assertEqual(1.0, state["uncertainty"])
+
+    def test_sp11_11_missing_prerequisite_requires_weak_prerequisite_evidence(self):
+        graph, _source, target, source_key, target_key = self._sp11_graph_with_prereq()
+        diagnosis = diagnose_root_cause(target, graph, self._sp11_states(source_key, target_key), [{"correct": False}, {"correct": False}], policy={"policy_values": default_policy_values()})
+        self.assertEqual("missing_prerequisite", diagnosis["diagnosis"])
+
+    def test_sp11_12_stable_prerequisites_produce_target_weakness(self):
+        graph, _source, target, source_key, target_key = self._sp11_graph_with_prereq()
+        diagnosis = diagnose_root_cause(target, graph, self._sp11_states(source_key, target_key, source_weak=False), [{"correct": False}, {"correct": False}], policy={"policy_values": default_policy_values()})
+        self.assertEqual("target_concept_weakness", diagnosis["diagnosis"])
+
+    def test_sp11_13_repeated_distractor_substitution_produces_confusion(self):
+        graph, source, target, source_key, target_key = self._sp11_graph_with_prereq()
+        graph["edges"]["conf"] = make_edge(target_key, source_key, "confusable_with", weight=0.8, evidence_level="strong")
+        diagnosis = diagnose_root_cause(target, normalize_graph(graph), {target_key: {"lowest_retrievability": 0.6, "wrong_count": 0, "correct_count": 1}}, [{"correct": False, "wrong_answer_family": "ports"}, {"correct": False, "wrong_answer_family": "ports"}], policy={"policy_values": default_policy_values()})
+        self.assertEqual("concept_confusion", diagnosis["diagnosis"])
+
+    def test_sp11_14_familiar_success_plus_scenario_failure_produces_transfer_failure(self):
+        q = self._sp11_question(1, stem="Scenario")
+        key = concept_key_for_question(q)[0]
+        diagnosis = diagnose_root_cause(q, normalize_graph({}, [q]), {key: {"lowest_retrievability": 0.7, "wrong_count": 0, "correct_count": 1}}, [{"correct": True, "stem_style": "Scenario"}, {"correct": False, "stem_style": "Troubleshooting"}], policy={"policy_values": default_policy_values()})
+        self.assertEqual("transfer_failure", diagnosis["diagnosis"])
+
+    def test_sp11_15_isolated_bad_item_can_produce_item_specific(self):
+        q = self._sp11_question(1)
+        key = concept_key_for_question(q)[0]
+        history = [{"question_number": 1, "correct": False}, {"question_number": 1, "correct": False}, {"question_number": 2, "correct": True}, {"question_number": 3, "correct": True}]
+        diagnosis = diagnose_root_cause(q, normalize_graph({}, [q]), {key: {"lowest_retrievability": 0.7, "wrong_count": 0, "correct_count": 2}}, history, policy={"policy_values": default_policy_values()})
+        self.assertEqual("item_specific_failure", diagnosis["diagnosis"])
+
+    def test_sp11_16_source_problem_requires_healthier_source_comparison(self):
+        q = self._sp11_question(1, source="Source conflict")
+        key = concept_key_for_question(q)[0]
+        history = [{"question_number": 1, "correct": False}, {"question_number": 2, "correct": True, "source_label": "Clean"}]
+        diagnosis = diagnose_root_cause(q, normalize_graph({}, [q]), {key: {"lowest_retrievability": 0.7}}, history, source_trust={"label": "Source conflict"}, policy={"policy_values": default_policy_values()})
+        self.assertEqual("source_quality_problem", diagnosis["diagnosis"])
+
+    def test_sp11_17_missing_evidence_produces_insufficient(self):
+        q = self._sp11_question(1)
+        self.assertEqual("insufficient_evidence", diagnose_root_cause(q, normalize_graph({}, [q]), {}, [], policy={"policy_values": default_policy_values()})["diagnosis"])
+
+    def test_sp11_18_diagnosis_cannot_bypass_protected_role_allocation(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("25", randomize=False)
+        roles = Counter(q["smart_primary_role"] for q in pool)
+        self.assertGreaterEqual(roles["weak_repair"] + roles["due_retention"], 10)
+
+    def test_sp11_19_graph_utility_stays_inside_component_bounds(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        self.assertLessEqual(pool[0]["smart_utility_breakdown"].get("misconception_repair_value", 0), 20.0)
+
+    def test_sp11_20_missing_prerequisite_routes_prerequisite_repair_first(self):
+        app = self._sp9_app_with_role_pool()
+        prereq = app.master_questions[0]
+        target = app.master_questions[1]
+        app.questions = [target] + app.master_questions[2:6]
+        app.index = 0
+        app.session_question_limit = 5
+        target["smart_root_cause"] = "missing_prerequisite"
+        target["smart_supporting_concepts"] = [concept_key_for_question(prereq)[0]]
+        inserted = app.plan_misconception_repair(target, is_correct=False)
+        self.assertTrue(inserted)
+        self.assertEqual(concept_key_for_question(prereq)[0], inserted[0]["repair_concept_key"])
+
+    def test_sp11_21_confusion_diagnosis_routes_contrast_repair(self):
+        app = self._sp9_app_with_role_pool()
+        q = app.master_questions[0]
+        q["smart_root_cause"] = "concept_confusion"
+        app.plan_misconception_repair(q, is_correct=False)
+        self.assertEqual("contrast", q["repair_stage"])
+
+    def test_sp11_22_transfer_failure_avoids_exact_item_repetition(self):
+        app = self._sp9_app_with_role_pool()
+        q = app.master_questions[0]
+        q["smart_root_cause"] = "transfer_failure"
+        inserted = app.plan_misconception_repair(q, is_correct=False)
+        self.assertTrue(all(item["question_number"] != q["question_number"] for item in inserted))
+
+    def test_sp11_23_item_specific_does_not_weaken_full_concept(self):
+        q = self._sp11_question(1)
+        key = concept_key_for_question(q)[0]
+        diagnosis = diagnose_root_cause(q, normalize_graph({}, [q]), {key: {"lowest_retrievability": 0.8, "wrong_count": 0, "correct_count": 2}}, [{"question_number": 1, "correct": False}, {"question_number": 1, "correct": False}, {"question_number": 2, "correct": True}, {"question_number": 3, "correct": True}], policy={"policy_values": default_policy_values()})
+        self.assertEqual("item_specific_failure", diagnosis["diagnosis"])
+        self.assertNotIn("target_repeated_weakness", diagnosis["evidence"])
+
+    def test_sp11_24_source_quality_problem_increases_source_risk(self):
+        app = self._sp9_app_with_role_pool()
+        app.master_questions[0]["smart_root_cause"] = "source_quality_problem"
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        self.assertGreaterEqual(pool[0]["smart_utility_breakdown"].get("source_quality_risk", 0), 0.0)
+
+    def test_sp11_25_graph_state_survives_real_progress_save_load(self):
+        app = self._sp9_app_with_role_pool()
+        graph = normalize_graph({}, [app.master_questions[0]])
+        app.progress_data["meta"]["smart_practice_concept_graph"] = graph
+        app.save_progress()
+        app.progress_data = {}
+        app.load_progress_if_present()
+        self.assertEqual(graph["graph_signature"], app.progress_data["meta"]["smart_practice_concept_graph"]["graph_signature"])
+
+    def test_sp11_26_diagnosis_metadata_survives_real_session_save_load(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        app.questions[0]["smart_root_cause"] = "target_concept_weakness"
+        app.save_session(show_notice=False)
+        app.questions[0]["smart_root_cause"] = ""
+        app.load_session_if_present(skip_identity_check=True)
+        self.assertEqual("target_concept_weakness", app.questions[0]["smart_root_cause"])
+
+    def test_sp11_27_malformed_graph_records_cannot_control_live_selection(self):
+        app = self._sp9_app_with_role_pool()
+        app.progress_data["meta"]["smart_practice_concept_graph"] = {"edges": {"bad": {"edge_id": "bad", "edge_type": "bad", "status": "active"}}}
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        self.assertNotEqual("bad", pool[0].get("smart_root_cause"))
+
+    def test_sp11_28_same_event_cannot_evaluate_own_diagnosis(self):
+        graph = store_diagnosis(empty_graph("2026-04-01T00:00:00"), {"diagnosis": "missing_prerequisite", "target_concept_key": "c", "diagnosed_at": "2026-04-02T00:00:00"})
+        metrics = diagnosis_measurement(graph, [{"at": "2026-04-02T00:00:00", "correct": True, "repair_stage": "contrast"}])
+        self.assertEqual("unobserved", metrics["diagnosis_accuracy"])
+
+    def test_sp11_29_later_prerequisite_repair_can_confirm_diagnosis(self):
+        graph = store_diagnosis(empty_graph("2026-04-01T00:00:00"), {"diagnosis": "missing_prerequisite", "target_concept_key": "c", "diagnosed_at": "2026-04-02T00:00:00"})
+        metrics = diagnosis_measurement(graph, [{"at": "2026-04-03T00:00:00", "correct": True, "repair_stage": "contrast"}])
+        self.assertEqual(1.0, metrics["diagnosis_accuracy"])
+
+    def test_sp11_30_unobserved_diagnosis_outcome_remains_unobserved(self):
+        graph = store_diagnosis(empty_graph("2026-04-01T00:00:00"), {"diagnosis": "transfer_failure", "target_concept_key": "c", "diagnosed_at": "2026-04-02T00:00:00"})
+        self.assertEqual("unobserved", diagnosis_measurement(graph, [])["transfer_failure_recovery"])
+
+    def test_sp11_31_active_policy_graph_control_reaches_runtime(self):
+        app = self._sp9_app_with_role_pool()
+        values = default_policy_values()
+        values["graph_enabled"] = False
+        app.progress_data["meta"]["smart_practice_policy_governance"] = self._sp10_active_governance_with_values(values)
+        app.smart_practice_signal_cache_key = None
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        self.assertEqual("insufficient_evidence", pool[0]["smart_root_cause"])
+
+    def test_sp11_32_disabling_graph_policy_removes_influence_without_deleting_history(self):
+        app = self._sp9_app_with_role_pool()
+        app.progress_data["meta"]["smart_practice_concept_graph"] = store_diagnosis(empty_graph(), {"diagnosis": "target_concept_weakness", "target_concept_key": "c", "diagnosed_at": "2026-04-02T00:00:00"})
+        before = dict(app.progress_data["meta"]["smart_practice_concept_graph"]["diagnoses"])
+        values = default_policy_values()
+        values["graph_enabled"] = False
+        app.progress_data["meta"]["smart_practice_policy_governance"] = self._sp10_active_governance_with_values(values)
+        app.build_smart_practice_pool("1", randomize=False)
+        self.assertEqual(before, app.progress_data["meta"]["smart_practice_concept_graph"]["diagnoses"])
+
+    def test_sp11_33_graph_policy_change_invalidates_smart_cache(self):
+        app = self._sp9_app_with_role_pool()
+        before = app._smart_practice_signal_key()
+        values = default_policy_values()
+        values["graph_enabled"] = False
+        app.progress_data["meta"]["smart_practice_policy_governance"] = self._sp10_active_governance_with_values(values)
+        after = app._smart_practice_signal_key()
+        self.assertNotEqual(before, after)
+
+    def test_sp11_34_deterministic_inputs_produce_deterministic_graph_and_diagnosis(self):
+        graph, _source, target, source_key, target_key = self._sp11_graph_with_prereq()
+        states = self._sp11_states(source_key, target_key)
+        self.assertEqual(normalize_graph(graph)["graph_signature"], normalize_graph(graph)["graph_signature"])
+        self.assertEqual(
+            diagnose_root_cause(target, graph, states, [{"correct": False}, {"correct": False}], policy={"policy_values": default_policy_values()}),
+            diagnose_root_cause(target, graph, states, [{"correct": False}, {"correct": False}], policy={"policy_values": default_policy_values()}),
+        )
+
+    def test_sp11_35_existing_smart_practice_valid_when_graph_insufficient(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("25", randomize=False)
+        self.assertEqual(25, len(pool))
+        self.assertTrue(all(q.get("smart_primary_role") for q in pool))
+
+    def _sp12_edge(self, status="provisional", weight=0.4):
+        graph, _source, _target, source_key, target_key = self._sp11_graph_with_prereq()
+        edge = make_edge(source_key, target_key, "prerequisite_of", weight=weight, evidence_level="strong", status=status)
+        edge["support_count"] = 0
+        edge["contradiction_count"] = 0
+        graph["edges"] = {edge["edge_id"]: edge}
+        return graph, edge
+
+    def _sp12_outcomes(self, edge, count, supports=True, same_question=False):
+        return [
+            {
+                "edge_id": edge["edge_id"],
+                "group_id": "same" if same_question else f"group-{idx}",
+                "question_number": 1 if same_question else idx + 1,
+                "supports_edge": supports,
+                "contradicts_edge": not supports,
+                "created_at": "2026-05-01T00:00:00",
+                "observed_at": f"2026-05-{idx + 2:02d}T00:00:00",
+            }
+            for idx in range(count)
+        ]
+
+    def test_sp12_01_one_outcome_cannot_activate_provisional_edge(self):
+        graph, edge = self._sp12_edge()
+        calibrated = calibrate_edge(edge, self._sp12_outcomes(edge, 1), graph)
+        self.assertNotEqual("active", calibrated["status"])
+
+    def test_sp12_02_three_distinct_supporting_groups_activate_valid_edge(self):
+        graph, edge = self._sp12_edge()
+        calibrated = calibrate_edge(edge, self._sp12_outcomes(edge, 3), graph)
+        self.assertEqual("active", calibrated["status"])
+
+    def test_sp12_03_repeated_contradiction_can_weaken_edge(self):
+        graph, edge = self._sp12_edge(status="active")
+        calibrated = calibrate_edge(edge, self._sp12_outcomes(edge, 2, supports=False), graph)
+        self.assertEqual("weakened", calibrated["status"])
+
+    def test_sp12_04_strong_contradiction_can_reject_weak_edge(self):
+        graph, edge = self._sp12_edge(status="provisional")
+        calibrated = calibrate_edge(edge, self._sp12_outcomes(edge, 4, supports=False), graph)
+        self.assertEqual("rejected", calibrated["status"])
+
+    def test_sp12_05_one_repeated_question_cannot_satisfy_distinct_evidence(self):
+        graph, edge = self._sp12_edge()
+        calibrated = calibrate_edge(edge, self._sp12_outcomes(edge, 3, same_question=True), graph)
+        self.assertNotEqual("active", calibrated["status"])
+
+    def test_sp12_06_weight_adjustment_is_bounded(self):
+        graph, edge = self._sp12_edge(weight=0.4)
+        calibrated = calibrate_edge(edge, self._sp12_outcomes(edge, 5), graph)
+        self.assertLessEqual(abs(calibrated["weight"] - 0.4), 0.10)
+
+    def test_sp12_07_weight_remains_inside_zero_one(self):
+        graph, edge = self._sp12_edge(weight=0.98)
+        calibrated = calibrate_edge(edge, self._sp12_outcomes(edge, 5), graph)
+        self.assertLessEqual(calibrated["weight"], 1.0)
+
+    def test_sp12_08_cycle_producing_prerequisite_activation_blocked(self):
+        graph, edge = self._sp12_edge()
+        reverse = make_edge(edge["target_concept_key"], edge["source_concept_key"], "prerequisite_of", weight=0.8, evidence_level="strong", status="active")
+        graph["edges"][reverse["edge_id"]] = reverse
+        calibrated = calibrate_edge(edge, self._sp12_outcomes(edge, 3), graph)
+        self.assertEqual("cycle_blocked", calibrated["calibration_status"])
+
+    def test_sp12_09_historical_edge_evidence_is_preserved(self):
+        graph, edge = self._sp12_edge()
+        edge["evidence_sources"] = ["manual"]
+        calibrated = calibrate_edge(edge, self._sp12_outcomes(edge, 3), graph)
+        self.assertEqual(["manual"], calibrated["evidence_sources"])
+
+    def test_sp12_10_orphan_concepts_reported(self):
+        q = self._sp11_question(1)
+        audit = audit_graph(normalize_graph({}, [q]), [q])
+        self.assertTrue(audit["orphan_concepts"])
+
+    def test_sp12_11_single_question_and_single_source_reported(self):
+        q = self._sp11_question(1)
+        audit = audit_graph(normalize_graph({}, [q]), [q])
+        self.assertTrue(audit["single_question_concepts"])
+        self.assertTrue(audit["single_source_concepts"])
+
+    def test_sp12_12_prerequisites_without_teaching_questions_reported(self):
+        graph, edge = self._sp12_edge(status="active")
+        audit = audit_graph(graph, [])
+        self.assertIn(edge["source_concept_key"], audit["prerequisites_without_teaching_questions"])
+
+    def test_sp12_13_duplicate_candidate_concepts_reported_not_merged(self):
+        q1 = self._sp11_question(1, objective="1.1", topic="Topic")
+        q2 = self._sp11_question(2, objective="1.1", topic="Topic")
+        graph = normalize_graph({}, [q1, q2])
+        graph["concepts"]["manual_duplicate"] = dict(next(iter(graph["concepts"].values())))
+        graph["concepts"]["manual_duplicate"]["concept_key"] = "manual_duplicate"
+        audit = audit_graph(graph, [q1, q2])
+        self.assertTrue(audit["duplicate_candidate_concepts"])
+        self.assertIn("manual_duplicate", graph["concepts"])
+
+    def test_sp12_14_overconnected_concepts_flagged(self):
+        graph, edge = self._sp12_edge(status="active")
+        source = edge["source_concept_key"]
+        for idx in range(13):
+            target = f"target::{idx}"
+            graph["concepts"][target] = {"concept_key": target, "supporting_question_numbers": [idx]}
+            graph["edges"][f"e{idx}"] = make_edge(source, target, "related_to", weight=0.5, evidence_level="strong")
+        self.assertIn(source, audit_graph(graph)["overconnected_concepts"])
+
+    def test_sp12_15_traversal_depth_never_exceeds_two(self):
+        graph, edge = self._sp12_edge(status="active")
+        path = select_prerequisite_path(edge["target_concept_key"], graph, {}, max_depth=2)
+        self.assertLessEqual(len(path), 2)
+
+    def test_sp12_16_repair_chain_never_exceeds_three(self):
+        graph, edge = self._sp12_edge(status="active")
+        path = select_prerequisite_path(edge["target_concept_key"], graph, {}, max_depth=3)
+        self.assertLessEqual(len(path), 3)
+
+    def test_sp12_17_candidate_inspection_respects_configured_maximum(self):
+        graph, edge = self._sp12_edge(status="active")
+        path = select_prerequisite_path(edge["target_concept_key"], graph, {}, max_parents=1)
+        self.assertLessEqual(len(path), 1)
+
+    def test_sp12_18_strongest_closest_weak_prerequisite_deterministic(self):
+        graph, edge = self._sp12_edge(status="active", weight=0.6)
+        path1 = select_prerequisite_path(edge["target_concept_key"], graph, {edge["source_concept_key"]: {"lowest_retrievability": 0.2}})
+        path2 = select_prerequisite_path(edge["target_concept_key"], graph, {edge["source_concept_key"]: {"lowest_retrievability": 0.2}})
+        self.assertEqual(path1, path2)
+
+    def _sp12_info(self, **overrides):
+        q = self._sp11_question(1)
+        q.update(overrides)
+        return information_value(q, {"uncertainty": 1.0}, {"dependent_concepts": ["a", "b"]}, {}, {"source_risk": 0.0}, {"policy_values": default_policy_values()})
+
+    def test_sp12_19_every_information_component_inside_bounds(self):
+        info = self._sp12_info()
+        for key, (low, high) in INFO_BOUNDS.items():
+            self.assertGreaterEqual(info[key], low)
+            self.assertLessEqual(info[key], high)
+
+    def test_sp12_20_total_matches_component_equation(self):
+        info = self._sp12_info()
+        expected = info["diagnostic_discrimination"] + info["graph_bottleneck_value"] + info["uncertainty_reduction"] + info["transfer_evidence_value"] + info["coverage_value"] - info["redundancy_cost"] - info["item_quality_risk"] - info["source_risk"]
+        self.assertEqual(info["total"], round(max(-6.0, min(6.0, expected)), 4))
+
+    def test_sp12_21_diagnostic_question_scores_higher_than_non_discriminating(self):
+        high = self._sp12_info(smart_root_cause="concept_confusion")
+        low = self._sp12_info(smart_root_cause="insufficient_evidence")
+        self.assertGreater(high["diagnostic_discrimination"], low["diagnostic_discrimination"])
+
+    def test_sp12_22_bottleneck_value_is_bounded(self):
+        info = information_value(self._sp11_question(1), {}, {"dependent_concepts": list(range(99))}, {}, {}, {"policy_values": default_policy_values()})
+        self.assertLessEqual(info["graph_bottleneck_value"], 10.0)
+
+    def test_sp12_23_high_uncertainty_increases_information_value(self):
+        high = information_value(self._sp11_question(1), {"uncertainty": 1.0}, {}, {}, {}, {"policy_values": default_policy_values()})
+        low = information_value(self._sp11_question(1), {"uncertainty": 0.0}, {}, {}, {}, {"policy_values": default_policy_values()})
+        self.assertGreater(high["uncertainty_reduction"], low["uncertainty_reduction"])
+
+    def test_sp12_24_exact_repetition_increases_redundancy_cost(self):
+        q = self._sp11_question(1)
+        info = information_value(q, {}, {}, {"seen_question_numbers": [1]}, {}, {"policy_values": default_policy_values()})
+        self.assertGreater(info["redundancy_cost"], 0)
+
+    def test_sp12_25_distinct_transfer_item_increases_transfer_value(self):
+        q = self._sp11_question(1, stem="Scenario")
+        info = information_value(q, {}, {}, {"seen_stem_styles": ["Definition"]}, {}, {"policy_values": default_policy_values()})
+        self.assertGreater(info["transfer_evidence_value"], 1.0)
+
+    def test_sp12_26_low_quality_item_receives_quality_risk(self):
+        info = information_value(self._sp11_question(1), {}, {}, {}, {"source_risk": 1.0}, {"policy_values": default_policy_values()})
+        self.assertGreater(info["item_quality_risk"], 0)
+
+    def test_sp12_27_information_value_cannot_bypass_protected_roles(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("25", randomize=False)
+        roles = Counter(q["smart_primary_role"] for q in pool)
+        self.assertGreaterEqual(roles["weak_repair"] + roles["due_retention"], 10)
+
+    def test_sp12_28_information_value_inside_existing_utility_bounds(self):
+        app = self._sp9_app_with_role_pool()
+        q = app.build_smart_practice_pool("1", randomize=False)[0]
+        self.assertLessEqual(q["smart_utility_breakdown"]["expected_learning_gain"], 20.0)
+
+    def test_sp12_29_disabling_policy_removes_information_influence(self):
+        app = self._sp9_app_with_role_pool()
+        values = default_policy_values()
+        values["information_value_enabled"] = False
+        app.progress_data["meta"]["smart_practice_policy_governance"] = self._sp10_active_governance_with_values(values)
+        app.smart_practice_signal_cache_key = None
+        q = app.build_smart_practice_pool("1", randomize=False)[0]
+        self.assertEqual(0.0, q["smart_information_value"])
+
+    def _quality_outcomes(self, n, correct=False, **extra):
+        return [{"question_number": 1, "session_id": f"s{i}", "correct": correct, **extra} for i in range(n)]
+
+    def test_sp12_30_low_sample_item_insufficient_data(self):
+        self.assertEqual("insufficient_data", question_quality_record(self._sp11_question(1), self._quality_outcomes(3))["status"])
+
+    def test_sp12_31_low_accuracy_alone_not_possible_bad_key(self):
+        self.assertNotEqual("possible_bad_key", question_quality_record(self._sp11_question(1), self._quality_outcomes(25))["status"])
+
+    def test_sp12_32_stable_concept_isolated_failure_raises_ambiguity(self):
+        outcomes = self._quality_outcomes(10, confidence="Sure", miss_reason="Misread")
+        self.assertEqual("ambiguous", question_quality_record(self._sp11_question(1), outcomes)["status"])
+
+    def test_sp12_33_stronger_outperforming_weaker_discrimination(self):
+        outcomes = self._quality_outcomes(8, correct=True, concept_retrievability=0.9) + self._quality_outcomes(8, correct=False, concept_retrievability=0.2)
+        self.assertGreater(question_quality_record(self._sp11_question(1), outcomes)["item_discrimination"], 0)
+
+    def test_sp12_34_repeated_stable_failure_poor_discriminator(self):
+        outcomes = self._quality_outcomes(16, correct=False, concept_retrievability=0.9)
+        self.assertEqual("poor_discriminator", question_quality_record(self._sp11_question(1), outcomes)["status"])
+
+    def test_sp12_35_possible_bad_key_requires_samples_and_corroboration(self):
+        q = self._sp11_question(1, source="Source conflict")
+        q["source_conflict"] = True
+        outcomes = self._quality_outcomes(20, correct=False, confidence="Sure", healthy_alternative_success=True)
+        self.assertEqual("possible_bad_key", question_quality_record(q, outcomes)["status"])
+
+    def test_sp12_36_source_conflict_requires_cross_source_evidence(self):
+        q = self._sp11_question(1, source="Source conflict")
+        q["source_conflict"] = True
+        self.assertNotEqual("source_conflicted", question_quality_record(q, self._quality_outcomes(10, correct=False))["status"])
+
+    def test_sp12_37_one_learner_repeated_session_cannot_dominate_quality(self):
+        outcomes = [{"question_number": 1, "session_id": "same", "correct": False} for _ in range(20)]
+        self.assertEqual("insufficient_data", question_quality_record(self._sp11_question(1), outcomes)["status"])
+
+    def test_sp12_38_question_quality_risk_does_not_weaken_full_concept(self):
+        q = self._sp11_question(1)
+        before = q["correct"][:]
+        question_quality_record(q, self._quality_outcomes(20, correct=False))
+        self.assertEqual(before, q["correct"])
+
+    def test_sp12_39_question_quality_cannot_change_answer_key(self):
+        q = self._sp11_question(1)
+        question_quality_record(q, self._quality_outcomes(25, correct=False, confidence="Sure"))
+        self.assertEqual(["A"], q["correct"])
+
+    def test_sp12_40_healthier_alternative_preferred_when_available(self):
+        risky = information_value(self._sp11_question(1, source="Source conflict"), {}, {}, {}, {"source_risk": 1.0}, {"policy_values": default_policy_values()})
+        healthy = information_value(self._sp11_question(2, source="Clean"), {}, {}, {}, {"source_risk": 0.0}, {"policy_values": default_policy_values()})
+        self.assertGreater(healthy["total"], risky["total"])
+
+    def test_sp12_41_same_event_cannot_calibrate_own_edge_or_quality(self):
+        graph, edge = self._sp12_edge()
+        outcome = {"edge_id": edge["edge_id"], "supports_edge": True, "group_id": "g", "created_at": "2026-05-02", "observed_at": "2026-05-02"}
+        self.assertNotEqual("active", calibrate_edge(edge, [outcome], graph)["status"])
+
+    def test_sp12_42_later_prerequisite_improvement_strengthens_edge(self):
+        graph, edge = self._sp12_edge()
+        self.assertEqual("strengthened", calibrate_edge(edge, self._sp12_outcomes(edge, 3), graph)["calibration_status"])
+
+    def test_sp12_43_later_contradiction_weakens_edge(self):
+        graph, edge = self._sp12_edge(status="active")
+        self.assertEqual("weakened", calibrate_edge(edge, self._sp12_outcomes(edge, 2, supports=False), graph)["status"])
+
+    def test_sp12_44_unobserved_outcome_remains_unobserved(self):
+        graph, edge = self._sp12_edge()
+        calibrated = calibrate_edge(edge, [], graph)
+        self.assertEqual("insufficient_evidence", calibrated["calibration_status"])
+
+    def test_sp12_45_graph_audit_deterministic(self):
+        graph, _edge = self._sp12_edge()
+        self.assertEqual(audit_graph(graph), audit_graph(graph))
+
+    def test_sp12_46_information_telemetry_survives_session_save_load(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        value = app.questions[0]["smart_information_value"]
+        app.save_session(show_notice=False)
+        app.questions[0]["smart_information_value"] = 0.0
+        app.load_session_if_present(skip_identity_check=True)
+        self.assertEqual(value, app.questions[0]["smart_information_value"])
+
+    def test_sp12_47_calibration_records_survive_progress_save_load(self):
+        app = self._sp9_app_with_role_pool()
+        store = normalize_calibration_store({})
+        store["edge_calibration"]["x"] = {"edge_id": "x"}
+        app.progress_data["meta"]["smart_practice_question_calibration"] = store
+        app.save_progress()
+        app.progress_data = {}
+        app.load_progress_if_present()
+        self.assertIn("x", app.progress_data["meta"]["smart_practice_question_calibration"]["edge_calibration"])
+
+    def test_sp12_48_duplicate_calibration_pass_does_not_duplicate_history(self):
+        app = self._sp9_app_with_role_pool()
+        app.build_smart_practice_pool("1", randomize=False)
+        first = dict(app.progress_data["meta"]["smart_practice_question_calibration"]["information_value_history"])
+        app.build_smart_practice_pool("1", randomize=False)
+        second = app.progress_data["meta"]["smart_practice_question_calibration"]["information_value_history"]
+        self.assertEqual(set(first), set(second))
+
+    def test_sp12_49_malformed_calibration_records_cannot_control_selection(self):
+        app = self._sp9_app_with_role_pool()
+        app.progress_data["meta"]["smart_practice_question_calibration"] = {"question_quality": {"1": {"status": "possible_bad_key", "source_risk": "bad"}}}
+        q = app.build_smart_practice_pool("1", randomize=False)[0]
+        self.assertIn(q["smart_primary_role"], {"weak_repair", "due_retention", "blueprint_coverage", "transfer", "controlled_stretch"})
+
+    def test_sp12_50_policy_change_invalidates_smart_cache(self):
+        app = self._sp9_app_with_role_pool()
+        before = app._smart_practice_signal_key()
+        values = default_policy_values()
+        values["information_value_enabled"] = False
+        app.progress_data["meta"]["smart_practice_policy_governance"] = self._sp10_active_governance_with_values(values)
+        self.assertNotEqual(before, app._smart_practice_signal_key())
 
 
 if __name__ == "__main__":

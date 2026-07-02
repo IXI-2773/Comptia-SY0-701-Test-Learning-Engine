@@ -1,6 +1,52 @@
 from dataclasses import dataclass
 
 
+SMART_PRACTICE_POLICY_VERSION = "smart-practice-9"
+SMART_PRACTICE_PRIMARY_ROLES = (
+    "due_retention",
+    "weak_repair",
+    "blueprint_coverage",
+    "transfer",
+    "controlled_stretch",
+)
+UTILITY_COMPONENT_BOUNDS = {
+    "retention_risk": (0.0, 25.0),
+    "expected_learning_gain": (0.0, 20.0),
+    "blueprint_importance": (0.0, 15.0),
+    "misconception_repair_value": (0.0, 20.0),
+    "exploration_value": (0.0, 10.0),
+    "repetition_cost": (0.0, 15.0),
+    "source_quality_risk": (0.0, 15.0),
+    "fatigue_cost": (0.0, 10.0),
+}
+
+
+def clamp_utility_component(name: str, value: float) -> float:
+    low, high = UTILITY_COMPONENT_BOUNDS[name]
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        number = low
+    if number != number:
+        number = low
+    return round(max(low, min(high, number)), 3)
+
+
+def smart_practice_utility_total(components: dict[str, float]) -> float:
+    clean = {name: clamp_utility_component(name, components.get(name, 0.0)) for name in UTILITY_COMPONENT_BOUNDS}
+    total = (
+        clean["retention_risk"]
+        + clean["expected_learning_gain"]
+        + clean["blueprint_importance"]
+        + clean["misconception_repair_value"]
+        + clean["exploration_value"]
+        - clean["repetition_cost"]
+        - clean["source_quality_risk"]
+        - clean["fatigue_cost"]
+    )
+    return round(total, 3)
+
+
 @dataclass(frozen=True)
 class SmartPracticeScoringProfile:
     gap_weight: float = 0.45
@@ -136,49 +182,37 @@ class SmartPracticeScoringProfile:
     objective_cap_min: int = 2
 
 
-@dataclass(frozen=True)
-class SmartPracticeQuotaProfile:
-    unseen_ratio: float
-    active_weak_ratio: float
-    due_ratio: float
-    recovered_ratio: float
-    advanced_scale: float
-
-
 SMART_PRACTICE_SCORING = SmartPracticeScoringProfile()
-
-SMART_PRACTICE_QUOTA_BALANCED = SmartPracticeQuotaProfile(
-    unseen_ratio=0.6,
-    active_weak_ratio=0.18,
-    due_ratio=0.14,
-    recovered_ratio=0.08,
-    advanced_scale=1.0,
-)
-
-SMART_PRACTICE_QUOTA_STABILIZE = SmartPracticeQuotaProfile(
-    unseen_ratio=0.66,
-    active_weak_ratio=0.15,
-    due_ratio=0.13,
-    recovered_ratio=0.08,
-    advanced_scale=0.65,
-)
-
-SMART_PRACTICE_QUOTA_PRESS = SmartPracticeQuotaProfile(
-    unseen_ratio=0.52,
-    active_weak_ratio=0.22,
-    due_ratio=0.16,
-    recovered_ratio=0.08,
-    advanced_scale=1.2,
-)
-
-
-def smart_practice_quota_profile(momentum_label: str, burnout_label: str) -> SmartPracticeQuotaProfile:
-    if burnout_label == "High" or momentum_label == "Stabilize":
-        return SMART_PRACTICE_QUOTA_STABILIZE
-    if momentum_label == "Press":
-        return SMART_PRACTICE_QUOTA_PRESS
-    return SMART_PRACTICE_QUOTA_BALANCED
 
 
 def smart_practice_objective_cap(target: int, profile: SmartPracticeScoringProfile = SMART_PRACTICE_SCORING) -> int:
     return max(profile.objective_cap_min, round(max(0, int(target)) * profile.objective_cap_ratio))
+
+
+def smart_practice_role_allocation(target: int, role_shares: dict[str, float] | None = None) -> dict[str, int]:
+    target = max(0, int(target or 0))
+    ratios = dict(role_shares or {
+        "due_retention": 0.25,
+        "weak_repair": 0.25,
+        "blueprint_coverage": 0.25,
+        "transfer": 0.15,
+        "controlled_stretch": 0.10,
+    })
+    total = sum(float(ratios.get(role, 0.0) or 0.0) for role in SMART_PRACTICE_PRIMARY_ROLES) or 1.0
+    ratios = {role: max(0.0, float(ratios.get(role, 0.0) or 0.0) / total) for role in SMART_PRACTICE_PRIMARY_ROLES}
+    if target == 0:
+        return {role: 0 for role in SMART_PRACTICE_PRIMARY_ROLES}
+    allocation = {role: int(target * ratios[role]) for role in SMART_PRACTICE_PRIMARY_ROLES}
+    remaining = target - sum(allocation.values())
+    priority = ["weak_repair", "due_retention", "blueprint_coverage", "transfer", "controlled_stretch"]
+    fractions = sorted(
+        ((target * ratios[role] - allocation[role], -priority.index(role), role) for role in SMART_PRACTICE_PRIMARY_ROLES),
+        reverse=True,
+    )
+    for _fraction, _priority, role in fractions[:remaining]:
+        allocation[role] += 1
+    if target <= len(priority):
+        allocation = {role: 0 for role in SMART_PRACTICE_PRIMARY_ROLES}
+        for role in priority[:target]:
+            allocation[role] = 1
+    return allocation

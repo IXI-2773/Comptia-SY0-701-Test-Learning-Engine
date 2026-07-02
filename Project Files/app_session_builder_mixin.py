@@ -14,14 +14,89 @@ from progress_store import (
 )
 from session_models import QuestionRuntimeState, reset_runtime_question_state
 from smart_practice_profile import (
+    SMART_PRACTICE_POLICY_VERSION,
     SMART_PRACTICE_SCORING,
+    clamp_utility_component,
+    smart_practice_utility_total,
     smart_practice_objective_cap,
-    smart_practice_quota_profile,
+    smart_practice_role_allocation,
+)
+from smart_practice_measurement import attach_prediction_to_question, normalize_measurement_store
+from smart_practice_concept_graph import (
+    GRAPH_VERSION,
+    aggregate_concept_state,
+    audit_graph,
+    concept_key_for_question,
+    diagnose_root_cause,
+    normalize_graph,
+    store_diagnosis,
+)
+from smart_practice_policy import active_policy, normalize_governance
+from smart_practice_question_value import (
+    empty_calibration_store,
+    information_value,
+    normalize_calibration_store,
+    question_quality_record,
 )
 
 
 class SessionBuilderMixin:
+    def _normalized_study_label(self, value: str) -> str:
+        text = " ".join(str(value or "").replace("&", "and").replace(",", " ").split()).casefold()
+        aliases = {
+            "security program management and oversight": "security program management and oversight",
+            "threats vulnerabilities and mitigations": "threats vulnerabilities and mitigations",
+            "threats vulnerability and mitigations": "threats vulnerabilities and mitigations",
+        }
+        return aliases.get(text, text)
+
     def _smart_practice_signal_key(self):
+        records_key = tuple(
+            (
+                key,
+                str((rec or {}).get("next_review", "")),
+                str(((rec or {}).get("learner_memory") or {}).get("next_review_at", "")),
+                float(((rec or {}).get("learner_memory") or {}).get("retrievability", 0.0) or 0.0),
+                int((rec or {}).get("attempts", 0) or 0),
+                int((rec or {}).get("wrong_count", 0) or 0),
+                int((rec or {}).get("correct_streak", 0) or 0),
+            )
+            for key, rec in sorted(self._progress_questions().items())
+        )
+        repair_key = tuple(
+            sorted(
+                (
+                    str(key),
+                    tuple(sorted((dict(value or {})).items())) if isinstance(value, dict) else str(value),
+                )
+                for key, value in (self.progress_data.get("meta", {}).get("repair_state", {}) or {}).items()
+            )
+        )
+        measurement_policy = tuple(
+            sorted(
+                (
+                    self.progress_data.get("meta", {})
+                    .get("smart_practice_measurement", {})
+                    .get("active_policy", {})
+                    or {}
+                ).items()
+            )
+        )
+        governance = normalize_governance(
+            self.progress_data.get("meta", {}).get("smart_practice_policy_governance")
+        )
+        active_smart_policy = active_policy(governance)
+        governance_policy = (
+            str(active_smart_policy.get("policy_id") or ""),
+            str(active_smart_policy.get("checksum") or ""),
+            int(active_smart_policy.get("policy_schema_version") or 0),
+        )
+        graph_key = str(
+            (self.progress_data.get("meta", {}).get("smart_practice_concept_graph") or {}).get("graph_signature") or ""
+        )
+        calibration_key = str(
+            (self.progress_data.get("meta", {}).get("smart_practice_question_calibration") or {}).get("last_updated_at") or ""
+        )
         session_answer_key = tuple(
             (
                 int(event.get("question_number") or 0),
@@ -31,7 +106,17 @@ class SessionBuilderMixin:
             )
             for event in (self.session_answer_history or [])
         )
-        return self._analytics_signature(), session_answer_key
+        return (
+            SMART_PRACTICE_POLICY_VERSION,
+            measurement_policy,
+            governance_policy,
+            graph_key,
+            calibration_key,
+            self._analytics_signature(),
+            records_key,
+            repair_key,
+            session_answer_key,
+        )
 
     def _build_near_miss_pressure_maps(self, history, questions):
         question_lookup = {int(q.get("question_number") or 0): q for q in questions}
@@ -761,9 +846,15 @@ class SessionBuilderMixin:
             if not q.get("suspended") and not is_suspended(records.get(self._question_key(q), {}))
         ]
         if domain and domain != "All domains":
-            pool = [q for q in pool if q.get("domain") == domain]
+            normalized_domain = self._normalized_study_label(domain)
+            pool = [q for q in pool if self._normalized_study_label(str(q.get("domain") or "")) == normalized_domain]
         if topic and topic != "All topics":
-            pool = [q for q in pool if topic in [str(t).strip() for t in q.get("topics", [])]]
+            normalized_topic = self._normalized_study_label(topic)
+            pool = [
+                q
+                for q in pool
+                if normalized_topic in [self._normalized_study_label(str(t)) for t in q.get("topics", [])]
+            ]
         return pool
 
     def filter_pool_by_session_source(self, pool):
@@ -824,10 +915,40 @@ class SessionBuilderMixin:
 
     def build_smart_practice_pool(self, count, randomize=True, base_pool=None) -> list[QuestionRuntimeState]:
         profile = SMART_PRACTICE_SCORING
+        governance = normalize_governance(self.progress_data.setdefault("meta", {}).get("smart_practice_policy_governance"))
+        self.progress_data.setdefault("meta", {})["smart_practice_policy_governance"] = governance
+        active_smart_policy = active_policy(governance)
+        active_policy_values = active_smart_policy.get("policy_values") or {}
+        utility_scales = dict(active_policy_values.get("utility_component_scales") or {})
+        utility_bounds = dict(active_policy_values.get("utility_component_bounds") or {})
+        source_risk_settings = dict(active_policy_values.get("source_risk_settings") or {})
+        fatigue_settings = dict(active_policy_values.get("fatigue_settings") or {})
+        review_interval_multiplier = float(active_policy_values.get("review_interval_multiplier", 1.0) or 1.0)
+        repair_trigger_settings = dict(active_policy_values.get("repair_trigger_settings") or {})
+        repair_spacing_settings = dict(active_policy_values.get("repair_spacing_settings") or {})
+        weakness_thresholds = dict(active_policy_values.get("weakness_thresholds") or {})
+        prediction_calibration = dict(active_policy_values.get("prediction_calibration") or {})
+        exploration_settings = dict(active_policy_values.get("exploration_settings") or {})
+        repetition_settings = dict(active_policy_values.get("repetition_settings") or {})
+        graph_enabled = bool(active_policy_values.get("graph_enabled", True))
+        graph_max_utility = float(active_policy_values.get("maximum_graph_utility_contribution", 4.0) or 4.0)
+        information_enabled = bool(active_policy_values.get("information_value_enabled", True))
+        quality_enabled = bool(active_policy_values.get("question_quality_enabled", True))
+        info_max = float(active_policy_values.get("maximum_information_value_contribution", 6.0) or 6.0)
+        quality_min_samples = int(active_policy_values.get("minimum_question_quality_samples", 10) or 10)
+        bad_key_min_samples = int(active_policy_values.get("possible_bad_key_minimum_samples", 20) or 20)
+        quality_risk_max = float(active_policy_values.get("quality_risk_maximum", 4.0) or 4.0)
+        role_shares = dict(active_policy_values.get("role_shares") or {})
         pool = list(base_pool) if base_pool is not None else self.get_filtered_master_pool()
         if not pool:
             return []
         records = self._progress_questions()
+        progress_history = self._progress_history()
+        meta = self.progress_data.setdefault("meta", {})
+        concept_graph = normalize_graph(meta.get("smart_practice_concept_graph"), pool)
+        meta["smart_practice_concept_graph"] = concept_graph
+        calibration_store = normalize_calibration_store(meta.get("smart_practice_question_calibration"))
+        meta["smart_practice_question_calibration"] = calibration_store
         signal_cache_key = self._smart_practice_signal_key()
         signal_payload = getattr(self, "smart_practice_signal_cache_payload", None)
         if signal_cache_key != getattr(self, "smart_practice_signal_cache_key", None) or signal_payload is None:
@@ -914,6 +1035,10 @@ class SessionBuilderMixin:
             stem_style = self._stem_style_for_question(question)
             source_name = str(question.get("source_name") or "Unknown source")
             source_label = str(question.get("source_label") or "")
+            normalized_domain = self._normalized_study_label(str(question.get("domain") or ""))
+            normalized_topics = tuple(
+                self._normalized_study_label(str(topic)) for topic in question.get("topics", []) if str(topic).strip()
+            )
             record = records.get(self._question_key(question), {})
             question_meta[qnum] = {
                 "record": record,
@@ -922,6 +1047,8 @@ class SessionBuilderMixin:
                 "objective_code": objective_code,
                 "source_name": source_name,
                 "source_label": source_label,
+                "normalized_domain": normalized_domain,
+                "normalized_topics": normalized_topics,
             }
             if objective_code and int(record.get("attempts", 0)) > 0:
                 exposure = objective_exposure_map.setdefault(objective_code, {"sources": set(), "styles": set()})
@@ -930,6 +1057,9 @@ class SessionBuilderMixin:
         interference_priority_map = {
             int(question.get("question_number") or 0): interference_priority(question) for question in pool
         }
+        concept_keys = sorted({concept_key_for_question(question)[0] for question in pool})
+        concept_states = {key: aggregate_concept_state(key, pool, records, progress_history) for key in concept_keys}
+        graph_audit = audit_graph(concept_graph, pool)
 
         priority_cache: dict[int, float] = {}
 
@@ -951,6 +1081,30 @@ class SessionBuilderMixin:
             and screenshot_unseen / max(1, screenshot_total) >= profile.imported_chapter_burst_unseen_min_ratio
         )
 
+        def policy_clamp_component(name, value):
+            low, high = utility_bounds.get(name, (0.0, 0.0))
+            try:
+                number = float(value)
+            except (TypeError, ValueError):
+                number = float(low)
+            if number != number:
+                number = float(low)
+            return round(max(float(low), min(float(high), number)), 3)
+
+        def policy_utility_total(components):
+            clean = {name: policy_clamp_component(name, components.get(name, 0.0)) for name in utility_bounds}
+            total = (
+                clean.get("retention_risk", 0.0)
+                + clean.get("expected_learning_gain", 0.0)
+                + clean.get("blueprint_importance", 0.0)
+                + clean.get("misconception_repair_value", 0.0)
+                + clean.get("exploration_value", 0.0)
+                - clean.get("repetition_cost", 0.0)
+                - clean.get("source_quality_risk", 0.0)
+                - clean.get("fatigue_cost", 0.0)
+            )
+            return round(total, 3)
+
         def smart_priority(question: QuestionRuntimeState) -> float:
             qnum = int(question.get("question_number") or 0)
             if qnum in priority_cache:
@@ -961,6 +1115,49 @@ class SessionBuilderMixin:
             source_trust = source_trust_map.get(
                 str(meta.get("source_name") or "Unknown source"), {"trust_score": 82.0, "label": "Watch"}
             )
+            diagnosis = diagnose_root_cause(
+                question,
+                concept_graph,
+                concept_states,
+                progress_history,
+                source_trust=source_trust,
+                policy=active_smart_policy,
+            ) if graph_enabled else {
+                "diagnosis": "insufficient_evidence",
+                "confidence": 0.0,
+                "target_concept_key": concept_key_for_question(question)[0],
+                "supporting_concept_keys": [],
+                "graph_version": GRAPH_VERSION,
+            }
+            graph_pressure = min(graph_max_utility, graph_max_utility * float(diagnosis.get("confidence", 0.0) or 0.0))
+            qnum_outcomes = [event for event in progress_history if int(event.get("question_number") or 0) == qnum]
+            quality = question_quality_record(
+                question,
+                qnum_outcomes,
+                minimum_samples=quality_min_samples,
+                possible_bad_key_minimum_samples=bad_key_min_samples,
+            ) if quality_enabled else {"status": "healthy", "source_risk": 0.0, "confidence": 0.0}
+            concept_key = str(diagnosis.get("target_concept_key") or concept_key_for_question(question)[0])
+            dependent_concepts = [
+                edge.get("target_concept_key")
+                for edge in (concept_graph.get("edges") or {}).values()
+                if edge.get("status") == "active" and edge.get("edge_type") == "prerequisite_of" and edge.get("source_concept_key") == concept_key
+            ]
+            session_context = {
+                "seen_question_numbers": [int(q.get("question_number") or 0) for q in getattr(self, "questions", [])],
+                "seen_concepts": [str(q.get("smart_concept_key") or "") for q in getattr(self, "questions", [])],
+                "seen_stem_styles": [str(q.get("stem_style") or "") for q in getattr(self, "questions", [])],
+                "seen_objectives": [str(q.get("objective_code") or "") for q in getattr(self, "questions", [])],
+            }
+            info = information_value(
+                question,
+                concept_states.get(concept_key, {}),
+                {**graph_audit, "dependent_concepts": dependent_concepts},
+                session_context,
+                quality,
+                policy=active_smart_policy,
+            ) if information_enabled else {"total": 0.0, "reasons": []}
+            info_pressure = max(-info_max, min(info_max, float(info.get("total", 0.0) or 0.0)))
             unit_key = str(meta.get("unit_key") or "")
             gap_score = float(gap_map.get(unit_key, 0.0))
             transfer_row = transfer_map.get(unit_key, {"score": 72.0})
@@ -976,6 +1173,7 @@ class SessionBuilderMixin:
             concept_memory_row = concept_memory_map.get(
                 unit_key, {"state": "new", "next_ramp": "recognition", "durability_signal": 0.0}
             )
+            memory_state = str(concept_memory_row.get("state") or "new")
             wrong_memory_pressure = float(wrong_answer_memory_pressure_map.get(unit_key, 0.0))
             wrong_recycle_pressure = float(wrong_answer_recycling_map.get(qnum, 0.0))
             near_miss_pressure = max(
@@ -1014,193 +1212,222 @@ class SessionBuilderMixin:
             difficulty_score = float(difficulty_row.get("score", 0.0))
             phrasing_penalty = max(0.0, 82.0 - float(phrasing_row.get("score", 100.0)))
             momentum_bias = float(momentum_profile.get("difficulty_bias", 0.0))
-            score = gap_score * profile.gap_weight
-            score += float(source_row.get("score", 0.8)) * profile.source_score_weight
-            score += (
-                max(0.0, profile.source_trust_baseline - float(source_trust.get("trust_score", 82.0)))
-                * profile.source_trust_penalty_weight
+            trust_score = max(0.0, min(100.0, float(source_trust.get("trust_score", 82.0))))
+            trust_label = str(source_trust.get("label") or "Watch")
+            source_label = str(source_row.get("label") or "")
+            memory_due = is_review_due(rec)
+            memory = dict((rec or {}).get("learner_memory") or {})
+            retrievability = max(0.0, min(1.0, float(memory.get("retrievability", 0.0) or 0.0)))
+            trust_risk = max(0.0, (profile.source_trust_baseline - trust_score) / profile.source_trust_baseline)
+            if trust_label == "Decayed":
+                trust_risk += float(source_risk_settings.get("decayed_penalty", 0.22) or 0.22)
+            if source_label == "Source conflict":
+                trust_risk += float(source_risk_settings.get("conflict_penalty", 0.28) or 0.28)
+            if str(question.get("import_status") or "") == "screenshot_review_needed":
+                trust_risk += float(source_risk_settings.get("decayed_penalty", 0.22) or 0.22)
+            trust_risk = max(0.0, min(1.0, trust_risk))
+            retention_risk = min(
+                25.0,
+                (18.0 if memory_due else 0.0)
+                + float(retention_stress_row.get("pressure", 0.0)) * 0.12
+                + max(0.0, 1.0 - retrievability) * 8.0,
+            ) * review_interval_multiplier
+            learning_gain = min(
+                20.0,
+                float(expected_gain_row.get("expected_gain", 0.0)) * 0.16
+                + float(knowledge_row.get("uncertainty", 0.0)) * 0.06
+                + max(0.0, profile.knowledge_trace_baseline - float(knowledge_row.get("mastery_prob", 70.0))) * 0.08,
             )
-            score += (
-                max(0.0, profile.transfer_baseline - float(transfer_row.get("score", 72.0))) * profile.transfer_weight
+            blueprint_importance = min(
+                15.0,
+                gap_score * 0.13
+                + (5.0 if int(rec.get("attempts", 0)) <= 0 else 0.0)
+                + max(0.0, profile.objective_mastery_baseline - float(objective_row.get("mastery_score", 72.0)))
+                * 0.08,
             )
-            score += float(prerequisite_row.get("severity", 0.0)) * profile.prerequisite_debt_weight
-            score += float(blind_spot_row.get("severity", 0.0)) * profile.blind_spot_weight
-            score += (
-                max(0.0, profile.robustness_baseline - float(robustness_row.get("score", profile.robustness_baseline)))
-                * profile.robustness_weight
+            misconception_repair = min(
+                20.0,
+                (8.0 if is_active_weak(rec) else 0.0)
+                + misconception_pressure * 0.08
+                + wrong_memory_pressure * 0.1
+                + wrong_recycle_pressure * 0.12
+                + near_miss_pressure * 0.12
+                + float(latent_row.get("score", 0.0)) * 0.12
+                + float(compression_row.get("compression", 0.0)) * 0.06,
             )
-            score += float(leverage_row.get("leverage", 0.0)) * profile.leverage_weight
-            score += float(misconception_pressure) * profile.misconception_weight
-            score += (
-                max(
-                    0.0,
-                    profile.half_life_target_days
-                    - float(half_life_row.get("half_life_days", profile.half_life_target_days)),
-                )
-                * profile.half_life_weight
-            )
-            score += (
-                max(
-                    0.0,
-                    profile.effort_efficiency_baseline
-                    - float(effort_row.get("score", profile.effort_efficiency_baseline)),
-                )
-                * profile.effort_efficiency_weight
-            )
-            score += float(reinforcement_row.get("priority", 0.0)) * profile.reinforcement_priority_weight
-            score += float(synthesis_row.get("score", 0.0)) * profile.synthesis_weight
-            score += (
-                max(
-                    0.0,
-                    profile.knowledge_trace_baseline
-                    - float(knowledge_row.get("mastery_prob", profile.knowledge_trace_baseline)),
-                )
-                * profile.knowledge_trace_weight
-            )
-            score += float(knowledge_row.get("uncertainty", 0.0)) * profile.knowledge_uncertainty_weight
-            memory_state = str(concept_memory_row.get("state") or "new")
-            if memory_state == "recognizable":
-                score += profile.concept_memory_weight * 32.0
-            elif memory_state == "retrievable":
-                score += profile.concept_memory_weight * 24.0
-            elif memory_state == "transferable":
-                score += profile.concept_memory_weight * 12.0
-            elif (
-                memory_state == "durable"
-                and not is_review_due(rec)
-                and float(retention_stress_row.get("pressure", 0.0)) <= 0
-            ):
-                score -= profile.durable_memory_penalty
-            score += wrong_memory_pressure * profile.wrong_answer_memory_weight
-            score += wrong_recycle_pressure * profile.wrong_answer_recycle_weight
-            if wrong_answer_recycling_map and qnum in wrong_answer_memory_example_qnums:
-                score -= profile.wrong_answer_recycle_example_penalty
-            score += near_miss_pressure * profile.near_miss_weight
-            score += float(expected_gain_row.get("expected_gain", 0.0)) * profile.learning_gain_weight
-            score += float(compression_row.get("compression", 0.0)) * profile.compression_weight
-            score += float(compression_point_row.get("gap", 0.0)) * (profile.compression_weight * 0.5)
-            score += max(0.0, profile.ladder_baseline - float(ladder_row.get("score", 72.0))) * profile.ladder_weight
-            if int(ladder_row.get("rung_count", 1)) < int(ladder_row.get("available_style_count", 1)):
-                score += profile.ladder_missing_rung_bonus
-            score += float(boundary_row.get("gap", 0.0)) * profile.boundary_weight
-            if str(boundary_row.get("weak_style") or "") == str(meta.get("stem_style") or ""):
-                score += profile.boundary_style_bonus
-            score += counterfactual_pressure * profile.counterfactual_weight
-            score += float(counterexample_row.get("pressure", 0.0)) * profile.counterexample_weight
-            score += float(contrast_pressure) * profile.contrast_rule_weight
-            score += float(recognition_row.get("gap", 0.0)) * profile.recognition_gap_weight
-            score += float(cue_row.get("score", 0.0)) * profile.cue_dependence_weight
-            score += float(delayed_probe_row.get("pressure", 0.0)) * profile.delayed_probe_weight
-            score += float(retention_stress_row.get("pressure", 0.0)) * profile.retention_stress_weight
-            score += float(failure_mode_row.get("pressure", 0.0)) * profile.failure_mode_weight
-            score += float(latency_row.get("drag", 0.0)) * profile.decision_latency_weight
-            score += (
-                max(
-                    0.0,
-                    profile.generalization_baseline
-                    - float(generalization_row.get("score", profile.generalization_baseline)),
-                )
-                * profile.generalization_weight
-            )
-            if str(concept_state_row.get("state") or "stable") in profile.concept_state_focus_states:
-                score += profile.concept_state_weight * 24.0
-            score += (
-                max(0.0, profile.objective_mastery_baseline - float(objective_row.get("mastery_score", 72.0)))
-                * profile.objective_mastery_weight
-            )
-            if int(objective_row.get("stem_style_count", 1)) <= 1:
-                score += profile.objective_stem_bonus
+            if diagnosis["diagnosis"] in {"missing_prerequisite", "target_concept_weakness", "concept_confusion"}:
+                misconception_repair += graph_pressure
+                learning_gain += graph_pressure * 0.5
+            learning_gain += max(0.0, info_pressure) * 0.4
+            blueprint_importance += max(0.0, info.get("graph_bottleneck_value", 0.0)) * 0.2 + max(0.0, info.get("coverage_value", 0.0)) * 0.2
             objective_exposure = objective_exposure_map.get(
                 str(meta.get("objective_code") or ""), {"sources": set(), "styles": set()}
             )
-            if (
-                int(rec.get("attempts", 0)) <= 0
-                and float(objective_row.get("mastery_score", 100.0)) < profile.objective_mastery_baseline
-            ):
-                if str(meta.get("source_name") or "") not in objective_exposure.get("sources", set()):
-                    score += profile.objective_new_source_bonus
-                if str(meta.get("stem_style") or "") not in objective_exposure.get("styles", set()):
-                    score += profile.objective_new_style_bonus
-            score += float(latent_row.get("score", 0.0)) * profile.latent_weight
-            score += interference_score * profile.interference_weight
-            score += difficulty_score * (
-                profile.difficulty_weight_positive if momentum_bias >= 0 else profile.difficulty_weight_negative
+            exploration_value = min(
+                10.0,
+                max(0.0, profile.transfer_baseline - float(transfer_row.get("score", 72.0))) * 0.06
+                + max(0.0, profile.generalization_baseline - float(generalization_row.get("score", 72.0))) * 0.05
+                + (2.5 if source_label == "Cross-source agreement" else 0.0)
+                + (2.0 if str(meta.get("source_name") or "") not in objective_exposure.get("sources", set()) else 0.0)
+                + (2.0 if str(meta.get("stem_style") or "") not in objective_exposure.get("styles", set()) else 0.0),
             )
-            if source_row.get("label") == "Cross-source agreement":
-                score += profile.source_agreement_bonus
-            elif source_row.get("label") == "Cross-source supported":
-                score += profile.source_supported_bonus
-            elif source_row.get("label") == "Source conflict":
-                score -= profile.source_conflict_penalty
-            if source_trust.get("label") == "Decayed":
-                score -= profile.source_decayed_penalty
-            if str(phrasing_row.get("label") or "") == "Noisy":
-                score -= profile.noisy_phrasing_penalty
-            score -= phrasing_penalty * profile.phrasing_penalty_weight
-            score -= freshness_penalty * profile.freshness_penalty_weight
-            if momentum_bias < 0:
-                score -= (
-                    max(0.0, difficulty_score - profile.negative_momentum_difficulty_floor)
-                    * profile.negative_momentum_difficulty_weight
-                )
-            elif momentum_bias > 0:
-                score += (
-                    max(0.0, difficulty_score - profile.positive_momentum_difficulty_floor)
-                    * profile.positive_momentum_difficulty_weight
-                )
+            exploration_value += max(0.0, float(exploration_settings.get("transfer_min_value", 4.0) or 4.0) - 4.0) * 0.2
+            if diagnosis["diagnosis"] == "transfer_failure":
+                exploration_value += graph_pressure
+                learning_gain += graph_pressure * 0.5
+            exploration_value += max(0.0, info.get("transfer_evidence_value", 0.0)) * 0.2
+            repetition_cost = min(
+                15.0,
+                freshness_penalty * 0.18
+                + int(rec.get("correct_streak", 0)) * float(repetition_settings.get("correct_streak_penalty", 1.4) or 1.4)
+                + max(0, int(recent_concept_cooldown_map.get(unit_key, 0) or 0) - 1)
+                * float(repetition_settings.get("recent_concept_penalty", 2.0) or 2.0),
+            )
+            if diagnosis["diagnosis"] == "item_specific_failure":
+                repetition_cost += graph_pressure
+            repetition_cost += max(0.0, info.get("redundancy_cost", 0.0)) * 0.2
+            source_quality_risk = min(
+                15.0,
+                trust_risk * 15.0
+                + phrasing_penalty * 0.06
+                + max(0.0, float(source_risk_settings.get("baseline", 85.0) or 85.0) - 85.0) * 0.01,
+            )
+            if diagnosis["diagnosis"] == "source_quality_problem":
+                source_quality_risk += graph_pressure
+            source_quality_risk += min(quality_risk_max, max(0.0, info.get("item_quality_risk", 0.0) + info.get("source_risk", 0.0)) * 0.2)
+            fatigue_cost = 0.0
             if burnout_risk.get("label") == "High":
-                score -= (
-                    max(0.0, difficulty_score - profile.burnout_difficulty_floor) * profile.burnout_difficulty_weight
+                fatigue_cost += max(0.0, difficulty_score - profile.burnout_difficulty_floor) * float(
+                    fatigue_settings.get("high_burnout_difficulty_penalty", 0.12) or 0.12
                 )
-            if is_active_weak(rec):
-                score += profile.active_weak_bonus
-            if is_review_due(rec):
-                score += profile.due_bonus
-            if int(rec.get("attempts", 0)) <= 0:
-                score += profile.unseen_bonus
-            intent_label = str(session_intent.get("label") or "")
-            if intent_label == "Build coverage":
-                score += gap_score * profile.intent_coverage_weight
-                if int(rec.get("attempts", 0)) <= 0:
-                    score += 4.0
-            elif intent_label == "Repair weak spots":
-                score += (
-                    wrong_memory_pressure
-                    + wrong_recycle_pressure
-                    + near_miss_pressure
-                    + float(latent_row.get("score", 0.0))
-                ) * profile.intent_repair_weight
-                if is_active_weak(rec):
-                    score += 4.0
-            elif intent_label == "Retain old material":
-                score += float(retention_stress_row.get("pressure", 0.0)) * profile.intent_retention_weight
-                if is_review_due(rec):
-                    score += 4.0
-            elif intent_label == "Exam readiness":
-                score += (
-                    max(0.0, profile.generalization_baseline - float(generalization_row.get("score", 72.0)))
-                    + max(0.0, profile.robustness_baseline - float(robustness_row.get("score", 72.0)))
-                    + difficulty_score
-                ) * profile.intent_readiness_weight
-            if is_screenshot_import(question):
-                score += profile.screenshot_source_priority_bonus
-                if int(rec.get("attempts", 0)) <= 0:
-                    score += profile.screenshot_unseen_priority_bonus
-                    if imported_chapter_burst_active:
-                        score += profile.imported_chapter_burst_bonus
-            concept_recent_count = int(recent_concept_cooldown_map.get(unit_key, 0) or 0)
+            if momentum_bias < 0:
+                fatigue_cost += max(0.0, difficulty_score - profile.negative_momentum_difficulty_floor) * float(
+                    fatigue_settings.get("negative_momentum_penalty", 0.08) or 0.08
+                )
+            fatigue_cost = min(10.0, fatigue_cost)
+            wrong_surplus = max(0, int(rec.get("wrong_count", 0) or 0) - int(rec.get("correct_count", 0) or 0))
+            policy_active_weak = is_active_weak(rec) or wrong_surplus >= int(
+                weakness_thresholds.get("active_weak_wrong_surplus", 1) or 1
+            )
+            repair_recent_delay = int(repair_spacing_settings.get("contrast_delay", 2) or 2)
+            if int(recent_concept_cooldown_map.get(unit_key, 0) or 0) and int(recent_concept_cooldown_map.get(unit_key, 0) or 0) < repair_recent_delay:
+                misconception_repair *= 0.5
             if (
-                concept_recent_count >= profile.recent_concept_cooldown_min_count
-                and not is_active_weak(rec)
-                and not is_review_due(rec)
+                policy_active_weak
+                or diagnosis["diagnosis"] in {"missing_prerequisite", "target_concept_weakness", "concept_confusion"}
+                or wrong_memory_pressure >= float(repair_trigger_settings.get("wrong_memory_min_pressure", 35.0) or 35.0)
+                or near_miss_pressure >= float(repair_trigger_settings.get("weak_repair_min_pressure", 20.0) or 20.0)
             ):
-                score -= (
-                    concept_recent_count
-                    - profile.recent_concept_cooldown_min_count
-                    + 1
-                ) * profile.recent_concept_cooldown_penalty
-            score -= int(rec.get("correct_streak", 0)) * profile.correct_streak_penalty
-            priority_cache[qnum] = round(score, 3)
+                primary_role = "weak_repair"
+            elif memory_due or float(retention_stress_row.get("pressure", 0.0)) >= 24.0:
+                primary_role = "due_retention"
+            elif int(rec.get("attempts", 0)) <= 0 or gap_score >= profile.coverage_focus_gap_min:
+                primary_role = "blueprint_coverage"
+            elif diagnosis["diagnosis"] == "transfer_failure" or exploration_value >= float(exploration_settings.get("transfer_min_value", 4.0) or 4.0) or memory_state in {"retrievable", "transferable"}:
+                primary_role = "transfer"
+            elif burnout_risk.get("label") != "High" and not memory_due:
+                primary_role = "controlled_stretch"
+            else:
+                primary_role = "blueprint_coverage"
+            breakdown = {
+                "retention_risk": policy_clamp_component(
+                    "retention_risk", retention_risk * float(utility_scales.get("retention_risk", 1.0))
+                ),
+                "expected_learning_gain": policy_clamp_component(
+                    "expected_learning_gain",
+                    learning_gain * float(utility_scales.get("expected_learning_gain", 1.0)),
+                ),
+                "blueprint_importance": policy_clamp_component(
+                    "blueprint_importance",
+                    blueprint_importance * float(utility_scales.get("blueprint_importance", 1.0)),
+                ),
+                "misconception_repair_value": policy_clamp_component(
+                    "misconception_repair_value",
+                    misconception_repair * float(utility_scales.get("misconception_repair_value", 1.0)),
+                ),
+                "exploration_value": policy_clamp_component(
+                    "exploration_value", exploration_value * float(utility_scales.get("exploration_value", 1.0))
+                ),
+                "repetition_cost": policy_clamp_component(
+                    "repetition_cost", repetition_cost * float(utility_scales.get("repetition_cost", 1.0))
+                ),
+                "source_quality_risk": policy_clamp_component(
+                    "source_quality_risk",
+                    source_quality_risk * float(utility_scales.get("source_quality_risk", 1.0)),
+                ),
+                "fatigue_cost": policy_clamp_component(
+                    "fatigue_cost", fatigue_cost * float(utility_scales.get("fatigue_cost", 1.0))
+                ),
+            }
+            total = policy_utility_total(breakdown)
+            positive_reasons = [
+                ("retention", retention_risk),
+                ("learning gain", learning_gain),
+                ("coverage", blueprint_importance),
+                ("repair", misconception_repair),
+                ("transfer", exploration_value),
+            ]
+            cost_reasons = [
+                ("recent repetition", repetition_cost),
+                ("source risk", source_quality_risk),
+                ("fatigue guard", fatigue_cost),
+            ]
+            reasons = [
+                label
+                for label, _value in sorted(positive_reasons, key=lambda row: row[1], reverse=True)
+                if _value > 1.0
+            ][:2]
+            reasons.extend(
+                f"penalty: {label}"
+                for label, _value in sorted(cost_reasons, key=lambda row: row[1], reverse=True)
+                if _value > 2.0
+            )
+            question["smart_primary_role"] = primary_role
+            question["smart_selection_reasons"] = reasons[:3]
+            question["smart_utility"] = round(total, 3)
+            question["smart_utility_breakdown"] = breakdown
+            question["smart_policy_version"] = SMART_PRACTICE_POLICY_VERSION
+            question["smart_policy_id"] = str(active_smart_policy.get("policy_id") or "")
+            question["smart_concept_key"] = str(diagnosis.get("target_concept_key") or "")
+            question["smart_root_cause"] = str(diagnosis.get("diagnosis") or "")
+            question["smart_root_cause_confidence"] = float(diagnosis.get("confidence", 0.0) or 0.0)
+            question["smart_supporting_concepts"] = [str(value) for value in diagnosis.get("supporting_concept_keys", [])]
+            question["smart_graph_version"] = str(diagnosis.get("graph_version") or GRAPH_VERSION)
+            question["smart_information_value"] = round(float(info.get("total", 0.0) or 0.0), 4)
+            question["smart_information_breakdown"] = dict(info)
+            question["smart_question_quality_status"] = str(quality.get("status") or "insufficient_data")
+            question["smart_question_quality_confidence"] = float(quality.get("confidence", 0.0) or 0.0)
+            question["smart_graph_bottleneck"] = float(info.get("graph_bottleneck_value", 0.0) or 0.0)
+            calibration_store.setdefault("question_quality", {})[str(qnum)] = quality
+            info_id = f"{qnum}:{active_smart_policy.get('policy_id','')}"
+            calibration_store.setdefault("information_value_history", {})[info_id] = {
+                "record_id": info_id,
+                "question_number": qnum,
+                "smart_policy_id": str(active_smart_policy.get("policy_id") or ""),
+                "information_value": question["smart_information_value"],
+                "breakdown": dict(info),
+            }
+            self.progress_data.setdefault("meta", {})["smart_practice_question_calibration"] = calibration_store
+            question["smart_prediction_offset"] = float(prediction_calibration.get("recall_probability_offset", 0.0) or 0.0)
+            question["smart_runtime_policy_controls"] = {
+                "role_shares": role_shares,
+                "utility_component_scales": utility_scales,
+                "utility_component_bounds": utility_bounds,
+                "source_risk_settings": source_risk_settings,
+                "fatigue_settings": fatigue_settings,
+                "review_interval_multiplier": review_interval_multiplier,
+                "repair_trigger_settings": repair_trigger_settings,
+                "repair_spacing_settings": repair_spacing_settings,
+                "weakness_thresholds": weakness_thresholds,
+                "prediction_calibration": prediction_calibration,
+                "exploration_settings": exploration_settings,
+                "repetition_settings": repetition_settings,
+                "minimum_evidence_thresholds": dict(active_policy_values.get("minimum_evidence_thresholds") or {}),
+            }
+            if graph_enabled and question["smart_root_cause"] != "insufficient_evidence":
+                stored_graph = store_diagnosis(self.progress_data.setdefault("meta", {}).get("smart_practice_concept_graph"), diagnosis)
+                self.progress_data.setdefault("meta", {})["smart_practice_concept_graph"] = stored_graph
+            priority_cache[qnum] = round(total, 3)
             return priority_cache[qnum]
 
         unseen = [
@@ -1622,246 +1849,7 @@ class SessionBuilderMixin:
                 reverse=True,
             )
 
-        quota_profile = smart_practice_quota_profile(
-            str(momentum_profile.get("label") or "Balanced"), str(burnout_risk.get("label") or "Low")
-        )
-
-        screenshot_ratio = (
-            profile.imported_chapter_burst_quota_ratio
-            if imported_chapter_burst_active
-            else profile.screenshot_focus_ratio
-        )
-
-        quota = {
-            "unseen": max(1, round(target * quota_profile.unseen_ratio)) if unseen else 0,
-            "active_weak": max(1, round(target * quota_profile.active_weak_ratio)) if active_weak else 0,
-            "due": max(1, round(target * quota_profile.due_ratio)) if due else 0,
-            "recovered": max(1, round(target * quota_profile.recovered_ratio)) if recovered else 0,
-            "screenshot": max(1, round(target * screenshot_ratio)) if screenshot_focus else 0,
-            "coverage": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if coverage_focus
-                else 0
-            ),
-            "objective": (
-                max(1, round(target * profile.objective_focus_ratio * quota_profile.advanced_scale))
-                if objective_focus
-                else 0
-            ),
-            "interference": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if interference_focus
-                else 0
-            ),
-            "compression": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if compression_focus
-                else 0
-            ),
-            "ladder": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if ladder_focus
-                else 0
-            ),
-            "boundary": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if boundary_focus
-                else 0
-            ),
-            "counterfactual": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if counterfactual_focus
-                else 0
-            ),
-            "prerequisite": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if prerequisite_focus
-                else 0
-            ),
-            "blind_spot": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if blind_spot_focus
-                else 0
-            ),
-            "robustness": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if robustness_focus
-                else 0
-            ),
-            "reinforcement": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if reinforcement_focus
-                else 0
-            ),
-            "synthesis": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if synthesis_focus
-                else 0
-            ),
-            "knowledge_trace": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if knowledge_trace_focus
-                else 0
-            ),
-            "learning_gain": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if learning_gain_focus
-                else 0
-            ),
-            "delayed_probe": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if delayed_probe_focus
-                else 0
-            ),
-            "cue_dependence": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if cue_dependence_focus
-                else 0
-            ),
-            "recognition_gap": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if recognition_focus
-                else 0
-            ),
-            "retention_stress": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if retention_stress_focus
-                else 0
-            ),
-            "failure_mode": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if failure_mode_focus
-                else 0
-            ),
-            "generalization": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if generalization_focus
-                else 0
-            ),
-            "decision_latency": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if decision_latency_focus
-                else 0
-            ),
-            "contrast_rule": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if contrast_rule_focus
-                else 0
-            ),
-            "concept_state": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if concept_state_focus
-                else 0
-            ),
-            "wrong_recycle": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if wrong_recycle_focus
-                else 0
-            ),
-            "near_miss": (
-                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
-                if near_miss_focus
-                else 0
-            ),
-        }
-
-        ordered = []
-        seen_qnums = set()
-        objective_counts = {}
         objective_cap = smart_practice_objective_cap(target, profile)
-
-        def take_from(group, limit):
-            skipped = []
-            for q in group:
-                if len(ordered) >= target or limit <= 0:
-                    break
-                qnum = q.get("question_number")
-                if qnum in seen_qnums:
-                    continue
-                objective_code = str(question_meta.get(int(qnum or 0), {}).get("objective_code") or "")
-                if objective_code and objective_counts.get(objective_code, 0) >= objective_cap:
-                    skipped.append(q)
-                    continue
-                seen_qnums.add(qnum)
-                ordered.append(q)
-                if objective_code:
-                    objective_counts[objective_code] = objective_counts.get(objective_code, 0) + 1
-                limit -= 1
-            for q in skipped:
-                if len(ordered) >= target or limit <= 0:
-                    break
-                qnum = q.get("question_number")
-                if qnum in seen_qnums:
-                    continue
-                seen_qnums.add(qnum)
-                ordered.append(q)
-                objective_code = str(question_meta.get(int(qnum or 0), {}).get("objective_code") or "")
-                if objective_code:
-                    objective_counts[objective_code] = objective_counts.get(objective_code, 0) + 1
-                limit -= 1
-
-        if target <= 3:
-            take_from(screenshot_focus, quota["screenshot"])
-            take_from(boundary_focus, quota["boundary"])
-            take_from(counterfactual_focus, quota["counterfactual"])
-            take_from(wrong_recycle_focus, quota["wrong_recycle"])
-            take_from(near_miss_focus, quota["near_miss"])
-            take_from(active_weak, quota["active_weak"])
-            take_from(coverage_focus, quota["coverage"])
-            take_from(reinforcement_focus, quota["reinforcement"])
-            take_from(objective_focus, quota["objective"])
-            take_from(unseen, quota["unseen"])
-            take_from(due, quota["due"])
-            take_from(prerequisite_focus, quota["prerequisite"])
-            take_from(blind_spot_focus, quota["blind_spot"])
-            take_from(knowledge_trace_focus, quota["knowledge_trace"])
-            take_from(learning_gain_focus, quota["learning_gain"])
-            take_from(delayed_probe_focus, quota["delayed_probe"])
-            take_from(retention_stress_focus, quota["retention_stress"])
-            take_from(failure_mode_focus, quota["failure_mode"])
-            take_from(contrast_rule_focus, quota["contrast_rule"])
-            take_from(interference_focus, quota["interference"])
-            take_from(compression_focus, quota["compression"])
-            take_from(ladder_focus, quota["ladder"])
-            take_from(cue_dependence_focus, quota["cue_dependence"])
-            take_from(recognition_focus, quota["recognition_gap"])
-            take_from(generalization_focus, quota["generalization"])
-            take_from(decision_latency_focus, quota["decision_latency"])
-            take_from(robustness_focus, quota["robustness"])
-            take_from(synthesis_focus, quota["synthesis"])
-            take_from(concept_state_focus, quota["concept_state"])
-            take_from(recovered, quota["recovered"])
-        else:
-            take_from(screenshot_focus, quota["screenshot"])
-            take_from(unseen, quota["unseen"])
-            take_from(active_weak, quota["active_weak"])
-            take_from(due, quota["due"])
-            take_from(coverage_focus, quota["coverage"])
-            take_from(objective_focus, quota["objective"])
-            take_from(interference_focus, quota["interference"])
-            take_from(compression_focus, quota["compression"])
-            take_from(ladder_focus, quota["ladder"])
-            take_from(boundary_focus, quota["boundary"])
-            take_from(counterfactual_focus, quota["counterfactual"])
-            take_from(wrong_recycle_focus, quota["wrong_recycle"])
-            take_from(near_miss_focus, quota["near_miss"])
-            take_from(prerequisite_focus, quota["prerequisite"])
-            take_from(blind_spot_focus, quota["blind_spot"])
-            take_from(robustness_focus, quota["robustness"])
-            take_from(reinforcement_focus, quota["reinforcement"])
-            take_from(synthesis_focus, quota["synthesis"])
-            take_from(knowledge_trace_focus, quota["knowledge_trace"])
-            take_from(learning_gain_focus, quota["learning_gain"])
-            take_from(delayed_probe_focus, quota["delayed_probe"])
-            take_from(cue_dependence_focus, quota["cue_dependence"])
-            take_from(recognition_focus, quota["recognition_gap"])
-            take_from(retention_stress_focus, quota["retention_stress"])
-            take_from(failure_mode_focus, quota["failure_mode"])
-            take_from(generalization_focus, quota["generalization"])
-            take_from(decision_latency_focus, quota["decision_latency"])
-            take_from(contrast_rule_focus, quota["contrast_rule"])
-            take_from(concept_state_focus, quota["concept_state"])
-            take_from(recovered, quota["recovered"])
 
         fallback = []
         for group in (
@@ -1896,19 +1884,51 @@ class SessionBuilderMixin:
             working_pool,
         ):
             fallback.extend(group)
-        for q in fallback:
-            if len(ordered) >= target:
-                break
-            qnum = q.get("question_number")
-            if qnum in seen_qnums:
-                continue
-            objective_code = str(question_meta.get(int(qnum or 0), {}).get("objective_code") or "")
-            if objective_code and objective_counts.get(objective_code, 0) >= objective_cap:
-                continue
-            seen_qnums.add(qnum)
-            ordered.append(q)
-            if objective_code:
-                objective_counts[objective_code] = objective_counts.get(objective_code, 0) + 1
+
+        def allocate_by_primary_role(candidates: list[QuestionRuntimeState]) -> list[QuestionRuntimeState]:
+            allocations = smart_practice_role_allocation(target, role_shares=role_shares)
+            buckets = {role: [] for role in allocations}
+            unique: list[QuestionRuntimeState] = []
+            used = set()
+            for question in candidates:
+                qnum = question.get("question_number")
+                if qnum in used:
+                    continue
+                used.add(qnum)
+                smart_priority(question)
+                role = str(question.get("smart_primary_role") or "blueprint_coverage")
+                if role not in buckets:
+                    role = "blueprint_coverage"
+                    question["smart_primary_role"] = role
+                buckets[role].append(question)
+                unique.append(question)
+            for bucket in buckets.values():
+                bucket.sort(key=lambda question: (-smart_priority(question), int(question.get("question_number") or 0)))
+            selected: list[QuestionRuntimeState] = []
+            selected_qnums = set()
+
+            def add(question: QuestionRuntimeState) -> bool:
+                qnum = question.get("question_number")
+                if qnum in selected_qnums or len(selected) >= target:
+                    return False
+                selected_qnums.add(qnum)
+                selected.append(question)
+                return True
+
+            for role in ("weak_repair", "due_retention", "blueprint_coverage", "transfer", "controlled_stretch"):
+                for question in buckets.get(role, [])[: allocations.get(role, 0)]:
+                    add(question)
+            remaining = sorted(
+                [question for question in unique if question.get("question_number") not in selected_qnums],
+                key=lambda question: (-smart_priority(question), int(question.get("question_number") or 0)),
+            )
+            for question in remaining:
+                if len(selected) >= target:
+                    break
+                add(question)
+            return selected[:target]
+
+        ordered = allocate_by_primary_role(working_pool)
 
         def source_label_for_question(question: QuestionRuntimeState) -> str:
             return str(question.get("source_label") or question.get("source_name") or "Unknown source").strip()
@@ -1926,7 +1946,7 @@ class SessionBuilderMixin:
                         continue
                     used_qnums.add(qnum)
                     candidates.append(item)
-            candidates.sort(key=smart_priority, reverse=True)
+            candidates.sort(key=lambda question: (-smart_priority(question), int(question.get("question_number") or 0)))
             return candidates
 
         def shape_for_variety(selected: list[QuestionRuntimeState]) -> list[QuestionRuntimeState]:
@@ -1938,7 +1958,11 @@ class SessionBuilderMixin:
                 for question in candidates
                 if self._primary_topic_label(question)
             }
-            available_domains = {str(question.get("domain") or "").strip() for question in candidates if question.get("domain")}
+            available_domains = {
+                self._normalized_study_label(str(question.get("domain") or ""))
+                for question in candidates
+                if question.get("domain")
+            }
             desired_topics = min(profile.variety_min_topics, target, len(available_topics))
             desired_domains = min(profile.variety_min_domains, target, len(available_domains))
             max_source = source_label_cap()
@@ -1994,11 +2018,15 @@ class SessionBuilderMixin:
                 for question in candidates:
                     if self._primary_topic_label(question) == topic and add(question, strict_source=True):
                         break
-            for domain in best_values(lambda question: str(question.get("domain") or "").strip(), desired_domains):
-                if domain in {str(question.get("domain") or "").strip() for question in shaped}:
+            for domain in best_values(
+                lambda question: self._normalized_study_label(str(question.get("domain") or "")), desired_domains
+            ):
+                if domain in {self._normalized_study_label(str(question.get("domain") or "")) for question in shaped}:
                     continue
                 for question in candidates:
-                    if str(question.get("domain") or "").strip() == domain and add(question, strict_source=True):
+                    if self._normalized_study_label(str(question.get("domain") or "")) == domain and add(
+                        question, strict_source=True
+                    ):
                         break
             for question in selected + candidates:
                 add(question, strict_source=True)
@@ -2058,6 +2086,21 @@ class SessionBuilderMixin:
             score -= min(18.0, freshness_average * 0.15)
             return round(max(0.0, min(100.0, score)), 2)
 
+        def protected_role_counts(selection: list[QuestionRuntimeState]) -> dict[str, int]:
+            counts = {"weak_repair": 0, "due_retention": 0, "blueprint_coverage": 0}
+            for question in selection:
+                role = str(question.get("smart_primary_role") or "")
+                if role in counts:
+                    counts[role] += 1
+            return counts
+
+        def preserves_protected_roles(
+            candidate: list[QuestionRuntimeState], baseline: list[QuestionRuntimeState]
+        ) -> bool:
+            candidate_counts = protected_role_counts(candidate)
+            baseline_counts = protected_role_counts(baseline)
+            return all(candidate_counts[role] >= baseline_counts[role] for role in baseline_counts)
+
         def source_balanced_seed() -> list[QuestionRuntimeState]:
             remaining = unique_candidates()
             seeded: list[QuestionRuntimeState] = []
@@ -2080,20 +2123,41 @@ class SessionBuilderMixin:
                 source_counts[label] = source_counts.get(label, 0) + 1
             return seeded
 
+        role_seed = list(ordered)
         ordered = shape_for_variety(ordered)
+        if not preserves_protected_roles(ordered, role_seed):
+            ordered = role_seed[:target]
         primary_quality = smart_practice_set_quality(ordered)
         retry_used = False
         if primary_quality < profile.set_quality_retry_threshold:
             alternate = shape_for_variety(source_balanced_seed())
             alternate_quality = smart_practice_set_quality(alternate)
-            if alternate_quality >= primary_quality + profile.set_quality_retry_margin:
+            if (
+                alternate_quality >= primary_quality + profile.set_quality_retry_margin
+                and preserves_protected_roles(alternate, ordered)
+            ):
                 ordered = alternate
                 primary_quality = alternate_quality
                 retry_used = True
         self.last_smart_practice_set_quality = {"score": primary_quality, "retry_used": retry_used}
 
+        def final_selection(selection: list[QuestionRuntimeState]) -> list[QuestionRuntimeState]:
+            result = self._interleave_questions(selection[:target])
+            if not preserves_protected_roles(result, role_seed):
+                result = self._interleave_questions(role_seed[:target])
+            measurement = normalize_measurement_store(
+                self.progress_data.setdefault("meta", {}).get("smart_practice_measurement")
+            )
+            for question in result:
+                if not question.get("smart_primary_role"):
+                    smart_priority(question)
+                record = records.get(self._question_key(question), {})
+                attach_prediction_to_question(question, measurement, record)
+            self.progress_data.setdefault("meta", {})["smart_practice_measurement"] = measurement
+            return result[:target]
+
         if not randomize:
-            result = self._interleave_questions(ordered)
+            result = final_selection(ordered)
             if pool_cache_key is not None:
                 self.smart_practice_pool_cache[pool_cache_key] = tuple(
                     int(question.get("question_number") or 0) for question in result
@@ -2102,4 +2166,4 @@ class SessionBuilderMixin:
 
         mixed = list(ordered[:target])
         random.shuffle(mixed)
-        return self._interleave_questions(mixed)
+        return final_selection(mixed)

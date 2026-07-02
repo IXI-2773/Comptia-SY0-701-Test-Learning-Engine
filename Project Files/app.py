@@ -76,6 +76,7 @@ from session_models import (
     clear_runtime_answer_state,
 )
 from smart_practice_cache import SmartPracticePrewarmService
+from smart_practice_measurement import event_prediction_fields
 from storage_utils import safe_write_json, setup_logging
 from ui_theme import (  # noqa: F401 - public test/theme compatibility exports
     AMBER,
@@ -2201,6 +2202,7 @@ class TestingEngineApp(
         rec = self._progress_record(q, create=False) or {}
         selected_letters = list(q.get("selected", []))
         correct_letters = list(q.get("correct", []))
+        prediction_fields = event_prediction_fields(q)
         event: QuestionHistoryEvent = {
             "at": now_iso(),
             "day": str(rec.get("last_seen") or ""),
@@ -2231,10 +2233,38 @@ class TestingEngineApp(
                 (feedback or {}).get("recall_failure") or self.classify_recall_failure(q, is_correct, feedback)
             ),
             "deciding_clue": str((feedback or {}).get("deciding_clue") or self.deciding_clue_for_question(q)),
-            "response_seconds": float((feedback or {}).get("response_seconds") or 0.0),
+            "response_seconds": float(
+                (feedback or {}).get("effective_response_seconds", (feedback or {}).get("response_seconds")) or 0.0
+            ),
+            "raw_response_seconds": float((feedback or {}).get("raw_response_seconds") or 0.0),
+            "effective_response_seconds": float(
+                (feedback or {}).get("effective_response_seconds", (feedback or {}).get("response_seconds")) or 0.0
+            ),
+            "response_time_contaminated": bool((feedback or {}).get("response_time_contaminated")),
             "was_due": bool((feedback or {}).get("was_due")),
             "was_active_weak": bool((feedback or {}).get("was_active_weak")),
             "session_tag": str(q.get("session_tag") or ""),
+            "smart_primary_role": str(q.get("smart_primary_role") or ""),
+            "smart_selection_reasons": [str(value) for value in q.get("smart_selection_reasons", [])],
+            "smart_utility": float(q.get("smart_utility", 0.0) or 0.0),
+            "smart_policy_id": str(q.get("smart_policy_id") or prediction_fields.get("smart_policy_id") or ""),
+            "smart_policy_version": str(
+                q.get("smart_policy_version") or prediction_fields.get("smart_policy_version") or ""
+            ),
+            "smart_concept_key": str(q.get("smart_concept_key") or ""),
+            "smart_root_cause": str(q.get("smart_root_cause") or ""),
+            "smart_root_cause_confidence": float(q.get("smart_root_cause_confidence", 0.0) or 0.0),
+            "smart_supporting_concepts": [str(value) for value in q.get("smart_supporting_concepts", [])],
+            "smart_graph_version": str(q.get("smart_graph_version") or ""),
+            "smart_information_value": float(q.get("smart_information_value", 0.0) or 0.0),
+            "smart_information_breakdown": dict(q.get("smart_information_breakdown") or {}),
+            "smart_question_quality_status": str(q.get("smart_question_quality_status") or ""),
+            "smart_question_quality_confidence": float(q.get("smart_question_quality_confidence", 0.0) or 0.0),
+            "smart_graph_bottleneck": float(q.get("smart_graph_bottleneck", 0.0) or 0.0),
+            "repair_stage": str(q.get("repair_stage") or ""),
+            "repair_concept_key": str(q.get("repair_concept_key") or ""),
+            "event_id": str(prediction_fields.get("prediction_id") or "") + f":{now_iso()}",
+            **prediction_fields,
         }
         append_progress_history(self.progress_data, event)
 
@@ -2247,6 +2277,9 @@ class TestingEngineApp(
             self._question_correct(q),
             confidence=feedback.get("confidence"),
             miss_reason=feedback.get("miss_reason"),
+            effective_response_seconds=feedback.get("effective_response_seconds", feedback.get("response_seconds", 0.0)),
+            session_tag=q.get("session_tag", ""),
+            recall_failure=feedback.get("recall_failure", ""),
         )
         self._progress_questions()[self._question_key(q)] = rec
         q["last_confidence"] = str(rec.get("last_confidence", "") or "")

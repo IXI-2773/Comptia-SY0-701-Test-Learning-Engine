@@ -54,6 +54,11 @@ class ProgressMeta(TypedDict):
     quest_stats: dict[str, QuestStat]
     issue_reports: list[IssueReport]
     stats: ProgressStats
+    repair_state: dict[str, dict[str, Any]]
+    smart_practice_measurement: dict[str, Any]
+    smart_practice_policy_governance: dict[str, Any]
+    smart_practice_concept_graph: dict[str, Any]
+    smart_practice_question_calibration: dict[str, Any]
 
 
 class ProgressSummary(TypedDict):
@@ -88,6 +93,16 @@ def normalize_progress_meta(meta: MutableMapping[str, Any] | Mapping[str, Any] |
     payload["level"] = max(1, int(payload.get("level", 1) or 1))
     payload["badges"] = [str(value) for value in payload.get("badges", []) if str(value).strip()]
     payload["milestones"] = [str(value) for value in payload.get("milestones", []) if str(value).strip()]
+    repair_state = payload.get("repair_state", {})
+    payload["repair_state"] = dict(repair_state) if isinstance(repair_state, Mapping) else {}
+    measurement = payload.get("smart_practice_measurement", {})
+    payload["smart_practice_measurement"] = dict(measurement) if isinstance(measurement, Mapping) else {}
+    governance = payload.get("smart_practice_policy_governance", {})
+    payload["smart_practice_policy_governance"] = dict(governance) if isinstance(governance, Mapping) else {}
+    graph = payload.get("smart_practice_concept_graph", {})
+    payload["smart_practice_concept_graph"] = dict(graph) if isinstance(graph, Mapping) else {}
+    calibration = payload.get("smart_practice_question_calibration", {})
+    payload["smart_practice_question_calibration"] = dict(calibration) if isinstance(calibration, Mapping) else {}
 
     raw_session_history = payload.get("session_history", [])
     session_history: list[SessionHistoryEntry] = []

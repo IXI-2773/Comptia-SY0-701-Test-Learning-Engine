@@ -14,6 +14,26 @@ class AnswerState(TypedDict):
     last_miss_reason: str
     recall_ready: bool
     session_tag: str
+    smart_primary_role: str
+    smart_selection_reasons: list[str]
+    smart_utility: float
+    smart_utility_breakdown: dict[str, float]
+    smart_policy_version: str
+    smart_policy_id: str
+    smart_concept_key: str
+    smart_root_cause: str
+    smart_root_cause_confidence: float
+    smart_supporting_concepts: list[str]
+    smart_graph_version: str
+    smart_information_value: float
+    smart_information_breakdown: dict[str, Any]
+    smart_question_quality_status: str
+    smart_question_quality_confidence: float
+    smart_graph_bottleneck: float
+    repair_stage: str
+    repair_concept_key: str
+    prediction_id: str
+    prediction_snapshot: dict[str, Any]
 
 
 class QuestionHistoryEvent(TypedDict):
@@ -25,6 +45,8 @@ class QuestionHistoryEvent(TypedDict):
     miss_reason: str
     domain: str
     topics: list[str]
+    objective_code: str
+    source_label: str
     mode: str
     trap_words: list[str]
     selected: list[str]
@@ -35,9 +57,21 @@ class QuestionHistoryEvent(TypedDict):
     recall_failure: str
     deciding_clue: str
     response_seconds: float
+    raw_response_seconds: float
+    effective_response_seconds: float
+    response_time_contaminated: bool
     was_due: bool
     was_active_weak: bool
     session_tag: str
+    smart_primary_role: str
+    smart_selection_reasons: list[str]
+    smart_utility: float
+    repair_stage: str
+    repair_concept_key: str
+    prediction_id: str
+    predicted_recall_probability: float
+    predicted_success_probability: float
+    predicted_learning_gain: float
 
 
 class SessionAnswerEvent(TypedDict):
@@ -51,7 +85,16 @@ class SessionAnswerEvent(TypedDict):
     was_active_weak: bool
     was_due: bool
     response_seconds: float
+    raw_response_seconds: float
+    effective_response_seconds: float
+    response_time_contaminated: bool
     session_tag: str
+    smart_primary_role: str
+    smart_selection_reasons: list[str]
+    smart_utility: float
+    repair_stage: str
+    repair_concept_key: str
+    prediction_id: str
 
 
 class QuestProgressState(TypedDict):
@@ -113,6 +156,26 @@ class QuestionRuntimeState(BankQuestion, total=False):
     last_miss_reason: str
     recall_ready: bool
     session_tag: str
+    smart_primary_role: str
+    smart_selection_reasons: list[str]
+    smart_utility: float
+    smart_utility_breakdown: dict[str, float]
+    smart_policy_version: str
+    smart_policy_id: str
+    smart_concept_key: str
+    smart_root_cause: str
+    smart_root_cause_confidence: float
+    smart_supporting_concepts: list[str]
+    smart_graph_version: str
+    smart_information_value: float
+    smart_information_breakdown: dict[str, Any]
+    smart_question_quality_status: str
+    smart_question_quality_confidence: float
+    smart_graph_bottleneck: float
+    repair_stage: str
+    repair_concept_key: str
+    prediction_id: str
+    prediction_snapshot: dict[str, Any]
 
 
 RuntimeQuestionMapping = MutableMapping[str, Any]
@@ -135,6 +198,26 @@ def answer_state_from_question(question: Mapping[str, Any]) -> AnswerState:
         "last_miss_reason": str(runtime.get("last_miss_reason", "") or ""),
         "recall_ready": bool(runtime.get("recall_ready")),
         "session_tag": str(runtime.get("session_tag", "") or ""),
+        "smart_primary_role": str(runtime.get("smart_primary_role", "") or ""),
+        "smart_selection_reasons": [str(value) for value in runtime.get("smart_selection_reasons", [])],
+        "smart_utility": float(runtime.get("smart_utility", 0.0) or 0.0),
+        "smart_utility_breakdown": dict(runtime.get("smart_utility_breakdown") or {}),
+        "smart_policy_version": str(runtime.get("smart_policy_version", "") or ""),
+        "smart_policy_id": str(runtime.get("smart_policy_id", "") or ""),
+        "smart_concept_key": str(runtime.get("smart_concept_key", "") or ""),
+        "smart_root_cause": str(runtime.get("smart_root_cause", "") or ""),
+        "smart_root_cause_confidence": float(runtime.get("smart_root_cause_confidence", 0.0) or 0.0),
+        "smart_supporting_concepts": [str(value) for value in runtime.get("smart_supporting_concepts", [])],
+        "smart_graph_version": str(runtime.get("smart_graph_version", "") or ""),
+        "smart_information_value": float(runtime.get("smart_information_value", 0.0) or 0.0),
+        "smart_information_breakdown": dict(runtime.get("smart_information_breakdown") or {}),
+        "smart_question_quality_status": str(runtime.get("smart_question_quality_status", "") or ""),
+        "smart_question_quality_confidence": float(runtime.get("smart_question_quality_confidence", 0.0) or 0.0),
+        "smart_graph_bottleneck": float(runtime.get("smart_graph_bottleneck", 0.0) or 0.0),
+        "repair_stage": str(runtime.get("repair_stage", "") or ""),
+        "repair_concept_key": str(runtime.get("repair_concept_key", "") or ""),
+        "prediction_id": str(runtime.get("prediction_id", "") or ""),
+        "prediction_snapshot": dict(runtime.get("prediction_snapshot") or {}),
     }
 
 
@@ -151,6 +234,26 @@ def apply_answer_state(question: RuntimeQuestionMapping, state: Mapping[str, Any
     runtime["last_miss_reason"] = str(answer_state.get("last_miss_reason", "") or "")
     runtime["recall_ready"] = bool(answer_state.get("recall_ready"))
     runtime["session_tag"] = str(answer_state.get("session_tag", "") or "")
+    runtime["smart_primary_role"] = str(answer_state.get("smart_primary_role", "") or "")
+    runtime["smart_selection_reasons"] = [str(value) for value in answer_state.get("smart_selection_reasons", [])]
+    runtime["smart_utility"] = float(answer_state.get("smart_utility", 0.0) or 0.0)
+    runtime["smart_utility_breakdown"] = dict(answer_state.get("smart_utility_breakdown") or {})
+    runtime["smart_policy_version"] = str(answer_state.get("smart_policy_version", "") or "")
+    runtime["smart_policy_id"] = str(answer_state.get("smart_policy_id", "") or "")
+    runtime["smart_concept_key"] = str(answer_state.get("smart_concept_key", "") or "")
+    runtime["smart_root_cause"] = str(answer_state.get("smart_root_cause", "") or "")
+    runtime["smart_root_cause_confidence"] = float(answer_state.get("smart_root_cause_confidence", 0.0) or 0.0)
+    runtime["smart_supporting_concepts"] = [str(value) for value in answer_state.get("smart_supporting_concepts", [])]
+    runtime["smart_graph_version"] = str(answer_state.get("smart_graph_version", "") or "")
+    runtime["smart_information_value"] = float(answer_state.get("smart_information_value", 0.0) or 0.0)
+    runtime["smart_information_breakdown"] = dict(answer_state.get("smart_information_breakdown") or {})
+    runtime["smart_question_quality_status"] = str(answer_state.get("smart_question_quality_status", "") or "")
+    runtime["smart_question_quality_confidence"] = float(answer_state.get("smart_question_quality_confidence", 0.0) or 0.0)
+    runtime["smart_graph_bottleneck"] = float(answer_state.get("smart_graph_bottleneck", 0.0) or 0.0)
+    runtime["repair_stage"] = str(answer_state.get("repair_stage", "") or "")
+    runtime["repair_concept_key"] = str(answer_state.get("repair_concept_key", "") or "")
+    runtime["prediction_id"] = str(answer_state.get("prediction_id", "") or "")
+    runtime["prediction_snapshot"] = dict(answer_state.get("prediction_snapshot") or {})
     return runtime
 
 
@@ -165,6 +268,26 @@ def reset_runtime_question_state(question: RuntimeQuestionMapping) -> QuestionRu
     runtime["last_miss_reason"] = str(runtime.get("last_miss_reason", "") or "")
     runtime["recall_ready"] = bool(runtime.get("recall_ready", False))
     runtime["session_tag"] = str(runtime.get("session_tag", "") or "")
+    runtime["smart_primary_role"] = str(runtime.get("smart_primary_role", "") or "")
+    runtime["smart_selection_reasons"] = [str(value) for value in runtime.get("smart_selection_reasons", [])]
+    runtime["smart_utility"] = float(runtime.get("smart_utility", 0.0) or 0.0)
+    runtime["smart_utility_breakdown"] = dict(runtime.get("smart_utility_breakdown") or {})
+    runtime["smart_policy_version"] = str(runtime.get("smart_policy_version", "") or "")
+    runtime["smart_policy_id"] = str(runtime.get("smart_policy_id", "") or "")
+    runtime["smart_concept_key"] = str(runtime.get("smart_concept_key", "") or "")
+    runtime["smart_root_cause"] = str(runtime.get("smart_root_cause", "") or "")
+    runtime["smart_root_cause_confidence"] = float(runtime.get("smart_root_cause_confidence", 0.0) or 0.0)
+    runtime["smart_supporting_concepts"] = [str(value) for value in runtime.get("smart_supporting_concepts", [])]
+    runtime["smart_graph_version"] = str(runtime.get("smart_graph_version", "") or "")
+    runtime["smart_information_value"] = float(runtime.get("smart_information_value", 0.0) or 0.0)
+    runtime["smart_information_breakdown"] = dict(runtime.get("smart_information_breakdown") or {})
+    runtime["smart_question_quality_status"] = str(runtime.get("smart_question_quality_status", "") or "")
+    runtime["smart_question_quality_confidence"] = float(runtime.get("smart_question_quality_confidence", 0.0) or 0.0)
+    runtime["smart_graph_bottleneck"] = float(runtime.get("smart_graph_bottleneck", 0.0) or 0.0)
+    runtime["repair_stage"] = str(runtime.get("repair_stage", "") or "")
+    runtime["repair_concept_key"] = str(runtime.get("repair_concept_key", "") or "")
+    runtime["prediction_id"] = str(runtime.get("prediction_id", "") or "")
+    runtime["prediction_snapshot"] = dict(runtime.get("prediction_snapshot") or {})
     return runtime
 
 

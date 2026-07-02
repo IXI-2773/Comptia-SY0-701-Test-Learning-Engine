@@ -65,6 +65,17 @@ from analytics_models import (
     WrongAnswerFamilyRow,
     WrongAnswerMemoryRow,
 )
+from smart_practice_measurement import build_measurement_report, normalize_measurement_store
+from smart_practice_policy import (
+    activate_candidate_policy as activate_policy_governance,
+    build_policy_review_report as build_policy_governance_review_report,
+    create_candidate_policy,
+    create_shadow_decision,
+    detect_drift,
+    evaluate_challenger,
+    normalize_governance,
+    rollback_policy as rollback_policy_governance,
+)
 from analytics_summary import AnalyticsSummaryCard, build_analytics_summary
 from app_constants import MODE_EXAM
 from config_store import DEFAULT_CONFIG
@@ -91,6 +102,114 @@ TEXT = '#1f1f1f'
 
 class AnalyticsMixin:
     STEM_STYLE_LADDER = ('Definition', 'Scenario', 'Troubleshooting', 'Best fit', 'Order', 'Exception', 'General')
+
+    def policy_governance(self):
+        meta = self.progress_data.setdefault("meta", {})
+        governance = normalize_governance(meta.get("smart_practice_policy_governance"))
+        meta["smart_practice_policy_governance"] = governance
+        return governance
+
+    def _save_policy_governance(self, governance, *, invalidate=True):
+        self.progress_data.setdefault("meta", {})["smart_practice_policy_governance"] = governance
+        if invalidate:
+            self.invalidate_learning_state(prewarm=True, prewarm_delay_ms=250)
+        self.schedule_progress_save()
+
+    def create_smart_practice_candidate_policy(self, recommendations, *, created_at=None, actor="user"):
+        candidate, governance, rejected = create_candidate_policy(
+            self.policy_governance(),
+            recommendations,
+            created_at=created_at,
+            actor=actor,
+        )
+        self._save_policy_governance(governance, invalidate=False)
+        return candidate, rejected
+
+    def record_smart_practice_shadow_decision(
+        self,
+        champion_questions,
+        challenger_questions,
+        *,
+        challenger_policy_id,
+        created_at,
+        learner_state_signature,
+        candidate_snapshot_signature,
+    ):
+        decision, governance = create_shadow_decision(
+            self.policy_governance(),
+            champion_questions,
+            challenger_questions,
+            challenger_policy_id=challenger_policy_id,
+            created_at=created_at,
+            learner_state_signature=learner_state_signature,
+            candidate_snapshot_signature=candidate_snapshot_signature,
+        )
+        self._save_policy_governance(governance, invalidate=False)
+        return decision
+
+    def evaluate_smart_practice_challenger(self, candidate_policy_id, outcome_support, *, evaluated_at):
+        evaluation, governance = evaluate_challenger(
+            self.policy_governance(),
+            candidate_policy_id,
+            outcome_support,
+            evaluated_at=evaluated_at,
+        )
+        self._save_policy_governance(governance, invalidate=False)
+        return evaluation
+
+    def activate_smart_practice_policy(self, candidate_policy_id, *, expected_active_policy_id, approval_reference, activated_at=None):
+        ok, governance, reason = activate_policy_governance(
+            self.policy_governance(),
+            candidate_policy_id,
+            expected_active_policy_id=expected_active_policy_id,
+            approval_reference=approval_reference,
+            activated_at=activated_at,
+        )
+        self._save_policy_governance(governance, invalidate=ok)
+        return ok, reason
+
+    def rollback_smart_practice_policy(self, target_policy_id, *, expected_active_policy_id, reason, rolled_back_at=None):
+        ok, governance, failure = rollback_policy_governance(
+            self.policy_governance(),
+            target_policy_id,
+            expected_active_policy_id=expected_active_policy_id,
+            reason=reason,
+            rolled_back_at=rolled_back_at,
+        )
+        self._save_policy_governance(governance, invalidate=ok)
+        return ok, failure
+
+    def detect_smart_practice_policy_drift(self, baseline, recent, *, sample_count, detected_at):
+        return detect_drift(baseline, recent, sample_count=sample_count, detected_at=detected_at)
+
+    def smart_practice_policy_review_report(self, candidate_policy_id, *, generated_at):
+        return build_policy_governance_review_report(
+            self.policy_governance(),
+            candidate_policy_id,
+            generated_at=generated_at,
+        )
+
+    def generate_smart_practice_measurement_report(self, evaluation_at=None):
+        meta = self.progress_data.setdefault("meta", {})
+        store = normalize_measurement_store(meta.get("smart_practice_measurement"))
+        store["repair_state"] = dict(meta.get("repair_state") or {})
+        store["concept_graph"] = dict(meta.get("smart_practice_concept_graph") or {})
+        store["question_calibration"] = dict(meta.get("smart_practice_question_calibration") or {})
+        report, store = build_measurement_report(
+            store,
+            self._progress_history(),
+            evaluation_at=evaluation_at,
+            requested_count=len(getattr(self, "questions", []) or []),
+        )
+        meta["smart_practice_measurement"] = store
+        self.schedule_progress_save()
+        return report
+
+    def _effective_response_seconds(self, event: dict[str, Any]) -> float:
+        try:
+            return float(event.get("effective_response_seconds", event.get("response_seconds", 0.0)) or 0.0)
+        except (TypeError, ValueError):
+            return 0.0
 
     def _confidence_weight(self, confidence):
         return {
@@ -165,11 +284,20 @@ class AnalyticsMixin:
         text = re.sub(r'[^a-z0-9]+', ' ', text)
         return re.sub(r'\s+', ' ', text).strip()
 
+    def _normalized_study_label(self, value: str) -> str:
+        text = ' '.join(str(value or '').replace('&', 'and').replace(',', ' ').split()).casefold()
+        aliases = {
+            'security program management and oversight': 'security program management and oversight',
+            'threats vulnerabilities and mitigations': 'threats vulnerabilities and mitigations',
+            'threats vulnerability and mitigations': 'threats vulnerabilities and mitigations',
+        }
+        return aliases.get(text, text)
+
     def _primary_topic_label(self, q) -> str:
         topics = [str(topic).strip() for topic in q.get('topics', []) if str(topic).strip()]
         if topics:
-            return topics[0]
-        return str(q.get('domain') or 'Unsorted')
+            return self._normalized_study_label(topics[0])
+        return self._normalized_study_label(str(q.get('domain') or 'Unsorted'))
 
     def _coverage_unit_for_question(self, q) -> tuple[str, str]:
         objective_code = str(q.get('objective_code') or '').strip()
@@ -178,7 +306,7 @@ class AnalyticsMixin:
         primary_topic = self._primary_topic_label(q)
         if primary_topic and primary_topic != 'Unsorted':
             return 'Topic', primary_topic
-        return 'Domain', str(q.get('domain') or 'Unsorted')
+        return 'Domain', self._normalized_study_label(str(q.get('domain') or 'Unsorted'))
 
     def _canonical_concept_id(self, q_or_kind, unit: str | None = None) -> str:
         if isinstance(q_or_kind, dict):
@@ -1097,7 +1225,7 @@ class AnalyticsMixin:
             return (sum(1 for event in group if event.get('correct')) / max(len(group), 1)) * 100.0
 
         def response(group):
-            values = [float(event.get('response_seconds') or 0.0) for event in group if float(event.get('response_seconds') or 0.0) > 0]
+            values = [self._effective_response_seconds(event) for event in group if self._effective_response_seconds(event) > 0]
             return (sum(values) / len(values)) if values else 0.0
 
         def fragile(group):
@@ -1552,7 +1680,7 @@ class AnalyticsMixin:
             else:
                 earned = 0.25 if confidence == 'Sure' else 0.18 if confidence == 'Unsure' else 0.1
             bucket['earned_total'] += earned
-            response_seconds = float(event.get('response_seconds') or 0.0)
+            response_seconds = self._effective_response_seconds(event)
             if response_seconds > 0:
                 bucket['time_total'] += response_seconds
                 bucket['time_seen'] += 1
@@ -1838,7 +1966,7 @@ class AnalyticsMixin:
                 continue
             kind, unit = self._coverage_unit_for_question(q)
             key = f'{kind}::{unit}'
-            response_seconds = float(event.get('response_seconds') or 0.0)
+            response_seconds = self._effective_response_seconds(event)
             if response_seconds <= 0:
                 continue
             bucket = grouped.setdefault(
@@ -1882,7 +2010,7 @@ class AnalyticsMixin:
             q = question_lookup.get(int(event.get('question_number') or 0))
             if not q:
                 continue
-            response_seconds = float(event.get('response_seconds') or 0.0)
+            response_seconds = self._effective_response_seconds(event)
             if response_seconds <= 0:
                 continue
             kind, unit = self._coverage_unit_for_question(q)
@@ -3378,7 +3506,7 @@ class AnalyticsMixin:
             for event in history:
                 if event.get('correct'):
                     continue
-                if float(event.get('response_seconds') or 0.0) > 0 and float(event.get('response_seconds') or 0.0) <= 7.0:
+                if self._effective_response_seconds(event) > 0 and self._effective_response_seconds(event) <= 7.0:
                     fast_wrong_count += 1
                 for trap_word in event.get('trap_words') or []:
                     trap_word_counts[trap_word] = trap_word_counts.get(trap_word, 0) + 1

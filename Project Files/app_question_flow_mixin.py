@@ -14,8 +14,9 @@ from app_constants import (
     QUESTION_TAG_TWIN,
     QUESTION_TAG_WRONG_ANSWER_MEMORY,
 )
-from progress_store import is_active_weak, is_review_due, is_suspended
+from progress_store import is_active_weak, is_review_due, is_suspended, sanitize_response_time
 from session_models import QuestionRuntimeState, SessionAnswerEvent, clear_runtime_answer_state
+from smart_practice_concept_graph import concept_key_for_question
 
 
 class QuestionFlowMixin:
@@ -787,6 +788,122 @@ class QuestionFlowMixin:
             self.rescue_domains_triggered.add(domain)
         return inserted
 
+    def repair_concept_key_for_question(self, q: QuestionRuntimeState) -> str:
+        kind, unit = self._coverage_unit_for_question(q)
+        return f"{kind}::{unit}"
+
+    def progress_repair_state(self) -> dict[str, Any]:
+        meta = self.progress_data.setdefault("meta", {})
+        state = meta.setdefault("repair_state", {})
+        return state if isinstance(state, dict) else {}
+
+    def plan_misconception_repair(self, q: QuestionRuntimeState, is_correct: bool) -> list[QuestionRuntimeState]:
+        if self.active_session_mode == MODE_EXAM:
+            return []
+        concept_key = self.repair_concept_key_for_question(q)
+        state = self.progress_repair_state()
+        row = dict(state.get(concept_key) or {})
+        row["concept_key"] = concept_key
+        row["last_question_number"] = int(q.get("question_number") or 0)
+        row["last_seen"] = time.strftime("%Y-%m-%d")
+        root_cause = str(q.get("smart_root_cause") or "")
+        supporting = [str(value) for value in q.get("smart_supporting_concepts", [])]
+        if not is_correct and root_cause == "missing_prerequisite" and supporting:
+            candidates = [
+                candidate
+                for candidate in self.master_questions
+                if concept_key_for_question(candidate)[0] in set(supporting)
+                and int(candidate.get("question_number") or 0) != int(q.get("question_number") or 0)
+            ]
+            inserted = self._insert_delayed_followup_questions(q, candidates, "Prerequisite repair", delay_slots=1)
+            if inserted:
+                for item in inserted:
+                    item["repair_stage"] = "contrast"
+                    item["repair_concept_key"] = supporting[0]
+                row["stage"] = "contrast"
+                row["status"] = "unresolved"
+                row["scheduled_tag"] = "Prerequisite repair"
+                state[concept_key] = row
+                return inserted
+        if not is_correct and root_cause == "transfer_failure":
+            candidates = [
+                candidate
+                for candidate in self.find_question_twins(q, limit=3)
+                if int(candidate.get("question_number") or 0) != int(q.get("question_number") or 0)
+            ]
+            inserted = self._insert_delayed_followup_questions(q, candidates, "Transfer repair", delay_slots=2)
+            if inserted:
+                for item in inserted:
+                    item["repair_stage"] = "transfer"
+                    item["repair_concept_key"] = concept_key
+                row["stage"] = "transfer"
+                row["status"] = "provisional"
+                row["scheduled_tag"] = "Transfer repair"
+                state[concept_key] = row
+                return inserted
+        if is_correct:
+            current_stage = str(q.get("repair_stage") or row.get("stage") or "")
+            if current_stage == "spaced_retrieval":
+                row["status"] = "resolved"
+                row["stage"] = "spaced_retrieval"
+                row["resolved_at_question"] = int(q.get("question_number") or 0)
+            elif str(row.get("status") or "") in {"unresolved", "blocked", ""}:
+                row["status"] = "provisional"
+                row["stage"] = "transfer"
+                tag, candidates = self.find_memory_ramp_candidates(q, limit=1)
+                if not candidates:
+                    candidates = self.find_question_twins(q, limit=1)
+                    tag = QUESTION_TAG_TRANSFER_CHECK
+                inserted = self._insert_delayed_followup_questions(q, candidates, tag or QUESTION_TAG_TRANSFER_CHECK, delay_slots=3)
+                if inserted:
+                    for item in inserted:
+                        item["repair_stage"] = "transfer"
+                        item["repair_concept_key"] = concept_key
+                    row["scheduled_transfer_qnums"] = [int(item.get("question_number") or 0) for item in inserted]
+                else:
+                    row["blocked_reason"] = "no_distinct_transfer_candidate"
+                    row["stage"] = "spaced_retrieval"
+                state[concept_key] = row
+                q["repair_stage"] = str(row.get("stage") or "")
+                q["repair_concept_key"] = concept_key
+                return inserted
+            elif current_stage == "transfer":
+                row["status"] = "provisional"
+                row["stage"] = "spaced_retrieval"
+                row["spaced_retrieval_due"] = True
+            state[concept_key] = row
+            q["repair_stage"] = str(row.get("stage") or "")
+            q["repair_concept_key"] = concept_key
+            return []
+
+        row["stage"] = "contrast"
+        row["status"] = "unresolved"
+        row["attempts"] = int(row.get("attempts") or 0) + 1
+        q["repair_stage"] = "contrast"
+        q["repair_concept_key"] = concept_key
+        repair_options = (
+            (QUESTION_TAG_CONFUSION_PAIR, self.find_confusion_pair_candidates(q, limit=1), 2),
+            (QUESTION_TAG_WRONG_ANSWER_MEMORY, self.find_wrong_answer_memory_candidates(q, limit=1), 3),
+            (QUESTION_TAG_TWIN, self.find_question_twins(q, limit=1), 3),
+        )
+        for tag, candidates, delay in repair_options:
+            inserted = self._insert_delayed_followup_questions(q, candidates, tag, delay_slots=delay)
+            if inserted:
+                for item in inserted:
+                    item["repair_stage"] = "contrast"
+                    item["repair_concept_key"] = concept_key
+                row["stage"] = "contrast"
+                row["scheduled_tag"] = tag
+                row["scheduled_question_numbers"] = [int(item.get("question_number") or 0) for item in inserted]
+                state[concept_key] = row
+                return inserted
+        row["status"] = "blocked"
+        row["stage"] = "spaced_retrieval"
+        row["spaced_retrieval_due"] = True
+        row["blocked_reason"] = "no_distinct_followup_candidate"
+        state[concept_key] = row
+        return []
+
     def _record_answer(
         self,
         q: QuestionRuntimeState,
@@ -802,6 +919,11 @@ class QuestionFlowMixin:
             self, "active_question_started_at", None
         ):
             response_seconds = round(max(0.2, time.time() - self.active_question_started_at), 1)
+        recent_times = [
+            float(event.get("effective_response_seconds", event.get("response_seconds", 0.0)) or 0.0)
+            for event in self.session_answer_history[-12:]
+        ]
+        timing = sanitize_response_time(response_seconds, recent_effective_seconds=recent_times)
         q["selected"] = list(selected)
         q["answered"] = True
         q["recall_ready"] = False
@@ -809,17 +931,18 @@ class QuestionFlowMixin:
             feedback = dict(feedback_override)
         else:
             feedback = self._collect_answer_feedback(q, self._question_correct(q))
-        feedback["response_seconds"] = response_seconds
+        feedback.update(timing)
+        feedback["response_seconds"] = timing["effective_response_seconds"]
         feedback["was_due"] = was_due
         feedback["was_active_weak"] = was_active_weak
         q["last_confidence"] = feedback.get("confidence", "")
         q["last_miss_reason"] = feedback.get("miss_reason", "")
-        self.update_progress_for_answer(q, feedback=feedback)
         is_correct = self._question_correct(q)
         recall_failure = self.classify_recall_failure(q, is_correct, feedback)
         deciding_clue = self.deciding_clue_for_question(q)
         feedback["recall_failure"] = recall_failure
         feedback["deciding_clue"] = deciding_clue
+        self.update_progress_for_answer(q, feedback=feedback)
         event: SessionAnswerEvent = {
             "question_number": int(q.get("question_number") or 0),
             "domain": q.get("domain") or "",
@@ -830,8 +953,29 @@ class QuestionFlowMixin:
             "deciding_clue": deciding_clue,
             "was_active_weak": bool(was_active_weak),
             "was_due": bool(was_due),
-            "response_seconds": float(response_seconds),
+            "response_seconds": float(timing["effective_response_seconds"]),
+            "raw_response_seconds": float(timing["raw_response_seconds"]),
+            "effective_response_seconds": float(timing["effective_response_seconds"]),
+            "response_time_contaminated": bool(timing["response_time_contaminated"]),
             "session_tag": q.get("session_tag", ""),
+            "smart_primary_role": str(q.get("smart_primary_role") or ""),
+            "smart_selection_reasons": list(q.get("smart_selection_reasons") or []),
+            "smart_utility": float(q.get("smart_utility", 0.0) or 0.0),
+            "repair_stage": str(q.get("repair_stage") or ""),
+            "repair_concept_key": str(q.get("repair_concept_key") or ""),
+            "prediction_id": str(q.get("prediction_id") or ""),
+            "smart_policy_id": str(q.get("smart_policy_id") or ""),
+            "smart_policy_version": str(q.get("smart_policy_version") or ""),
+            "smart_concept_key": str(q.get("smart_concept_key") or ""),
+            "smart_root_cause": str(q.get("smart_root_cause") or ""),
+            "smart_root_cause_confidence": float(q.get("smart_root_cause_confidence", 0.0) or 0.0),
+            "smart_supporting_concepts": [str(value) for value in q.get("smart_supporting_concepts", [])],
+            "smart_graph_version": str(q.get("smart_graph_version") or ""),
+            "smart_information_value": float(q.get("smart_information_value", 0.0) or 0.0),
+            "smart_information_breakdown": dict(q.get("smart_information_breakdown") or {}),
+            "smart_question_quality_status": str(q.get("smart_question_quality_status") or ""),
+            "smart_question_quality_confidence": float(q.get("smart_question_quality_confidence", 0.0) or 0.0),
+            "smart_graph_bottleneck": float(q.get("smart_graph_bottleneck", 0.0) or 0.0),
         }
         self.session_answer_history.append(event)
         self.active_question_started_qnum = None
@@ -839,17 +983,15 @@ class QuestionFlowMixin:
         xp_gained = self._apply_xp_for_answer(q, is_correct, feedback, was_active_weak=was_active_weak, was_due=was_due)
         q["last_xp_gained"] = int(xp_gained)
         if not is_correct:
-            inserted = self.maybe_queue_confusion_pair_drill(q)
-            if not inserted:
-                inserted = self.maybe_queue_wrong_answer_memory(q)
-            if not inserted:
-                self.maybe_queue_question_twins(q)
-            self.maybe_trigger_streak_rescue(q)
+            self.plan_misconception_repair(q, is_correct=False)
         else:
+            repair_inserted = self.plan_misconception_repair(q, is_correct=True)
             self.maybe_trigger_stealth_checkpoint(q)
-            inserted = self.maybe_queue_memory_ramp(q)
-            if not inserted:
-                self.maybe_queue_delayed_recall_probe(q)
+            if not repair_inserted:
+                inserted = self.maybe_queue_memory_ramp(q)
+                if not inserted:
+                    self.maybe_queue_delayed_recall_probe(q)
+        self.schedule_progress_save()
         self.maybe_trigger_boss_round(q)
         self.refresh_session_quests()
         self._unlock_quest_rewards()

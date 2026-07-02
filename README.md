@@ -74,6 +74,16 @@ Related bank files in the repo:
   - duplicate suppression
   - issue reporting and exclusion from scoring
 
+**Why Smart Practice Is The Core**
+
+`Smart Practice` is the strongest part of the engine. It is built to feel like a focused tutor running quietly in the background, not just a random question picker.
+
+It now weighs learner memory, missed concepts, prerequisite gaps, source trust, question quality, transfer weakness, repeated confusion, and delayed-review timing before shaping a set. The goal is simple: spend fewer questions on noise and more questions on the exact concepts most likely to improve retention, recovery, and exam readiness.
+
+Smart Practice also keeps the study session controlled. A `25` question set stays a `25` question set, adaptive follow-ups compete for space inside the limit, and protected roles keep the set balanced between weak repair, due retention, coverage, transfer checks, and controlled stretch.
+
+Behind the scenes, the engine keeps improving its decisions with policy governance, concept-graph diagnosis, question information value, quality scoring, and later-outcome measurement. In plain English: it tries to learn why you missed something, pick the next best question, and avoid drilling bad or low-value items too hard.
+
 **How The App Works**
 
 At startup the app loads the default merged bank, restores saved configuration, and waits in a blank ready state until you start a set.
