@@ -43,6 +43,15 @@ class SmartPracticeScoringProfile:
     concept_state_weight: float = 0.1
     concept_memory_weight: float = 0.16
     wrong_answer_memory_weight: float = 0.14
+    wrong_answer_recycle_weight: float = 0.18
+    wrong_answer_recycle_example_penalty: float = 9.0
+    wrong_answer_recycle_focus_min: float = 20.0
+    near_miss_focus_min: float = 20.0
+    near_miss_weight: float = 0.16
+    intent_coverage_weight: float = 0.12
+    intent_repair_weight: float = 0.16
+    intent_retention_weight: float = 0.14
+    intent_readiness_weight: float = 0.08
     durable_memory_penalty: float = 4.0
     generalization_baseline: float = 72.0
     generalization_weight: float = 0.12

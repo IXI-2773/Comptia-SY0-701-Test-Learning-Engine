@@ -33,6 +33,129 @@ class SessionBuilderMixin:
         )
         return self._analytics_signature(), session_answer_key
 
+    def _build_near_miss_pressure_maps(self, history, questions):
+        question_lookup = {int(q.get("question_number") or 0): q for q in questions}
+        unit_pressure: dict[str, float] = {}
+        label_pressure: dict[str, float] = {}
+        near_miss_families = {"Near-synonym / look-alike distractor", "Plausible distractor"}
+        for event in history:
+            if event.get("correct"):
+                continue
+            family = str(event.get("wrong_answer_family") or "")
+            recall_failure = str(event.get("recall_failure") or "")
+            confidence = str(event.get("confidence") or "")
+            is_near_miss = (
+                family in near_miss_families
+                or recall_failure == "Concept interference"
+                or confidence in {"Sure", "Unsure"}
+            )
+            if not is_near_miss:
+                continue
+            question = question_lookup.get(int(event.get("question_number") or 0))
+            if not question:
+                continue
+            kind, unit = self._coverage_unit_for_question(question)
+            unit_key = f"{kind}::{unit}"
+            unit_pressure[unit_key] = min(100.0, unit_pressure.get(unit_key, 0.0) + 18.0)
+            labels = [
+                self._choice_concept_label(str(text)) or str(text).strip()[:48]
+                for text in list(event.get("selected_texts") or []) + list(event.get("correct_texts") or [])
+                if str(text).strip()
+            ]
+            for label in labels:
+                if label:
+                    label_pressure[label] = min(100.0, label_pressure.get(label, 0.0) + 14.0)
+        question_pressure = {}
+        for question in questions:
+            qnum = int(question.get("question_number") or 0)
+            kind, unit = self._coverage_unit_for_question(question)
+            pressure = unit_pressure.get(f"{kind}::{unit}", 0.0)
+            for label, label_score in label_pressure.items():
+                if self._question_mentions_label(question, label):
+                    pressure = max(pressure, label_score)
+            if pressure:
+                question_pressure[qnum] = pressure
+        return unit_pressure, question_pressure
+
+    def _build_wrong_answer_recycling_map(self, memory_rows, questions):
+        question_pressure = {}
+        for question in questions:
+            qnum = int(question.get("question_number") or 0)
+            pressure = 0.0
+            for row in memory_rows[:12]:
+                tempting = str(row.get("tempting_distractor") or "")
+                correct = str(row.get("correct_concept") or "")
+                row_pressure = float(row.get("pressure", 0.0))
+                if qnum in set(row.get("example_question_numbers") or []):
+                    continue
+                mentions_tempting = tempting and self._question_mentions_label(question, tempting)
+                mentions_correct = correct and self._question_mentions_label(question, correct)
+                if mentions_tempting and mentions_correct:
+                    pressure = max(pressure, row_pressure + 14.0)
+                elif mentions_tempting:
+                    pressure = max(pressure, row_pressure + 6.0)
+                elif mentions_correct:
+                    pressure = max(pressure, row_pressure * 0.55)
+            if pressure:
+                question_pressure[qnum] = min(100.0, pressure)
+        return question_pressure
+
+    def _infer_smart_practice_intent(
+        self,
+        *,
+        records,
+        signal_questions,
+        gap_map,
+        wrong_answer_memory_pressure_map,
+        near_miss_unit_map,
+        retention_stress_map,
+        momentum_profile,
+    ):
+        attempted = 0
+        unseen = 0
+        active_weak = 0
+        due = 0
+        for question in signal_questions:
+            rec = records.get(self._question_key(question), {})
+            if int(rec.get("attempts", 0)) > 0:
+                attempted += 1
+            else:
+                unseen += 1
+            if is_active_weak(rec):
+                active_weak += 1
+            if is_review_due(rec):
+                due += 1
+        total = max(1, len(signal_questions))
+        coverage_signal = (unseen / total) * 100.0 + (max(gap_map.values()) if gap_map else 0.0) * 0.35
+        repair_signal = (
+            active_weak * 8.0
+            + (max(wrong_answer_memory_pressure_map.values()) if wrong_answer_memory_pressure_map else 0.0)
+            + (max(near_miss_unit_map.values()) if near_miss_unit_map else 0.0) * 0.6
+        )
+        retention_signal = due * 10.0 + (
+            max(float(row.get("pressure", 0.0)) for row in retention_stress_map.values())
+            if retention_stress_map
+            else 0.0
+        )
+        readiness_signal = attempted / total * 70.0
+        if momentum_profile.get("label") == "Press":
+            readiness_signal += 18.0
+        if repair_signal >= 45.0 or repair_signal >= max(coverage_signal, retention_signal, readiness_signal):
+            label = "Repair weak spots"
+        elif retention_signal >= max(coverage_signal, readiness_signal):
+            label = "Retain old material"
+        elif readiness_signal >= coverage_signal and attempted / total >= 0.55:
+            label = "Exam readiness"
+        else:
+            label = "Build coverage"
+        return {
+            "label": label,
+            "coverage_signal": round(coverage_signal, 1),
+            "repair_signal": round(repair_signal, 1),
+            "retention_signal": round(retention_signal, 1),
+            "readiness_signal": round(readiness_signal, 1),
+        }
+
     def _build_smart_practice_signal_payload(self):
         records = self._progress_questions()
         signal_questions = [
@@ -71,9 +194,21 @@ class SessionBuilderMixin:
         _concept_memory_rows, concept_memory_map = self._build_concept_memory_state_rows(
             question_history_map, signal_questions
         )
-        _wrong_answer_memory_rows, wrong_answer_memory_pressure_map = self._build_wrong_answer_memory_rows(
+        wrong_answer_memory_rows, wrong_answer_memory_pressure_map = self._build_wrong_answer_memory_rows(
             recent_history, signal_questions
         )
+        near_miss_unit_map, near_miss_question_map = self._build_near_miss_pressure_maps(
+            recent_history, signal_questions
+        )
+        wrong_answer_recycling_map = self._build_wrong_answer_recycling_map(
+            wrong_answer_memory_rows, signal_questions
+        )
+        wrong_answer_memory_example_qnums = {
+            int(qnum)
+            for row in wrong_answer_memory_rows
+            for qnum in row.get("example_question_numbers", [])
+            if int(qnum or 0)
+        }
         _recognition_retrieval_rows, recognition_retrieval_map = self._build_recognition_retrieval_rows(
             question_history_map, signal_questions
         )
@@ -189,6 +324,15 @@ class SessionBuilderMixin:
             recent_concept_cooldown_map[unit_key] = recent_concept_cooldown_map.get(unit_key, 0) + 1
         burnout_risk = self._build_burnout_risk_row(self.session_answer_history or recent_history)
         momentum_profile = self._build_momentum_profile(self.session_answer_history or recent_history, burnout_risk)
+        session_intent = self._infer_smart_practice_intent(
+            records=records,
+            signal_questions=signal_questions,
+            gap_map=gap_map,
+            wrong_answer_memory_pressure_map=wrong_answer_memory_pressure_map,
+            near_miss_unit_map=near_miss_unit_map,
+            retention_stress_map=retention_stress_map,
+            momentum_profile=momentum_profile,
+        )
         return {
             "source_map": source_map,
             "source_trust_map": source_trust_map,
@@ -198,6 +342,10 @@ class SessionBuilderMixin:
             "knowledge_trace_map": knowledge_trace_map,
             "concept_memory_map": concept_memory_map,
             "wrong_answer_memory_pressure_map": wrong_answer_memory_pressure_map,
+            "wrong_answer_recycling_map": wrong_answer_recycling_map,
+            "wrong_answer_memory_example_qnums": wrong_answer_memory_example_qnums,
+            "near_miss_unit_map": near_miss_unit_map,
+            "near_miss_question_map": near_miss_question_map,
             "recognition_retrieval_map": recognition_retrieval_map,
             "confidence_compression_map": confidence_compression_map,
             "abstraction_ladder_map": abstraction_ladder_map,
@@ -231,6 +379,7 @@ class SessionBuilderMixin:
             "recent_concept_cooldown_map": recent_concept_cooldown_map,
             "burnout_risk": burnout_risk,
             "momentum_profile": momentum_profile,
+            "session_intent": session_intent,
         }
 
     def _publish_smart_practice_signal_snapshot(self, snapshot) -> None:
@@ -708,6 +857,10 @@ class SessionBuilderMixin:
         knowledge_trace_map = signal_payload["knowledge_trace_map"]
         concept_memory_map = signal_payload["concept_memory_map"]
         wrong_answer_memory_pressure_map = signal_payload["wrong_answer_memory_pressure_map"]
+        wrong_answer_recycling_map = signal_payload["wrong_answer_recycling_map"]
+        wrong_answer_memory_example_qnums = set(signal_payload.get("wrong_answer_memory_example_qnums", set()))
+        near_miss_unit_map = signal_payload["near_miss_unit_map"]
+        near_miss_question_map = signal_payload["near_miss_question_map"]
         recognition_retrieval_map = signal_payload["recognition_retrieval_map"]
         confidence_compression_map = signal_payload["confidence_compression_map"]
         abstraction_ladder_map = signal_payload["abstraction_ladder_map"]
@@ -741,6 +894,7 @@ class SessionBuilderMixin:
         recent_concept_cooldown_map = signal_payload["recent_concept_cooldown_map"]
         burnout_risk = signal_payload["burnout_risk"]
         momentum_profile = signal_payload["momentum_profile"]
+        session_intent = signal_payload.get("session_intent", {"label": "Build coverage"})
 
         def interference_priority(question: QuestionRuntimeState) -> float:
             score = 0.0
@@ -823,6 +977,11 @@ class SessionBuilderMixin:
                 unit_key, {"state": "new", "next_ramp": "recognition", "durability_signal": 0.0}
             )
             wrong_memory_pressure = float(wrong_answer_memory_pressure_map.get(unit_key, 0.0))
+            wrong_recycle_pressure = float(wrong_answer_recycling_map.get(qnum, 0.0))
+            near_miss_pressure = max(
+                float(near_miss_unit_map.get(unit_key, 0.0)),
+                float(near_miss_question_map.get(qnum, 0.0)),
+            )
             recognition_row = recognition_retrieval_map.get(unit_key, {"gap": 0.0})
             compression_row = confidence_compression_map.get(unit_key, {"compression": 0.0})
             compression_point_row = compression_point_map.get(unit_key, {"gap": 0.0})
@@ -913,6 +1072,10 @@ class SessionBuilderMixin:
             ):
                 score -= profile.durable_memory_penalty
             score += wrong_memory_pressure * profile.wrong_answer_memory_weight
+            score += wrong_recycle_pressure * profile.wrong_answer_recycle_weight
+            if wrong_answer_recycling_map and qnum in wrong_answer_memory_example_qnums:
+                score -= profile.wrong_answer_recycle_example_penalty
+            score += near_miss_pressure * profile.near_miss_weight
             score += float(expected_gain_row.get("expected_gain", 0.0)) * profile.learning_gain_weight
             score += float(compression_row.get("compression", 0.0)) * profile.compression_weight
             score += float(compression_point_row.get("gap", 0.0)) * (profile.compression_weight * 0.5)
@@ -995,6 +1158,30 @@ class SessionBuilderMixin:
                 score += profile.due_bonus
             if int(rec.get("attempts", 0)) <= 0:
                 score += profile.unseen_bonus
+            intent_label = str(session_intent.get("label") or "")
+            if intent_label == "Build coverage":
+                score += gap_score * profile.intent_coverage_weight
+                if int(rec.get("attempts", 0)) <= 0:
+                    score += 4.0
+            elif intent_label == "Repair weak spots":
+                score += (
+                    wrong_memory_pressure
+                    + wrong_recycle_pressure
+                    + near_miss_pressure
+                    + float(latent_row.get("score", 0.0))
+                ) * profile.intent_repair_weight
+                if is_active_weak(rec):
+                    score += 4.0
+            elif intent_label == "Retain old material":
+                score += float(retention_stress_row.get("pressure", 0.0)) * profile.intent_retention_weight
+                if is_review_due(rec):
+                    score += 4.0
+            elif intent_label == "Exam readiness":
+                score += (
+                    max(0.0, profile.generalization_baseline - float(generalization_row.get("score", 72.0)))
+                    + max(0.0, profile.robustness_baseline - float(robustness_row.get("score", 72.0)))
+                    + difficulty_score
+                ) * profile.intent_readiness_weight
             if is_screenshot_import(question):
                 score += profile.screenshot_source_priority_bonus
                 if int(rec.get("attempts", 0)) <= 0:
@@ -1310,6 +1497,25 @@ class SessionBuilderMixin:
             )
             in profile.concept_state_focus_states
         ]
+        wrong_recycle_focus = [
+            q
+            for q in pool
+            if float(wrong_answer_recycling_map.get(int(q.get("question_number") or 0), 0.0))
+            >= profile.wrong_answer_recycle_focus_min
+        ]
+        near_miss_focus = [
+            q
+            for q in pool
+            if max(
+                float(
+                    near_miss_unit_map.get(
+                        str(question_meta.get(int(q.get("question_number") or 0), {}).get("unit_key") or ""), 0.0
+                    )
+                ),
+                float(near_miss_question_map.get(int(q.get("question_number") or 0), 0.0)),
+            )
+            >= profile.near_miss_focus_min
+        ]
         target = len(pool)
         if count != "All visible":
             try:
@@ -1368,6 +1574,8 @@ class SessionBuilderMixin:
                 decision_latency_focus,
                 contrast_rule_focus,
                 concept_state_focus,
+                wrong_recycle_focus,
+                near_miss_focus,
             ]
         ]
         (
@@ -1399,6 +1607,8 @@ class SessionBuilderMixin:
             decision_latency_focus,
             contrast_rule_focus,
             concept_state_focus,
+            wrong_recycle_focus,
+            near_miss_focus,
         ) = groups
         for group in groups:
             if randomize:
@@ -1543,6 +1753,16 @@ class SessionBuilderMixin:
                 if concept_state_focus
                 else 0
             ),
+            "wrong_recycle": (
+                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
+                if wrong_recycle_focus
+                else 0
+            ),
+            "near_miss": (
+                max(1, round(target * profile.advanced_focus_ratio * quota_profile.advanced_scale))
+                if near_miss_focus
+                else 0
+            ),
         }
 
         ordered = []
@@ -1582,9 +1802,11 @@ class SessionBuilderMixin:
 
         if target <= 3:
             take_from(screenshot_focus, quota["screenshot"])
-            take_from(active_weak, quota["active_weak"])
             take_from(boundary_focus, quota["boundary"])
             take_from(counterfactual_focus, quota["counterfactual"])
+            take_from(wrong_recycle_focus, quota["wrong_recycle"])
+            take_from(near_miss_focus, quota["near_miss"])
+            take_from(active_weak, quota["active_weak"])
             take_from(coverage_focus, quota["coverage"])
             take_from(reinforcement_focus, quota["reinforcement"])
             take_from(objective_focus, quota["objective"])
@@ -1621,6 +1843,8 @@ class SessionBuilderMixin:
             take_from(ladder_focus, quota["ladder"])
             take_from(boundary_focus, quota["boundary"])
             take_from(counterfactual_focus, quota["counterfactual"])
+            take_from(wrong_recycle_focus, quota["wrong_recycle"])
+            take_from(near_miss_focus, quota["near_miss"])
             take_from(prerequisite_focus, quota["prerequisite"])
             take_from(blind_spot_focus, quota["blind_spot"])
             take_from(robustness_focus, quota["robustness"])

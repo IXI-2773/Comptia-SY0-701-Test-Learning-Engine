@@ -3622,6 +3622,90 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         app.analytics_source_cache_key = None
         self.assertEqual([], app.compute_analytics(source=app.master_questions[:1])["wrong_answer_memory"])
 
+    def test_smart_practice_infers_repair_intent_from_near_misses(self):
+        app = self.make_app(start_session=False)
+        q = app.master_questions[0]
+        q.update(
+            {
+                "prompt": "Which attack compromises a trusted website to target developers?",
+                "choices": {"A": "Watering Hole", "B": "Spear Phishing"},
+                "correct": ["A"],
+                "domain": "Threats",
+                "topics": ["Social engineering"],
+                "source_name": "Source One",
+                "objective_code": "2.2",
+            }
+        )
+
+        for _ in range(2):
+            q["selected"] = ["B"]
+            app._progress_questions()["1"] = update_progress_record(
+                app._progress_questions().get("1", {}),
+                ["B"],
+                False,
+                confidence="Unsure",
+                miss_reason="Narrowed to two",
+            )
+            app.append_answer_history(q, False, {"confidence": "Unsure", "miss_reason": "Narrowed to two"})
+
+        payload = app._build_smart_practice_signal_payload()
+
+        self.assertEqual("Repair weak spots", payload["session_intent"]["label"])
+        self.assertGreater(payload["near_miss_unit_map"]["Objective::2.2"], 0.0)
+
+    def test_smart_practice_recycles_tempting_wrong_answer_contrasts(self):
+        app = self.make_app(start_session=False)
+        app.master_questions = [
+            {
+                "question_number": 1,
+                "prompt": "Which attack compromises a trusted website to target developers?",
+                "choices": {"A": "Watering Hole", "B": "Spear Phishing"},
+                "correct": ["A"],
+                "domain": "Threats",
+                "topics": ["Social engineering"],
+                "source_name": "Source One",
+                "objective_code": "2.2",
+            },
+            {
+                "question_number": 2,
+                "prompt": "Contrast Watering Hole with Spear Phishing for compromised trusted websites.",
+                "choices": {"A": "Watering Hole", "B": "Spear Phishing"},
+                "correct": ["A"],
+                "domain": "Threats",
+                "topics": ["Social engineering"],
+                "source_name": "Source Two",
+                "objective_code": "2.2",
+            },
+            {
+                "question_number": 3,
+                "prompt": "Which control protects against power loss?",
+                "choices": {"A": "UPS", "B": "WAF"},
+                "correct": ["A"],
+                "domain": "Operations",
+                "topics": ["Resilience"],
+                "source_name": "Source Three",
+                "objective_code": "4.1",
+            },
+        ]
+        app._reset_runtime_question_state(app.master_questions)
+        q = app.master_questions[0]
+        for _ in range(2):
+            q["selected"] = ["B"]
+            app._progress_questions()["1"] = update_progress_record(
+                app._progress_questions().get("1", {}),
+                ["B"],
+                False,
+                confidence="Sure",
+                miss_reason="Misread",
+            )
+            app.append_answer_history(q, False, {"confidence": "Sure", "miss_reason": "Misread"})
+
+        payload = app._build_smart_practice_signal_payload()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+
+        self.assertGreater(payload["wrong_answer_recycling_map"][2], 0.0)
+        self.assertEqual([2], [question["question_number"] for question in pool])
+
     def test_correct_answer_can_insert_memory_ramp_followup(self):
         app = self.make_app(start_session=False)
         app.master_questions = [
