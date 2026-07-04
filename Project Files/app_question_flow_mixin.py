@@ -235,10 +235,12 @@ class QuestionFlowMixin:
                 text=f"Session: Ready\nQuestions: 0\nVisible: 0\nAnswered: 0\nFlagged: 0    Issues: 0\nDue review: {progress['due']}    Active weak: {progress['wrong']}"
             )
             self.last_question_list_signature = None
+            self.question_list_dirty = False
             return
         signature = self._question_list_signature()
         if signature == self.last_question_list_signature:
             self._sync_question_list_selection()
+            self.question_list_dirty = False
             return
         current_qnum = self.questions[self.index]["question_number"]
         domain = self.domain_filter_var.get()
@@ -286,12 +288,17 @@ class QuestionFlowMixin:
             text=f"Session: {self.active_session_mode}\nQuestions: {len(self.questions)}\nVisible: {len(self.visible_indices)}\nAnswered: {answered_count}\nFlagged: {flagged_count}    Issues: {issues_count}\nDue review: {progress['due']}    Active weak: {progress['wrong']}"
         )
         self.last_question_list_signature = signature
+        self.question_list_dirty = False
 
     def _render_current_view(self, save_session=True):
         if save_session:
             self.schedule_session_save(delay_ms=125)
         self.scroll_to_top_on_render = True
         self.render_question()
+
+    def mark_question_list_dirty(self):
+        self.last_question_list_signature = None
+        self.question_list_dirty = True
 
     def _set_current_index(self, idx):
         self.index = idx
@@ -797,6 +804,45 @@ class QuestionFlowMixin:
         state = meta.setdefault("repair_state", {})
         return state if isinstance(state, dict) else {}
 
+    def normalize_progress_repair_state(self) -> bool:
+        meta = self.progress_data.setdefault("meta", {})
+        state = meta.get("repair_state")
+        if not isinstance(state, dict):
+            meta["repair_state"] = {}
+            return False
+        source_questions = []
+        master_questions = list(getattr(self, "master_questions", []) or [])
+        data = getattr(self, "data", None)
+        if master_questions:
+            source_questions = master_questions
+        elif isinstance(data, dict):
+            source_questions = list(data.get("questions") or [])
+        by_qnum = {
+            int(question.get("question_number") or 0): question
+            for question in source_questions
+            if int(question.get("question_number") or 0)
+        }
+        normalized: dict[str, dict[str, Any]] = {}
+        changed = False
+        for raw_key, raw_row in state.items():
+            row = dict(raw_row or {})
+            qnum = int(row.get("last_question_number") or 0)
+            question = by_qnum.get(qnum)
+            if question:
+                canonical_key = self.repair_concept_key_for_question(question)
+                row_key = str(row.get("concept_key") or raw_key or "")
+                if row_key != canonical_key or str(raw_key) != canonical_key:
+                    row["legacy_repair_concept_key"] = row_key
+                    row["concept_key"] = canonical_key
+                    changed = True
+                normalized[canonical_key] = row
+                continue
+            normalized[str(raw_key)] = row
+        if changed or normalized != state:
+            meta["repair_state"] = normalized
+            return True
+        return False
+
     def plan_misconception_repair(self, q: QuestionRuntimeState, is_correct: bool) -> list[QuestionRuntimeState]:
         if self.active_session_mode == MODE_EXAM:
             return []
@@ -925,8 +971,10 @@ class QuestionFlowMixin:
         ]
         timing = sanitize_response_time(response_seconds, recent_effective_seconds=recent_times)
         q["selected"] = list(selected)
+        q["pending"] = list(selected)
         q["answered"] = True
         q["recall_ready"] = False
+        self.mark_question_list_dirty()
         if feedback_override is not None:
             feedback = dict(feedback_override)
         else:
@@ -1079,6 +1127,7 @@ class QuestionFlowMixin:
         q = self.current_question()
         if not q.get("answered"):
             return
+        self.cancel_auto_next_after_answer()
         rec = self._progress_record(q, create=True)
         old_conf = str(rec.get("last_confidence") or q.get("last_confidence") or "Sure")
         new_conf = str(confidence or "Sure")
@@ -1106,6 +1155,7 @@ class QuestionFlowMixin:
                     event["miss_reason"] = new_reason
                     break
             self._progress_questions()[self._question_key(q)] = rec
+            self.mark_question_list_dirty()
             self.schedule_progress_save()
             self.schedule_session_save(delay_ms=125)
         if self._go_to_next_unanswered_silent():
@@ -1118,15 +1168,24 @@ class QuestionFlowMixin:
         total = len(self.questions)
         for step in range(1, total + 1):
             idx = (self.index + step) % total
-            if not self.questions[idx].get("answered"):
+            if not self._question_resolved_for_finish(self.questions[idx]):
                 self._set_current_index(idx)
                 return True
         return False
 
+    def _question_resolved_for_finish(self, q):
+        return bool(q.get("answered") or q.get("flagged") or q.get("suspended"))
+
+    def _all_session_questions_resolved_for_finish(self):
+        return bool(self.questions) and all(self._question_resolved_for_finish(q) for q in self.questions)
+
     def finish_exam(self):
         if self.active_session_mode != MODE_EXAM:
-            if not self.questions or any(not q.get("answered") for q in self.questions):
-                messagebox.showinfo("Finish set", "Answer every question in this set before finishing.")
+            if not self._all_session_questions_resolved_for_finish():
+                messagebox.showinfo(
+                    "Finish set",
+                    "Answer, flag, or suspend every question in this set before finishing.",
+                )
                 return
             self.maybe_finish_session(force=True)
             self.open_analytics_window()
@@ -1140,6 +1199,7 @@ class QuestionFlowMixin:
         q = self.current_question()
         q["flagged"] = not q.get("flagged", False)
         self.update_progress_for_flag(q)
+        self.mark_question_list_dirty()
         self.schedule_session_save()
         self._render_current_view(save_session=False)
 
@@ -1147,7 +1207,7 @@ class QuestionFlowMixin:
         q = self.current_question()
         q["suspended"] = not q.get("suspended", False)
         self.update_progress_for_suspended(q)
-        self.last_question_list_signature = None
+        self.mark_question_list_dirty()
         if q.get("suspended"):
             for idx, candidate in enumerate(self.questions):
                 rec = self._progress_record(candidate, create=False)
@@ -1167,6 +1227,7 @@ class QuestionFlowMixin:
             messagebox.showinfo("Exam mode", "Finish the exam before redoing recorded answers.")
             return
         clear_runtime_answer_state(q)
+        self.mark_question_list_dirty()
         self.schedule_session_save()
         self._render_current_view(save_session=False)
 
@@ -1181,7 +1242,7 @@ class QuestionFlowMixin:
     def next_unanswered(self):
         if self._go_to_next_unanswered_silent():
             return
-        messagebox.showinfo("Next unanswered", "All questions in this session are answered.")
+        messagebox.showinfo("Next unanswered", "All questions in this session are answered, flagged, or suspended.")
 
     def maybe_auto_next_after_answer(self, q):
         if not self.auto_next_correct_var.get():
@@ -1192,7 +1253,21 @@ class QuestionFlowMixin:
             return
         if self.index >= len(self.questions) - 1:
             return
-        self.root.after(650, self.next_question)
+        self.cancel_auto_next_after_answer()
+        self.auto_next_after_id = self.root.after(650, self._auto_next_after_answer)
+
+    def _auto_next_after_answer(self):
+        self.auto_next_after_id = None
+        self.next_question()
+
+    def cancel_auto_next_after_answer(self):
+        after_id = getattr(self, "auto_next_after_id", None)
+        if after_id:
+            try:
+                self.root.after_cancel(after_id)
+            except Exception:
+                pass
+            self.auto_next_after_id = None
 
     def format_choice_explanations(self, q):
         selected = sorted(q.get("selected", []))

@@ -321,9 +321,11 @@ class TestingEngineApp(
         self.answer_feedback_after_ids = []
         self.answer_result_after_ids = []
         self.study_hud_pulse_after_ids = []
+        self.auto_next_after_id = None
         self.active_question_started_qnum = None
         self.active_question_started_at = None
         self.scroll_to_top_on_render = False
+        self.question_list_dirty = True
         self.session_answer_history: list[SessionAnswerEvent] = []
         self.rescue_domains_triggered = set()
         self.session_base_question_count = None
@@ -2155,6 +2157,7 @@ class TestingEngineApp(
             data["meta"] = {}
         self.progress_data = data
         self._progress_meta()
+        self.normalize_progress_repair_state()
         self.last_progress_snapshot = json.dumps(
             self._progress_snapshot_payload(), sort_keys=True, separators=(",", ":")
         )

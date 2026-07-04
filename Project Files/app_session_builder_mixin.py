@@ -950,6 +950,19 @@ class SessionBuilderMixin:
         calibration_store = normalize_calibration_store(meta.get("smart_practice_question_calibration"))
         meta["smart_practice_question_calibration"] = calibration_store
         signal_cache_key = self._smart_practice_signal_key()
+        pool_cache_key = (
+            signal_cache_key,
+            str(count),
+            tuple(int(question.get("question_number") or 0) for question in pool),
+            bool(randomize),
+        )
+        cached_qnums = getattr(self, "smart_practice_pool_cache", {}).get(pool_cache_key)
+        if cached_qnums is not None:
+            question_map = {int(question.get("question_number") or 0): question for question in pool}
+            cached_order = [qnum for qnum in cached_qnums if qnum in question_map]
+            if randomize:
+                random.shuffle(cached_order)
+            return [question_map[qnum] for qnum in cached_order]
         signal_payload = getattr(self, "smart_practice_signal_cache_payload", None)
         if signal_cache_key != getattr(self, "smart_practice_signal_cache_key", None) or signal_payload is None:
             prewarm = getattr(self, "smart_practice_prewarm", None)
@@ -958,17 +971,6 @@ class SessionBuilderMixin:
             signal_payload = self._build_smart_practice_signal_payload()
             self.smart_practice_signal_cache_key = signal_cache_key
             self.smart_practice_signal_cache_payload = signal_payload
-        pool_cache_key = None
-        if not randomize:
-            pool_cache_key = (
-                signal_cache_key,
-                str(count),
-                tuple(int(question.get("question_number") or 0) for question in pool),
-            )
-            cached_qnums = getattr(self, "smart_practice_pool_cache", {}).get(pool_cache_key)
-            if cached_qnums is not None:
-                question_map = {int(question.get("question_number") or 0): question for question in pool}
-                return [question_map[qnum] for qnum in cached_qnums if qnum in question_map]
 
         source_map = signal_payload["source_map"]
         source_trust_map = signal_payload["source_trust_map"]
@@ -2154,14 +2156,15 @@ class SessionBuilderMixin:
                 record = records.get(self._question_key(question), {})
                 attach_prediction_to_question(question, measurement, record)
             self.progress_data.setdefault("meta", {})["smart_practice_measurement"] = measurement
+            final_signal_key = self._smart_practice_signal_key()
+            self.smart_practice_signal_cache_key = final_signal_key
+            self.smart_practice_pool_cache[(final_signal_key, str(count), tuple(int(question.get("question_number") or 0) for question in pool), bool(randomize))] = tuple(
+                int(question.get("question_number") or 0) for question in result
+            )
             return result[:target]
 
         if not randomize:
             result = final_selection(ordered)
-            if pool_cache_key is not None:
-                self.smart_practice_pool_cache[pool_cache_key] = tuple(
-                    int(question.get("question_number") or 0) for question in result
-                )
             return result
 
         mixed = list(ordered[:target])

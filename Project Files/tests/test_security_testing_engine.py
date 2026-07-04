@@ -1236,6 +1236,72 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         finish_mock.assert_called_once_with(force=True)
         analytics_mock.assert_called_once()
 
+    def test_smart_practice_finish_set_allows_flagged_or_suspended_unanswered_items(self):
+        app = self.make_app()
+        app.active_session_mode = app_module.MODE_SMART_PRACTICE
+        for question in app.questions:
+            question["answered"] = True
+            question["flagged"] = False
+            question["suspended"] = False
+        app.questions[0]["answered"] = False
+        app.questions[0]["flagged"] = True
+        app.questions[1]["answered"] = False
+        app.questions[1]["suspended"] = True
+
+        app.render_question()
+
+        self.assertEqual("FINISH SET", app.finish_btn.cget("text"))
+        self.assertEqual("normal", str(app.finish_btn.cget("state")))
+
+    def test_next_unanswered_skips_flagged_or_suspended_unanswered_items(self):
+        app = self.make_app()
+        app.active_session_mode = app_module.MODE_SMART_PRACTICE
+        for question in app.questions:
+            question["answered"] = True
+            question["flagged"] = False
+            question["suspended"] = False
+        app.questions[0]["answered"] = False
+        app.questions[0]["flagged"] = True
+        app.questions[1]["answered"] = False
+        app.questions[1]["suspended"] = True
+        app.questions[2]["answered"] = False
+        app.index = 0
+
+        moved = app._go_to_next_unanswered_silent()
+
+        self.assertTrue(moved)
+        self.assertEqual(2, app.index)
+
+    def test_finished_set_with_flagged_or_suspended_items_is_saved_and_not_resumable(self):
+        app = self.make_app(start_session=False)
+        app.session_mode_var.set(app_module.MODE_SMART_PRACTICE)
+        app.session_count_var.set("2")
+        app.session_source_var.set("All")
+        app.session_random_var.set(False)
+
+        app.start_custom_session()
+        session_path = app.session_path
+        builder_context = app.current_builder_context(
+            mode=app_module.MODE_SMART_PRACTICE,
+            count=app.session_count_var.get(),
+            randomize=False,
+            source_label=app.current_builder_source_label(app_module.MODE_SMART_PRACTICE),
+        )
+        app.questions[0]["answered"] = False
+        app.questions[0]["flagged"] = True
+        app.questions[1]["answered"] = False
+        app.questions[1]["suspended"] = True
+        app.update_progress_for_flag(app.questions[0])
+        app.update_progress_for_suspended(app.questions[1])
+
+        with mock.patch.object(app, "open_analytics_window"):
+            app.finish_exam()
+
+        self.assertFalse(session_path.exists())
+        self.assertIsNone(app.session_path)
+        self.assertEqual("Session complete: progress saved", app.session_label.cget("text"))
+        self.assertIsNone(app.find_resumable_session_for_builder(builder_context))
+
     def test_finished_smart_practice_does_not_remain_resumable(self):
         app = self.make_app(start_session=False)
         app.session_mode_var.set(app_module.MODE_SMART_PRACTICE)
@@ -1277,6 +1343,7 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
             app.finish_exam()
 
         self.assertFalse(session_path.exists())
+        self.assertIsNone(app.session_path)
         self.assertFalse(stale_path.exists())
         self.assertIsNone(app.find_resumable_session_for_builder(builder_context))
 
@@ -1899,6 +1966,15 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertEqual([], app.current_question()["selected"])
         self.assertEqual([], app.current_question()["pending"])
 
+    def test_single_choice_answer_syncs_pending_with_selection(self):
+        app = self.make_app()
+
+        app.toggle_choice("A")
+
+        self.assertTrue(app.current_question()["answered"])
+        self.assertEqual(["A"], app.current_question()["selected"])
+        self.assertEqual(["A"], app.current_question()["pending"])
+
     def test_confidence_click_advances_to_next_unanswered(self):
         app = self.make_app()
 
@@ -1909,6 +1985,24 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
         self.assertEqual(1, app.index)
         self.assertFalse(app.current_question()["answered"])
+
+    def test_confidence_click_cancels_pending_auto_next_before_advancing(self):
+        app = self.make_app()
+        correct_letter = app.current_question()["correct"][0]
+        app.auto_next_correct_var.set(True)
+
+        with (
+            mock.patch.object(app.root, "after", return_value="after#1") as after_mock,
+            mock.patch.object(app.root, "after_cancel") as cancel_mock,
+        ):
+            app.toggle_choice(correct_letter)
+            self.assertEqual("after#1", app.auto_next_after_id)
+            app.retag_current_answer_confidence("Sure")
+
+        self.assertEqual(1, sum(1 for args, _kwargs in after_mock.call_args_list if args and args[0] == 650))
+        self.assertTrue(any(call.args == ("after#1",) for call in cancel_mock.call_args_list))
+        self.assertEqual(1, app.index)
+        self.assertIsNone(app.auto_next_after_id)
 
     def test_answer_recording_uses_deferred_progress_and_session_saves(self):
         app = self.make_app()
@@ -4427,6 +4521,16 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertTrue(app.top_feedback_label.winfo_manager())
         self.assertIn("Nice hit +", app.top_feedback_label.cget("text"))
 
+    def test_no_op_rerender_skips_question_list_refresh(self):
+        app = self.make_app()
+        app.render_question()
+        app.question_list_dirty = False
+
+        with mock.patch.object(app, "refresh_question_list") as refresh_mock:
+            app.render_question()
+
+        refresh_mock.assert_not_called()
+
     def test_wrong_answer_feedback_chip_shows_miss_reason(self):
         app = self.make_app()
 
@@ -4490,6 +4594,20 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertEqual(22, len(app_module.QUEST_VARIANTS))
         self.assertEqual(3, len(app.current_quests))
         self.assertTrue(app.current_quests)
+
+    def test_randomized_smart_practice_pool_reuses_cached_selection(self):
+        app = self.make_app(start_session=False)
+        app.session_source_var.set("All")
+
+        first = app.build_smart_practice_pool("3", randomize=True)
+        first_qnums = [q["question_number"] for q in first]
+
+        with mock.patch.object(app, "_build_concept_memory_state_rows", side_effect=AssertionError("rebuild")):
+            second = app.build_smart_practice_pool("3", randomize=True)
+
+        second_qnums = [q["question_number"] for q in second]
+        self.assertEqual(set(first_qnums), set(second_qnums))
+        self.assertEqual(3, len(second_qnums))
 
     def test_boss_round_inserts_challenge_after_ten_answers(self):
         app = self.make_app()
@@ -4958,6 +5076,28 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         app.plan_misconception_repair(q, is_correct=False)
         self.assertEqual("contrast", app.progress_data["meta"]["repair_state"][app.repair_concept_key_for_question(q)]["stage"])
 
+    def test_sp9_22b_progress_repair_state_normalizes_legacy_key_on_load(self):
+        app = self._sp9_app_with_role_pool()
+        question = app.master_questions[0]
+        canonical_key = app.repair_concept_key_for_question(question)
+        legacy_key = f"Topic::{question['topics'][0]}"
+        payload = copy.deepcopy(app.progress_data)
+        payload.setdefault("meta", {})["repair_state"] = {
+            legacy_key: {
+                "concept_key": legacy_key,
+                "last_question_number": question["question_number"],
+                "status": "resolved",
+            }
+        }
+        app.progress_path.write_text(json.dumps(payload), encoding="utf-8")
+
+        app.load_progress_if_present()
+
+        normalized = app.progress_data["meta"]["repair_state"]
+        self.assertIn(canonical_key, normalized)
+        self.assertEqual(legacy_key, normalized[canonical_key]["legacy_repair_concept_key"])
+        self.assertEqual(canonical_key, normalized[canonical_key]["concept_key"])
+
     def test_sp9_23_contrast_probe_distinct_and_delayed(self):
         app = self._sp9_app_with_role_pool()
         app.active_session_mode = app_module.MODE_SMART_PRACTICE
@@ -5096,6 +5236,225 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertLessEqual(prediction["predicted_success_probability"], 0.99)
         self.assertGreater(prediction["predicted_response_seconds"], 0)
 
+    def test_sp9_measurement_02b_prediction_uses_graph_concept_key_not_tuple_string(self):
+        question = self._sp9_question(1)
+        question.pop("repair_concept_key", None)
+        prediction = prediction_from_question(question, {}, created_at="2026-01-01T00:00:00")
+
+        self.assertEqual(concept_key_for_question(question)[0], prediction["concept_key"])
+        self.assertNotIn("(", prediction["concept_key"])
+        self.assertNotIn(",", prediction["concept_key"])
+
+    def test_sp9_measurement_02c_rejects_container_like_concept_identity(self):
+        question = self._sp9_question(1)
+        question["repair_concept_key"] = "('domain_topic::general_security_concepts::general_review', 'weak')"
+
+        with self.assertRaises(ValueError):
+            prediction_from_question(question, {}, created_at="2026-01-01T00:00:00")
+
+    def test_sp9_measurement_02d_runtime_loaded_paths_are_exercised_by_tests(self):
+        import app_question_flow_mixin
+        import app_session_builder_mixin
+        import smart_practice_measurement
+
+        repo_root = ROOT.parent
+
+        self.assertEqual(repo_root / "Project Files" / "app_question_flow_mixin.py", Path(app_question_flow_mixin.__file__).resolve())
+        self.assertEqual(repo_root / "Project Files" / "app_session_builder_mixin.py", Path(app_session_builder_mixin.__file__).resolve())
+        self.assertEqual(repo_root / "smart_practice_measurement.py", Path(smart_practice_measurement.__file__).resolve())
+
+    def test_sp9_measurement_02e_prediction_identity_survives_resume_and_answer_link(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        before_question = app.questions[0]
+        before_prediction_id = before_question["prediction_id"]
+        before_concept_key = before_question["prediction_snapshot"]["concept_key"]
+        before_prediction_count = len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"])
+        before_history_count = len(app._progress_history())
+
+        app.save_session(show_notice=False)
+        app.questions[0]["prediction_id"] = ""
+        app.questions[0]["prediction_snapshot"] = {}
+        app.load_session_if_present(skip_identity_check=True)
+        resumed = app.questions[0]
+
+        self.assertEqual(before_prediction_id, resumed["prediction_id"])
+        self.assertEqual(before_concept_key, resumed["prediction_snapshot"]["concept_key"])
+        self.assertEqual(before_prediction_count, len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"]))
+
+        app._record_answer(resumed, list(resumed["correct"]), feedback_override={"confidence": "Sure", "miss_reason": ""})
+        new_history = app._progress_history()[before_history_count:]
+
+        self.assertEqual(1, len(app.session_answer_history))
+        self.assertEqual(1, len(new_history))
+        self.assertEqual(before_prediction_id, app.session_answer_history[0]["prediction_id"])
+        self.assertEqual(before_prediction_id, new_history[0]["prediction_id"])
+        self.assertEqual(int(resumed["question_number"]), new_history[0]["question_number"])
+        self.assertEqual(before_prediction_count, len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"]))
+
+    def test_sp9_measurement_02f_repair_prediction_preserves_canonical_repair_identity(self):
+        question = self._sp9_question(1)
+        repair_key = concept_key_for_question(question)[0]
+        question["repair_concept_key"] = repair_key
+        prediction = prediction_from_question(question, {}, created_at="2026-01-01T00:00:00")
+
+        self.assertEqual(repair_key, prediction["concept_key"])
+        self.assertEqual(repair_key, question["repair_concept_key"])
+
+    def test_sp9_measurement_02g_legacy_topic_repair_key_migrates_on_real_session_restore(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        q = app.questions[0]
+        canonical_key = concept_key_for_question(q)[0]
+        legacy_key = f"Topic::{q['topics'][0]}"
+        prediction_id = q["prediction_id"]
+        prediction_count = len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"])
+        app.save_session(show_notice=False)
+
+        payload = json.loads(app.session_path.read_text(encoding="utf-8"))
+        payload["answers"][0]["repair_concept_key"] = legacy_key
+        payload["answers"][0]["prediction_id"] = prediction_id
+        payload["answers"][0]["prediction_snapshot"] = {
+            "prediction_id": prediction_id,
+            "question_number": q["question_number"],
+            "concept_key": legacy_key,
+        }
+        app.session_path.write_text(json.dumps(payload), encoding="utf-8")
+        app.questions[0]["repair_concept_key"] = ""
+        app.questions[0]["prediction_id"] = ""
+        app.questions[0]["prediction_snapshot"] = {}
+
+        app.load_session_if_present(skip_identity_check=True)
+        restored = app.questions[0]
+
+        self.assertEqual(canonical_key, restored["repair_concept_key"])
+        self.assertEqual(legacy_key, restored["legacy_repair_concept_key"])
+        self.assertEqual(canonical_key, restored["prediction_snapshot"]["concept_key"])
+        self.assertEqual(prediction_id, restored["prediction_id"])
+        self.assertEqual(prediction_count, len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"]))
+
+        app.questions[0]["repair_concept_key"] = ""
+        app.questions[0]["prediction_snapshot"] = {}
+        app.load_session_if_present(skip_identity_check=True)
+        restored_again = app.questions[0]
+
+        self.assertEqual(canonical_key, restored_again["repair_concept_key"])
+        self.assertEqual(legacy_key, restored_again["legacy_repair_concept_key"])
+        self.assertEqual(canonical_key, restored_again["prediction_snapshot"]["concept_key"])
+        self.assertEqual(prediction_count, len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"]))
+
+    def test_sp9_measurement_02h_unknown_legacy_topic_repair_key_fails_visibly(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        app.save_session(show_notice=False)
+        payload = json.loads(app.session_path.read_text(encoding="utf-8"))
+        payload["answers"][0]["repair_concept_key"] = "Topic::Not This Question"
+        app.session_path.write_text(json.dumps(payload), encoding="utf-8")
+
+        with mock.patch.object(app, "_show_bad_json_warning") as warning:
+            app.load_session_if_present(skip_identity_check=True)
+
+        warning.assert_called_once()
+
+    def test_sp9_measurement_02h1_mismatched_canonical_repair_key_fails_visibly(self):
+        app = self._sp9_app_with_role_pool()
+        pool = app.build_smart_practice_pool("1", randomize=False)
+        app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        app.save_session(show_notice=False)
+
+        payload = json.loads(app.session_path.read_text(encoding="utf-8"))
+        payload["answers"][0]["repair_concept_key"] = "coverage::wrong_bucket"
+        app.session_path.write_text(json.dumps(payload), encoding="utf-8")
+
+        with mock.patch.object(app, "_show_bad_json_warning") as warning:
+            app.load_session_if_present(skip_identity_check=True)
+
+        warning.assert_called_once()
+
+    def test_sp9_measurement_02i_legacy_objective_repair_key_migrates_on_real_session_restore(self):
+        app = self.make_app(start_session=False)
+        question = self._sp9_question(1, topic="General Review")
+        question["objective_code"] = "1.2"
+        app.master_questions = [dict(question)]
+        pool = [dict(question)]
+        app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        q = app.questions[0]
+        canonical_key = concept_key_for_question(q)[0]
+        legacy_key = "Objective::1.2"
+        q["smart_primary_role"] = "weak_repair"
+        q["smart_utility"] = 9.0
+        q["smart_utility_breakdown"] = {"misconception_repair_value": 9.0}
+        attach_prediction_to_question(q, app.progress_data["meta"]["smart_practice_measurement"], {}, created_at="2026-01-01T00:00:00")
+        prediction_id = q["prediction_id"]
+        prediction_count = len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"])
+        app.save_session(show_notice=False)
+
+        payload = json.loads(app.session_path.read_text(encoding="utf-8"))
+        payload["answers"][0]["repair_concept_key"] = legacy_key
+        payload["answers"][0]["prediction_id"] = prediction_id
+        payload["answers"][0]["prediction_snapshot"] = {
+            "prediction_id": prediction_id,
+            "question_number": q["question_number"],
+            "concept_key": legacy_key,
+        }
+        app.session_path.write_text(json.dumps(payload), encoding="utf-8")
+        app.questions[0]["repair_concept_key"] = ""
+        app.questions[0]["prediction_id"] = ""
+        app.questions[0]["prediction_snapshot"] = {}
+
+        app.load_session_if_present(skip_identity_check=True)
+        restored = app.questions[0]
+
+        self.assertEqual(canonical_key, restored["repair_concept_key"])
+        self.assertEqual(legacy_key, restored["legacy_repair_concept_key"])
+        self.assertEqual(canonical_key, restored["prediction_snapshot"]["concept_key"])
+        self.assertEqual(prediction_id, restored["prediction_id"])
+        self.assertEqual(prediction_count, len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"]))
+
+    def test_sp9_measurement_02j_legacy_domain_repair_key_migrates_on_real_session_restore(self):
+        app = self.make_app(start_session=False)
+        question = self._sp9_question(1, topic="General Review")
+        question["domain"] = "Security Operations"
+        question["objective_code"] = ""
+        app.master_questions = [dict(question)]
+        pool = [dict(question)]
+        app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        q = app.questions[0]
+        canonical_key = concept_key_for_question(q)[0]
+        legacy_key = "Domain::Security Operations"
+        q["smart_primary_role"] = "weak_repair"
+        q["smart_utility"] = 8.0
+        q["smart_utility_breakdown"] = {"misconception_repair_value": 8.0}
+        attach_prediction_to_question(q, app.progress_data["meta"]["smart_practice_measurement"], {}, created_at="2026-01-01T00:00:00")
+        prediction_id = q["prediction_id"]
+        prediction_count = len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"])
+        app.save_session(show_notice=False)
+
+        payload = json.loads(app.session_path.read_text(encoding="utf-8"))
+        payload["answers"][0]["repair_concept_key"] = legacy_key
+        payload["answers"][0]["prediction_id"] = prediction_id
+        payload["answers"][0]["prediction_snapshot"] = {
+            "prediction_id": prediction_id,
+            "question_number": q["question_number"],
+            "concept_key": legacy_key,
+        }
+        app.session_path.write_text(json.dumps(payload), encoding="utf-8")
+        app.questions[0]["repair_concept_key"] = ""
+        app.questions[0]["prediction_id"] = ""
+        app.questions[0]["prediction_snapshot"] = {}
+
+        app.load_session_if_present(skip_identity_check=True)
+        restored = app.questions[0]
+
+        self.assertEqual(canonical_key, restored["repair_concept_key"])
+        self.assertEqual(legacy_key, restored["legacy_repair_concept_key"])
+        self.assertEqual(canonical_key, restored["prediction_snapshot"]["concept_key"])
+        self.assertEqual(prediction_id, restored["prediction_id"])
+        self.assertEqual(prediction_count, len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"]))
+
     def test_sp9_measurement_03_prediction_keeps_original_learner_state(self):
         prediction = self._measurement_prediction()
         changed = update_progress_record({"learner_memory": {"retrievability": 0.1}}, ["B"], False)
@@ -5158,6 +5517,31 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         event = self._measurement_event("2026-01-01T00:10:00", qnum=2, repair_stage="contrast")
         self.assertEqual("not_observed", find_future_outcome(prediction, [event], "24h", concept=True)["status"])
 
+    def test_sp9_measurement_13b_legacy_event_repair_key_matches_canonical_concept(self):
+        prediction = self._measurement_prediction()
+        event = self._measurement_event("2026-01-02T00:00:00", qnum=2, correct=False)
+
+        observed = find_future_outcome(prediction, [event], "24h", concept=True)
+
+        self.assertEqual("observed", observed["status"])
+        self.assertEqual("legacy_topic", observed["match_basis"])
+
+    def test_sp9_measurement_13c_malformed_legacy_repair_key_does_not_match(self):
+        prediction = self._measurement_prediction()
+        event = self._measurement_event("2026-01-02T00:00:00", qnum=2, correct=False, repair_concept_key="Topic::Not This Topic")
+
+        observed = find_future_outcome(prediction, [event], "24h", concept=True)
+
+        self.assertEqual("not_observed", observed["status"])
+
+    def test_sp9_measurement_13d_unknown_repair_key_prefix_does_not_fall_through(self):
+        prediction = self._measurement_prediction()
+        event = self._measurement_event("2026-01-02T00:00:00", qnum=2, correct=False, repair_concept_key="Chapter::1")
+
+        observed = find_future_outcome(prediction, [event], "24h", concept=True)
+
+        self.assertEqual("not_observed", observed["status"])
+
     def test_sp9_measurement_14_malformed_negative_timestamp_rejected(self):
         prediction = self._measurement_prediction()
         events = [self._measurement_event("bad-date"), self._measurement_event("2025-12-31T23:00:00")]
@@ -5210,6 +5594,13 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp9_measurement_25_resolved_repair_later_failure_relapse(self):
         perf = repair_performance({"x": {"status": "resolved", "concept_key": "c"}}, [self._measurement_event("2026-01-05T00:00:00", correct=False, repair_concept_key="c")])
+        self.assertEqual(1.0, perf["relapse_rate"])
+
+    def test_sp9_measurement_25b_resolved_repair_relapse_matches_question_number_when_key_family_changes(self):
+        perf = repair_performance(
+            {"x": {"status": "resolved", "concept_key": "coverage::general_review", "last_question_number": 1}},
+            [self._measurement_event("2026-01-05T00:00:00", qnum=1, correct=False, repair_concept_key="objective_topic::1_2::general_review")],
+        )
         self.assertEqual(1.0, perf["relapse_rate"])
 
     def test_sp9_measurement_26_weak_precision_uses_observed(self):

@@ -827,7 +827,7 @@ class GameRewardsMixin:
         }
 
     def maybe_finish_session(self, force=False):
-        if not self.questions or any(not q.get("answered") for q in self.questions):
+        if not self._all_session_questions_resolved_for_finish():
             return
         signature = f"{self.current_session_signature()}:{len(self.session_answer_history)}"
         if signature == self.session_completion_signature:
@@ -867,6 +867,7 @@ class GameRewardsMixin:
         self._check_global_milestones()
         self.schedule_progress_save()
         self.save_session(show_notice=False)
+        self.session_label.configure(text="Session complete: progress saved")
         self.show_session_celebration(summary)
 
     def show_session_celebration(self, summary=None):

@@ -32,6 +32,7 @@ class AnswerState(TypedDict):
     smart_graph_bottleneck: float
     repair_stage: str
     repair_concept_key: str
+    legacy_repair_concept_key: str
     prediction_id: str
     prediction_snapshot: dict[str, Any]
 
@@ -174,6 +175,7 @@ class QuestionRuntimeState(BankQuestion, total=False):
     smart_graph_bottleneck: float
     repair_stage: str
     repair_concept_key: str
+    legacy_repair_concept_key: str
     prediction_id: str
     prediction_snapshot: dict[str, Any]
 
@@ -216,6 +218,7 @@ def answer_state_from_question(question: Mapping[str, Any]) -> AnswerState:
         "smart_graph_bottleneck": float(runtime.get("smart_graph_bottleneck", 0.0) or 0.0),
         "repair_stage": str(runtime.get("repair_stage", "") or ""),
         "repair_concept_key": str(runtime.get("repair_concept_key", "") or ""),
+        "legacy_repair_concept_key": str(runtime.get("legacy_repair_concept_key", "") or ""),
         "prediction_id": str(runtime.get("prediction_id", "") or ""),
         "prediction_snapshot": dict(runtime.get("prediction_snapshot") or {}),
     }
@@ -252,6 +255,7 @@ def apply_answer_state(question: RuntimeQuestionMapping, state: Mapping[str, Any
     runtime["smart_graph_bottleneck"] = float(answer_state.get("smart_graph_bottleneck", 0.0) or 0.0)
     runtime["repair_stage"] = str(answer_state.get("repair_stage", "") or "")
     runtime["repair_concept_key"] = str(answer_state.get("repair_concept_key", "") or "")
+    runtime["legacy_repair_concept_key"] = str(answer_state.get("legacy_repair_concept_key", "") or "")
     runtime["prediction_id"] = str(answer_state.get("prediction_id", "") or "")
     runtime["prediction_snapshot"] = dict(answer_state.get("prediction_snapshot") or {})
     return runtime
@@ -286,6 +290,7 @@ def reset_runtime_question_state(question: RuntimeQuestionMapping) -> QuestionRu
     runtime["smart_graph_bottleneck"] = float(runtime.get("smart_graph_bottleneck", 0.0) or 0.0)
     runtime["repair_stage"] = str(runtime.get("repair_stage", "") or "")
     runtime["repair_concept_key"] = str(runtime.get("repair_concept_key", "") or "")
+    runtime["legacy_repair_concept_key"] = str(runtime.get("legacy_repair_concept_key", "") or "")
     runtime["prediction_id"] = str(runtime.get("prediction_id", "") or "")
     runtime["prediction_snapshot"] = dict(runtime.get("prediction_snapshot") or {})
     return runtime

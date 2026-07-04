@@ -5,7 +5,12 @@ from datetime import datetime
 from typing import Any, Mapping
 
 from progress_store import now_iso
-from smart_practice_concept_graph import audit_graph, diagnosis_measurement, normalize_graph
+from smart_practice_concept_graph import (
+    audit_graph,
+    concept_key_for_question as graph_concept_key_for_question,
+    diagnosis_measurement,
+    normalize_graph,
+)
 from smart_practice_question_value import normalize_calibration_store, quality_measurement
 from smart_practice_profile import SMART_PRACTICE_POLICY_VERSION, smart_practice_role_allocation
 
@@ -47,13 +52,27 @@ def stable_id(*parts) -> str:
 
 
 def concept_key_for_question(question: Mapping[str, Any]) -> str:
-    objective = str(question.get("objective_code") or "").strip()
-    if objective:
-        return f"Objective::{objective}"
-    topics = [str(topic).strip() for topic in question.get("topics", []) if str(topic).strip()]
-    if topics:
-        return f"Topic::{topics[0].casefold()}"
-    return f"Domain::{str(question.get('domain') or 'Unsorted').casefold()}"
+    return graph_concept_key_for_question(question)[0]
+
+
+def concept_key_for_event(event: Mapping[str, Any]) -> str:
+    clean_event = dict(event or {})
+    clean_event.pop("repair_concept_key", None)
+    canonical_key = graph_concept_key_for_question(clean_event)[0]
+    raw_key = str(event.get("repair_concept_key") or "").strip()
+    canonical_prefixes = (
+        "coverage::",
+        "objective_topic::",
+        "repair::",
+        "group::",
+        "domain_topic::",
+        "question::",
+    )
+    if canonical_key and not canonical_key.startswith("repair::") and not canonical_key.startswith("question::"):
+        return canonical_key
+    if raw_key and raw_key.casefold().startswith(canonical_prefixes):
+        return raw_key
+    return canonical_key or raw_key
 
 
 def empty_measurement_store() -> dict[str, Any]:
@@ -103,11 +122,14 @@ def prediction_from_question(question: Mapping[str, Any], record: Mapping[str, A
     policy_id = str(question.get("smart_policy_id") or "")
     qnum = int(question.get("question_number") or 0)
     prediction_id = str(question.get("prediction_id") or stable_id(policy_version, created_at, qnum, question.get("smart_primary_role", "")))
+    concept_key = str(question.get("repair_concept_key") or concept_key_for_question(question))
+    if any(marker in concept_key for marker in ("(", ")", "[", "]", "{", "}", "<", ">", ",")):
+        raise ValueError(f"Malformed Smart Practice concept identity: {concept_key}")
     return {
         "prediction_id": prediction_id,
         "prediction_created_at": created_at,
         "question_number": qnum,
-        "concept_key": str(question.get("repair_concept_key") or concept_key_for_question(question)),
+        "concept_key": concept_key,
         "objective_code": str(question.get("objective_code") or ""),
         "domain": str(question.get("domain") or "Unsorted"),
         "smart_primary_role": str(question.get("smart_primary_role") or ""),
@@ -162,10 +184,66 @@ def event_id(event: Mapping[str, Any]) -> str:
     return str(event.get("event_id") or stable_id(event.get("at", ""), event.get("question_number", ""), event.get("prediction_id", ""), event.get("selected", "")))
 
 
+def _normalize_key_fragment(value: Any) -> str:
+    return "".join(character if character.isalnum() else "_" for character in str(value or "").casefold()).strip("_")
+
+
+def _legacy_repair_key_match(prediction: Mapping[str, Any], raw_repair_key: str) -> tuple[bool, str]:
+    lowered = raw_repair_key.casefold().strip()
+    if not lowered:
+        return False, ""
+    if lowered.startswith("topic::"):
+        topic_value = raw_repair_key.split("::", 1)[1].strip()
+        normalized_topic = _normalize_key_fragment(topic_value)
+        if not normalized_topic:
+            return False, ""
+        prediction_topics = [
+            _normalize_key_fragment(topic)
+            for topic in (prediction.get("topics") or [])
+            if _normalize_key_fragment(topic)
+        ]
+        if normalized_topic in prediction_topics:
+            return True, "legacy_topic"
+        prediction_concept = _normalize_key_fragment(str(prediction.get("concept_key") or ""))
+        if prediction_concept and normalized_topic == prediction_concept.split("__")[-1]:
+            return True, "legacy_topic"
+        return False, ""
+    if lowered.startswith("objective::"):
+        objective_value = raw_repair_key.split("::", 1)[1].strip()
+        normalized_objective = _normalize_key_fragment(objective_value)
+        if normalized_objective and normalized_objective == _normalize_key_fragment(prediction.get("objective_code")):
+            return True, "legacy_objective"
+        return False, ""
+    if lowered.startswith("domain::"):
+        domain_value = raw_repair_key.split("::", 1)[1].strip()
+        normalized_domain = _normalize_key_fragment(domain_value)
+        if not normalized_domain:
+            return False, ""
+        if normalized_domain == _normalize_key_fragment(prediction.get("domain")):
+            return True, "legacy_domain"
+        prediction_concept = _normalize_key_fragment(str(prediction.get("concept_key") or ""))
+        if prediction_concept and normalized_domain in prediction_concept:
+            return True, "legacy_domain"
+        return False, ""
+    return False, ""
+
+
 def same_concept(prediction: Mapping[str, Any], event: Mapping[str, Any]) -> tuple[bool, str]:
     if int(prediction.get("question_number") or 0) == int(event.get("question_number") or 0):
         return True, "same_question"
-    if str(prediction.get("concept_key") or "") and str(prediction.get("concept_key") or "") == str(event.get("repair_concept_key") or ""):
+    raw_repair_key = str(event.get("repair_concept_key") or "").strip()
+    legacy_match, legacy_basis = _legacy_repair_key_match(prediction, raw_repair_key)
+    if legacy_match:
+        return True, legacy_basis
+    if raw_repair_key:
+        lowered_repair_key = raw_repair_key.casefold()
+        if lowered_repair_key.startswith(("topic::", "objective::", "domain::")):
+            return False, ""
+        if "::" in raw_repair_key:
+            return False, ""
+    event_concept_key = concept_key_for_event(event)
+    prediction_concept_key = str(prediction.get("concept_key") or "")
+    if prediction_concept_key and prediction_concept_key == event_concept_key:
         return True, "repair_concept"
     if str(prediction.get("objective_code") or "") and str(prediction.get("objective_code") or "") == str(event.get("objective_code") or ""):
         pred_topic = str(prediction.get("concept_key") or "").casefold()
@@ -348,8 +426,12 @@ def repair_performance(repair_state, history):
     relapse = 0
     for row in resolved:
         key = str(row.get("concept_key") or "")
+        last_qnum = int(row.get("last_question_number") or 0)
         for event in history:
-            if str(event.get("repair_concept_key") or "") == key and event.get("correct") is False:
+            if event.get("correct") is False and (
+                concept_key_for_event(event) == key
+                or (last_qnum and int(event.get("question_number") or 0) == last_qnum)
+            ):
                 relapse += 1
                 break
     return {

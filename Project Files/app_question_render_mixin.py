@@ -293,10 +293,13 @@ class QuestionRenderMixin:
             self.last_render_snapshot = snapshot
         self._update_progress()
         self._apply_compact_review_visibility(q)
-        self.refresh_question_list()
+        if getattr(self, "question_list_dirty", True):
+            self.refresh_question_list()
+        else:
+            self._sync_question_list_selection()
         self.prev_btn.configure(state='normal' if self.index > 0 else 'disabled')
         self.next_btn.configure(state='normal' if self.index < len(self.questions) - 1 else 'disabled')
-        all_answered = bool(self.questions) and all(q.get('answered') for q in self.questions)
+        all_answered = self._all_session_questions_resolved_for_finish()
         if self.active_session_mode == MODE_EXAM:
             self.finish_btn.configure(text='FINISH EXAM', state='normal')
         else:

@@ -23,6 +23,7 @@ from session_store import (
     session_file_path,
     session_signature,
 )
+from smart_practice_concept_graph import concept_key_for_question as graph_concept_key_for_question
 
 
 class SessionPersistenceMixin:
@@ -310,6 +311,12 @@ class SessionPersistenceMixin:
                 break
             q = self.questions[i]
             merged_state = dict(state)
+            try:
+                self._migrate_legacy_repair_concept_key(q, merged_state)
+            except ValueError as exc:
+                logging.warning('Session restore skipped after repair concept migration failure: %s', exc)
+                self._show_bad_json_warning('Session', self.session_path, None, exc)
+                return
             merged_state['flagged'] = bool(state.get('flagged')) or bool(q.get('flagged'))
             merged_state['suspended'] = bool(state.get('suspended')) or bool(q.get('suspended'))
             apply_answer_state(q, merged_state)
@@ -338,16 +345,64 @@ class SessionPersistenceMixin:
         self.refresh_session_quests()
         self.refresh_reward_badges()
 
+    def _migrate_legacy_repair_concept_key(self, question, answer_state):
+        legacy_key = answer_state.get('repair_concept_key')
+        if not legacy_key:
+            return
+        if not isinstance(legacy_key, str):
+            raise ValueError('repair_concept_key must be a string')
+        if any(marker in legacy_key for marker in ('(', ')', '[', ']', '{', '}', '<', '>', ',')):
+            raise ValueError(f'Malformed repair_concept_key: {legacy_key}')
+        canonical_key = graph_concept_key_for_question(question)[0]
+        if legacy_key == canonical_key:
+            return
+        known_canonical_prefixes = (
+            'coverage::',
+            'objective_topic::',
+            'repair::',
+            'group::',
+            'domain_topic::',
+            'question::',
+        )
+        lowered = legacy_key.casefold()
+        if lowered.startswith(known_canonical_prefixes):
+            if lowered != canonical_key.casefold():
+                raise ValueError(f'Unknown legacy repair_concept_key for restored question: {legacy_key}')
+            if legacy_key != canonical_key:
+                answer_state['repair_concept_key'] = canonical_key
+            return
+        if '::' not in legacy_key:
+            raise ValueError(f'Unknown repair_concept_key format: {legacy_key}')
+        legacy_kind, legacy_value = legacy_key.split('::', 1)
+        legacy_kind = legacy_kind.strip().casefold()
+        legacy_value = legacy_value.strip().casefold()
+        if legacy_kind == 'topic':
+            expected_values = [str(topic).strip().casefold() for topic in question.get('topics', []) if str(topic).strip()]
+        elif legacy_kind == 'objective':
+            expected_values = [str(question.get('objective_code') or '').strip().casefold()]
+        elif legacy_kind == 'domain':
+            expected_values = [str(question.get('domain') or '').strip().casefold()]
+        else:
+            raise ValueError(f'Unknown repair_concept_key format: {legacy_key}')
+        if legacy_value not in [value for value in expected_values if value]:
+            raise ValueError(f'Unknown legacy repair_concept_key for restored question: {legacy_key}')
+        answer_state['legacy_repair_concept_key'] = legacy_key
+        answer_state['repair_concept_key'] = canonical_key
+        snapshot = answer_state.get('prediction_snapshot')
+        if isinstance(snapshot, dict) and snapshot.get('concept_key') == legacy_key:
+            snapshot['concept_key'] = answer_state['repair_concept_key']
+
     def save_session(self, show_notice=False):
         if not self.questions or not self.session_path:
             return
         self.save_queue.cancel('session')
-        if all(q.get('answered') for q in self.questions):
+        if self._all_session_questions_resolved_for_finish():
             self.clear_resumable_sessions_for_builder(self.current_builder_context_data)
             if self.session_path.exists():
                 self.session_path.unlink()
             self.last_session_snapshot = None
-            self.session_label.configure(text='Session file: completed set')
+            self.session_path = None
+            self.session_label.configure(text='Session complete: progress saved')
             return
         snapshot = build_session_snapshot(
             app_version=APP_VERSION,
