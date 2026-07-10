@@ -162,11 +162,11 @@
         "D": "Isolate that segment on its own VLAN."
       },
       "correct": [
-        "D"
+        "A"
       ],
-      "general_explanation": "The NIPS is not seeing the traffic on that network segment. By implementing port mirroring, the traffic from that segment can be copied to the segment where the NIPS is installed. Installing a network IPS on the segment would require additional resources. This would work but is not the most efficient approach. Nothing in this scenario suggests that the NIPS is inadequate. It just is not seeing all the traffic. Finally, isolating the segment to its own VLAN would isolate that network segment but would still not allow the NIPS to analyze the traffic from that segment.",
+      "general_explanation": "The NIPS is functioning correctly, so the problem is visibility rather than capability. Enabling port mirroring/monitor mode copies traffic from that segment to where the NIPS can inspect it. Installing another NIPS would require extra hardware, upgrading the NIPS would not solve the visibility gap, and placing the segment on its own VLAN would change segmentation without automatically giving the NIPS access to that traffic.",
       "parse_warnings": [],
-      "review_notes": "OCR draft requires human verification before merging."
+      "review_notes": "Verified answer corrected to A because the screenshot explanation supports port mirroring and explicitly rules out VLAN isolation."
     },
     {
       "filename": "Screenshot 2026-06-12 at 03-24-02 Question 43 - Chapter 3 Domain 3.0 Security Architecture - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",

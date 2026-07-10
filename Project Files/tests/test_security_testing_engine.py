@@ -927,6 +927,15 @@ class SecurityTestingEngineTests(unittest.TestCase):
         self.assertEqual(3, len(result["analytics_timings"]))
         self.assertLess(result["warm_pool_seconds"], 0.35)
 
+    def test_merged_bank_q1105_uses_port_mirroring_answer_key(self):
+        bank = load_bank(ROOT / "public_sy0701_bank_v4_plus_studyguide_clean.json")
+        question = next(q for q in bank["questions"] if q.get("question_number") == 1105)
+
+        self.assertEqual(["A"], question["correct"])
+        self.assertIn("visibility", question["general_explanation"].lower())
+        self.assertIn("port mirroring/monitor mode", question["general_explanation"].lower())
+        self.assertIn("does not by itself make the nips see that traffic", question["choice_explanations"]["D"].lower())
+
     def test_bank_validation_flags_conflicting_and_repeated_prompts(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "bank.json"
