@@ -9,6 +9,21 @@ from ui_theme import BLUE, DARK, RED, TEXT
 
 
 class QuestionRenderMixin:
+    def _question_topics_text(self, q):
+        topics = ', '.join(str(t).strip() for t in q.get('topics', []) if str(t).strip())
+        return f"   Topic: {topics}" if topics else ''
+
+    def _question_header_text(self, q):
+        return f"Q{q.get('question_number')}   Page {q.get('source_page','')}   Domain: {q.get('domain','')}{self._question_topics_text(q)}"
+
+    def _question_meta_text(self, q, trust_warning=None):
+        study_status = study_status_name(self._progress_record(q, create=False))
+        question_type_text = 'Multi-select' if q.get('question_type') == 'multi' else 'Single answer'
+        meta_text = f"Status: {study_status}   |   {self.current_source_badge_text()}   |   {question_type_text}"
+        if trust_warning:
+            meta_text += f"   |   {trust_warning['text']}"
+        return meta_text
+
     def _render_empty_question_state(self):
         self.topbar_title.configure(text='Security Testing Engine')
         self.question_meta_label.configure(text='Ready to start a set')
@@ -53,15 +68,9 @@ class QuestionRenderMixin:
 
     def _render_question_header(self, q, trust_warning=None):
         self.topbar_title.configure(text=f"Security Testing Engine - {self.active_session_mode}")
-        topics = ', '.join(str(t).strip() for t in q.get('topics', []) if str(t).strip())
-        topic_text = f"   Topic: {topics}" if topics else ''
-        self.question_meta_label.configure(text=f"Q{q.get('question_number')}   Page {q.get('source_page','')}   Domain: {q.get('domain','')}{topic_text}")
-        rec = self._progress_record(q, create=False)
-        study_status = study_status_name(rec)
-        question_type_text = 'Multi-select' if q.get('question_type') == 'multi' else 'Single answer'
-        meta_text = f"Status: {study_status}   |   {self.current_source_badge_text()}   |   {question_type_text}"
+        self.question_meta_label.configure(text=self._question_header_text(q))
+        meta_text = self._question_meta_text(q, trust_warning)
         if trust_warning:
-            meta_text += f"   |   {trust_warning['text']}"
             self.meta_strip_label.configure(
                 text=meta_text,
                 bg=trust_warning['background'],
@@ -77,18 +86,11 @@ class QuestionRenderMixin:
         else:
             self.issue_label.pack_forget()
         self._render_answer_toast()
-        return rec
+        return self._progress_record(q, create=False)
 
     def _build_question_render_snapshot(self, q, show_exam_feedback, ladder_stage, trust_warning):
-        topics = ', '.join(str(topic).strip() for topic in q.get('topics', []) if str(topic).strip())
-        topic_text = f"   Topic: {topics}" if topics else ''
-        header_text = f"Q{q.get('question_number')}   Page {q.get('source_page','')}   Domain: {q.get('domain','')}{topic_text}"
-        rec = self._progress_record(q, create=False)
-        study_status = study_status_name(rec)
-        question_type_text = 'Multi-select' if q.get('question_type') == 'multi' else 'Single answer'
-        meta_text = f"Status: {study_status}   |   {self.current_source_badge_text()}   |   {question_type_text}"
-        if trust_warning:
-            meta_text += f"   |   {trust_warning['text']}"
+        header_text = self._question_header_text(q)
+        meta_text = self._question_meta_text(q, trust_warning)
         selected = set(q.get('selected', []))
         pending = set(q.get('pending', []))
         correct = set(q.get('correct', []))

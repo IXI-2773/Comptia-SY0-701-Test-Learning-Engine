@@ -11,6 +11,12 @@ from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 from typing import cast
 
+BASE_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = BASE_DIR.parent
+if str(PROJECT_ROOT) not in sys.path:
+    # Allow the app and tests to import Smart Practice modules stored one level above this folder.
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 from app_analytics_mixin import AnalyticsMixin
 from app_constants import (
     ABSOLUTE_DISTRACTOR_WORDS,
@@ -110,8 +116,6 @@ from widget_models import (
     RewardHistoryWidgetRegistry,
     ScreenshotReviewWidgetRegistry,
 )
-
-BASE_DIR = Path(__file__).resolve().parent
 RESOURCE_DIR = Path(getattr(sys, "_MEIPASS", BASE_DIR))
 APP_DIR = Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else BASE_DIR
 
