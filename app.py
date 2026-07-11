@@ -339,6 +339,8 @@ class TestingEngineApp(
         self.sidebar_visible = True
         self.sidebar_auto_collapsed = False
         self.submit_btn_visible = False
+        self.last_action_layout_signature = None
+        self.last_more_menu_signature = None
         self.sidebar_width_options = {"Full": 320, "Narrow": 248}
         self.sidebar_width_mode = str(self.config.get("sidebar_width_mode", "Full") or "Full")
 
@@ -2663,6 +2665,18 @@ class TestingEngineApp(
         self.general_card.pack(fill="x", pady=(0, 10))
 
     def _rebuild_more_menu(self, include_maintenance=False):
+        signature = (
+            bool(include_maintenance),
+            str(self.flag_btn.cget("text") or ""),
+            str(self.flag_btn.cget("state") or "normal"),
+            str(self.suspend_btn.cget("text") or ""),
+            str(self.suspend_btn.cget("state") or "normal"),
+            str(self.report_issue_btn.cget("text") or ""),
+            str(self.report_issue_btn.cget("state") or "normal"),
+            str(self.redo_btn.cget("state") or "normal"),
+        )
+        if signature == self.last_more_menu_signature:
+            return
         self.more_menu.delete(0, tk.END)
         self.more_menu.add_command(label="Save Session", command=lambda: self.save_session(show_notice=True))
         self.more_menu.add_command(label="Analytics Dashboard", command=self.open_analytics_window)
@@ -2687,6 +2701,7 @@ class TestingEngineApp(
             self.more_menu.add_command(
                 label="Redo Question", command=self.redo_question, state=str(self.redo_btn.cget("state") or "normal")
             )
+        self.last_more_menu_signature = signature
 
     def _layout_action_buttons(self, width=None):
         if not hasattr(self, "card_action_panel"):
@@ -2694,6 +2709,17 @@ class TestingEngineApp(
         self._ensure_sticky_action_bar()
         width = width or self.card_action_panel.winfo_width() or self.card.winfo_width()
         narrow = bool(width) and width < 1120
+        signature = (
+            bool(narrow),
+            bool(self.submit_btn_visible),
+            str(self.flag_btn.cget("text") or ""),
+            str(self.suspend_btn.cget("text") or ""),
+            str(self.report_issue_btn.cget("text") or ""),
+            str(self.redo_btn.cget("state") or "normal"),
+        )
+        if signature == self.last_action_layout_signature:
+            self._rebuild_more_menu(include_maintenance=narrow)
+            return
         for button in (
             self.submit_btn,
             self.flag_btn,
@@ -2711,6 +2737,7 @@ class TestingEngineApp(
             self.report_issue_btn.pack(side="left", padx=(8, 0))
             self.redo_btn.pack(side="left", padx=(8, 0))
         self.next_unanswered_btn.pack(side="left", padx=(8, 0))
+        self.last_action_layout_signature = signature
         self._rebuild_more_menu(include_maintenance=narrow)
 
     def _ensure_sticky_action_bar(self):
