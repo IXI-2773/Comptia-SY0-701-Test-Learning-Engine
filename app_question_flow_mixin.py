@@ -298,7 +298,7 @@ class QuestionFlowMixin:
 
     def _render_current_view(self, save_session=True):
         if save_session:
-            self.schedule_session_save(delay_ms=125)
+            self.schedule_session_save(delay_ms=450)
         self.scroll_to_top_on_render = True
         self.render_question()
 

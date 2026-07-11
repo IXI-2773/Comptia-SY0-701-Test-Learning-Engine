@@ -57,9 +57,9 @@ class QuestionRenderMixin:
         self._apply_compact_review_visibility()
 
     def _source_trust_warning_for_question(self, q):
-        if self._smart_practice_signal_key() != getattr(self, 'smart_practice_signal_cache_key', None):
-            return None
         payload = getattr(self, 'smart_practice_signal_cache_payload', None) or {}
+        if not payload:
+            return None
         return derive_source_trust_warning(
             q,
             payload.get('source_map') or {},
