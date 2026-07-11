@@ -308,7 +308,8 @@ class QuestionFlowMixin:
 
     def _set_current_index(self, idx):
         self.index = idx
-        self._render_current_view()
+        self.schedule_session_save(delay_ms=1200)
+        self._render_current_view(save_session=False)
 
     def _collect_answer_feedback(self, q, is_correct):
         return {"confidence": "Sure", "miss_reason": self._infer_miss_reason_from_confidence("Sure", is_correct)}
