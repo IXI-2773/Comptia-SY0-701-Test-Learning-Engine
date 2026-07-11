@@ -411,6 +411,11 @@ def update_progress_record(
         recall_failure=recall_failure,
         seen_on=seen_on,
     )
+    if is_correct and int(record.get("wrong_count", 0) or 0) > 0 and int(record.get("correct_streak", 0) or 0) <= 2:
+        recovery_days = review_interval_for_streak(int(record.get("correct_streak", 0) or 0))
+        if recovery_days > 0:
+            recovery_day = date.fromisoformat(str(seen_on)) if isinstance(seen_on, str) else (seen_on or date.today())
+            record["learner_memory"]["next_review_at"] = (recovery_day + timedelta(days=recovery_days)).isoformat()
     record["next_review"] = str(record["learner_memory"].get("next_review_at") or "")
     return record
 
@@ -475,7 +480,7 @@ def is_review_due(record: Mapping[str, Any] | None, on_date=None) -> bool:
     record = record or {}
     memory = normalize_learner_memory(record.get("learner_memory"))
     next_review = memory.get("next_review_at") or record.get("next_review")
-    if int(record.get("attempts", 0) or 0) > 0 and float(memory.get("retrievability", 0.0) or 0.0) <= 0.05:
+    if int(record.get("attempts", 0) or 0) > 0 and not next_review and float(memory.get("retrievability", 0.0) or 0.0) <= 0.05:
         return True
     if not next_review:
         return False

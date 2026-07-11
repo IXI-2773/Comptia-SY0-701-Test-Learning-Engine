@@ -9,6 +9,7 @@ from smart_practice_profile import SMART_PRACTICE_POLICY_VERSION
 
 GRAPH_SCHEMA_VERSION = 1
 GRAPH_VERSION = "smart-practice-graph-1"
+NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
 VALID_EVIDENCE_LEVELS = {"explicit", "strong", "moderate", "weak", "fallback"}
 VALID_EDGE_TYPES = {
     "prerequisite_of",
@@ -36,7 +37,7 @@ def stable_id(prefix: str, *parts: Any) -> str:
 
 def normalize_label(value: Any) -> str:
     text = str(value or "").casefold()
-    text = re.sub(r"[^a-z0-9]+", " ", text)
+    text = NON_ALNUM_RE.sub(" ", text)
     return " ".join(text.split())
 
 

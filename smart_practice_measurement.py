@@ -428,8 +428,9 @@ def repair_performance(repair_state, history):
         key = str(row.get("concept_key") or "")
         last_qnum = int(row.get("last_question_number") or 0)
         for event in history:
+            event_repair_key = str(event.get("repair_concept_key") or "").strip()
             if event.get("correct") is False and (
-                concept_key_for_event(event) == key
+                (key and (concept_key_for_event(event) == key or event_repair_key == key))
                 or (last_qnum and int(event.get("question_number") or 0) == last_qnum)
             ):
                 relapse += 1

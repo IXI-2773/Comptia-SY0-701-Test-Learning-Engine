@@ -1473,8 +1473,15 @@ class TestingEngineApp(
         return cast(list[QuestionHistoryEvent], history)
 
     def _progress_meta(self) -> ProgressMeta:
-        meta = normalize_progress_meta(self.progress_data.setdefault("meta", {}))
+        raw_meta = self.progress_data.setdefault("meta", {})
+        cached_raw = getattr(self, "_progress_meta_cache_raw", None)
+        cached_meta = getattr(self, "_progress_meta_cache_value", None)
+        if raw_meta is cached_raw and cached_meta is not None:
+            return cached_meta
+        meta = normalize_progress_meta(raw_meta)
         self.progress_data["meta"] = meta
+        self._progress_meta_cache_raw = meta
+        self._progress_meta_cache_value = meta
         return meta
 
     def _progress_snapshot_payload(self):
@@ -1492,13 +1499,22 @@ class TestingEngineApp(
             target_qnum = int(qnum or 0)
         except (TypeError, ValueError):
             return []
-        return [
-            report
-            for report in self._issue_reports()
-            if str(report.get("status") or "open") == "open"
-            and str(report.get("question_number", "")).isdigit()
-            and int(report.get("question_number", 0)) == target_qnum
-        ]
+        issue_reports = self._issue_reports()
+        cached_reports = getattr(self, "_open_issue_reports_cache_source", None)
+        indexed_reports = getattr(self, "_open_issue_reports_cache_value", None)
+        if issue_reports is not cached_reports or indexed_reports is None:
+            indexed_reports = {}
+            for report in issue_reports:
+                if str(report.get("status") or "open") != "open":
+                    continue
+                try:
+                    report_qnum = int(report.get("question_number", 0) or 0)
+                except (TypeError, ValueError):
+                    continue
+                indexed_reports.setdefault(report_qnum, []).append(report)
+            self._open_issue_reports_cache_source = issue_reports
+            self._open_issue_reports_cache_value = indexed_reports
+        return list(indexed_reports.get(target_qnum, []))
 
     def question_has_open_issue_report(self, q):
         return bool(self._open_issue_reports_for_question(q.get("question_number")))
@@ -2069,11 +2085,12 @@ class TestingEngineApp(
         return cast(ProgressRecord, record)
 
     def _show_bad_json_warning(self, label, path, backup, err):
+        backup_name = backup.name if backup is not None else 'not created'
         messagebox.showwarning(
             f"{label} reset",
             f"{label} file could not be read and was moved aside.\n\n"
             f"Original: {path.name}\n"
-            f"Backup: {backup.name}\n\n"
+            f"Backup: {backup_name}\n\n"
             f"The app will start fresh for that file.\n\n{err}",
         )
 

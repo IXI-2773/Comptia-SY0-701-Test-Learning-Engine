@@ -25,7 +25,6 @@ from smart_practice_profile import (
 from smart_practice_measurement import attach_prediction_to_question, normalize_measurement_store
 from smart_practice_concept_graph import (
     GRAPH_VERSION,
-    aggregate_concept_state,
     audit_graph,
     concept_key_for_question,
     diagnose_root_cause,
@@ -943,6 +942,19 @@ class SessionBuilderMixin:
         pool = list(base_pool) if base_pool is not None else self.get_filtered_master_pool()
         if not pool:
             return []
+        existing_signal_key = getattr(self, "smart_practice_signal_cache_key", None)
+        existing_signal_payload = getattr(self, "smart_practice_signal_cache_payload", None)
+        existing_pool_cache = getattr(self, "smart_practice_pool_cache", {})
+        pool_qnums = tuple(int(question.get("question_number") or 0) for question in pool)
+        if existing_signal_key is not None and existing_signal_payload is not None:
+            quick_cache_key = (existing_signal_key, str(count), pool_qnums, bool(randomize))
+            cached_qnums = existing_pool_cache.get(quick_cache_key)
+            if cached_qnums is not None:
+                question_map = {int(question.get("question_number") or 0): question for question in pool}
+                cached_order = [qnum for qnum in cached_qnums if qnum in question_map]
+                if randomize:
+                    random.shuffle(cached_order)
+                return [question_map[qnum] for qnum in cached_order]
         records = self._progress_questions()
         progress_history = self._progress_history()
         meta = self.progress_data.setdefault("meta", {})
@@ -954,7 +966,7 @@ class SessionBuilderMixin:
         pool_cache_key = (
             signal_cache_key,
             str(count),
-            tuple(int(question.get("question_number") or 0) for question in pool),
+            pool_qnums,
             bool(randomize),
         )
         cached_qnums = getattr(self, "smart_practice_pool_cache", {}).get(pool_cache_key)
@@ -1031,6 +1043,11 @@ class SessionBuilderMixin:
 
         question_meta = {}
         objective_exposure_map = {}
+        attempted_by_unit = {}
+        attempted_by_objective = {}
+        unseen_by_unit = {}
+        unseen_by_objective = {}
+        outcomes_by_qnum = {}
         for question in pool:
             qnum = int(question.get("question_number") or 0)
             kind, unit = self._coverage_unit_for_question(question)
@@ -1043,26 +1060,138 @@ class SessionBuilderMixin:
                 self._normalized_study_label(str(topic)) for topic in question.get("topics", []) if str(topic).strip()
             )
             record = records.get(self._question_key(question), {})
+            attempts = int(record.get("attempts", 0) or 0)
+            unit_key = f"{kind}::{unit}"
+            base_concept_key = concept_key_for_question(question)[0]
             question_meta[qnum] = {
                 "record": record,
-                "unit_key": f"{kind}::{unit}",
+                "unit_key": unit_key,
                 "stem_style": stem_style,
                 "objective_code": objective_code,
                 "source_name": source_name,
                 "source_label": source_label,
                 "normalized_domain": normalized_domain,
                 "normalized_topics": normalized_topics,
+                "base_concept_key": base_concept_key,
             }
-            if objective_code and int(record.get("attempts", 0)) > 0:
+            if attempts > 0:
+                attempted_by_unit[unit_key] = int(attempted_by_unit.get(unit_key, 0)) + 1
+                if objective_code:
+                    attempted_by_objective[objective_code] = int(attempted_by_objective.get(objective_code, 0)) + 1
+            else:
+                unseen_by_unit[unit_key] = int(unseen_by_unit.get(unit_key, 0)) + 1
+                if objective_code:
+                    unseen_by_objective[objective_code] = int(unseen_by_objective.get(objective_code, 0)) + 1
+            if objective_code and attempts > 0:
                 exposure = objective_exposure_map.setdefault(objective_code, {"sources": set(), "styles": set()})
                 exposure["sources"].add(source_name)
                 exposure["styles"].add(stem_style)
+        for event in progress_history:
+            qnum = int(event.get("question_number") or 0)
+            outcomes_by_qnum.setdefault(qnum, []).append(event)
         interference_priority_map = {
             int(question.get("question_number") or 0): interference_priority(question) for question in pool
         }
-        concept_keys = sorted({concept_key_for_question(question)[0] for question in pool})
-        concept_states = {key: aggregate_concept_state(key, pool, records, progress_history) for key in concept_keys}
+        concept_keys = sorted(
+            {str(meta.get("base_concept_key") or "") for meta in question_meta.values() if str(meta.get("base_concept_key") or "")}
+        )
+        concept_groups = {}
+        for question in pool:
+            qnum = int(question.get("question_number") or 0)
+            concept_key = str(question_meta.get(qnum, {}).get("base_concept_key") or "")
+            if concept_key:
+                concept_groups.setdefault(concept_key, []).append(question)
+        high_conf_wrong_by_concept = {}
+        for event in progress_history:
+            if event.get("correct") is False and str(event.get("confidence") or "") == "Sure":
+                concept_key = str(event.get("smart_concept_key") or "")
+                if concept_key:
+                    high_conf_wrong_by_concept[concept_key] = int(high_conf_wrong_by_concept.get(concept_key, 0)) + 1
+        concept_states = {}
+        for concept_key in concept_keys:
+            concept_questions = concept_groups.get(concept_key, [])
+            per_question = []
+            sources = set()
+            styles = set()
+            for question in concept_questions:
+                qnum = int(question.get("question_number") or 0)
+                rec = dict(question_meta.get(qnum, {}).get("record") or {})
+                memory = dict(rec.get("learner_memory") or {})
+                attempts = int(rec.get("attempts", 0) or 0)
+                correct = int(rec.get("correct_count", 0) or 0)
+                wrong = int(rec.get("wrong_count", 0) or 0)
+                if attempts or correct or wrong:
+                    per_question.append(
+                        {
+                            "retrievability": float(memory.get("retrievability", 0.35) or 0.35),
+                            "stability": float(memory.get("stability", 0.0) or 0.0),
+                            "uncertainty": float(memory.get("uncertainty", 0.65) or 0.65),
+                            "attempts": attempts,
+                            "correct": correct,
+                            "wrong": wrong,
+                            "last": str(memory.get("last_reviewed_at") or rec.get("last_seen") or ""),
+                            "next": str(memory.get("next_review_at") or rec.get("next_review") or ""),
+                        }
+                    )
+                if question.get("source_name") or question.get("source_label"):
+                    sources.add(str(question.get("source_name") or question.get("source_label")))
+                if question.get("stem_style"):
+                    styles.add(str(question.get("stem_style")))
+            if not per_question:
+                concept_states[concept_key] = {
+                    "concept_key": concept_key,
+                    "stability": 0.0,
+                    "lowest_retrievability": 0.0,
+                    "mean_retrievability": 0.0,
+                    "uncertainty": 1.0,
+                    "attempt_count": 0,
+                    "correct_count": 0,
+                    "wrong_count": 0,
+                    "high_confidence_wrong_count": int(high_conf_wrong_by_concept.get(concept_key, 0)),
+                    "distinct_question_count": len(concept_questions),
+                    "distinct_source_count": len(sources),
+                    "distinct_stem_style_count": len(styles),
+                    "last_reviewed_at": "",
+                    "next_review_at": "",
+                    "evidence_strength": "insufficient_evidence",
+                }
+                continue
+            concept_states[concept_key] = {
+                "concept_key": concept_key,
+                "stability": round(sum(row["stability"] for row in per_question) / len(per_question), 4),
+                "lowest_retrievability": round(min(row["retrievability"] for row in per_question), 4),
+                "mean_retrievability": round(sum(row["retrievability"] for row in per_question) / len(per_question), 4),
+                "uncertainty": round(sum(row["uncertainty"] for row in per_question) / len(per_question), 4),
+                "attempt_count": sum(min(1, row["attempts"]) for row in per_question),
+                "correct_count": sum(1 for row in per_question if row["correct"] > 0),
+                "wrong_count": sum(1 for row in per_question if row["wrong"] > 0),
+                "high_confidence_wrong_count": int(high_conf_wrong_by_concept.get(concept_key, 0)),
+                "distinct_question_count": len(per_question),
+                "distinct_source_count": len(sources),
+                "distinct_stem_style_count": len(styles),
+                "last_reviewed_at": max((row["last"] for row in per_question), default=""),
+                "next_review_at": min((row["next"] for row in per_question if row["next"]), default=""),
+                "evidence_strength": "strong" if len(per_question) >= 3 else "moderate" if len(per_question) >= 2 else "weak",
+            }
         graph_audit = audit_graph(concept_graph, pool)
+        normalized_source_trust_map = {
+            str(key).strip().casefold(): value for key, value in (source_trust_map or {}).items()
+        }
+        dependent_concepts_by_source = {}
+        for edge in (concept_graph.get("edges") or {}).values():
+            if edge.get("status") != "active" or edge.get("edge_type") != "prerequisite_of":
+                continue
+            source_key = str(edge.get("source_concept_key") or "")
+            target_key = str(edge.get("target_concept_key") or "")
+            if source_key and target_key:
+                dependent_concepts_by_source.setdefault(source_key, []).append(target_key)
+        current_session_questions = list(getattr(self, "questions", []))
+        session_context = {
+            "seen_question_numbers": [int(q.get("question_number") or 0) for q in current_session_questions],
+            "seen_concepts": [str(q.get("smart_concept_key") or "") for q in current_session_questions],
+            "seen_stem_styles": [str(q.get("stem_style") or "") for q in current_session_questions],
+            "seen_objectives": [str(q.get("objective_code") or "") for q in current_session_questions],
+        }
 
         priority_cache: dict[int, float] = {}
 
@@ -1120,9 +1249,7 @@ class SessionBuilderMixin:
             source_name_key = str(meta.get("source_name") or "Unknown source").strip()
             source_trust = source_trust_map.get(source_name_key)
             if source_trust is None:
-                source_trust = {
-                    str(key).strip().casefold(): value for key, value in (source_trust_map or {}).items()
-                }.get(source_name_key.casefold())
+                source_trust = normalized_source_trust_map.get(source_name_key.casefold())
             if source_trust is None:
                 source_trust = {"trust_score": 82.0, "label": "Watch"}
             diagnosis = diagnose_root_cause(
@@ -1135,30 +1262,20 @@ class SessionBuilderMixin:
             ) if graph_enabled else {
                 "diagnosis": "insufficient_evidence",
                 "confidence": 0.0,
-                "target_concept_key": concept_key_for_question(question)[0],
+                "target_concept_key": str(meta.get("base_concept_key") or ""),
                 "supporting_concept_keys": [],
                 "graph_version": GRAPH_VERSION,
             }
             graph_pressure = min(graph_max_utility, graph_max_utility * float(diagnosis.get("confidence", 0.0) or 0.0))
-            qnum_outcomes = [event for event in progress_history if int(event.get("question_number") or 0) == qnum]
+            qnum_outcomes = outcomes_by_qnum.get(qnum, [])
             quality = question_quality_record(
                 question,
                 qnum_outcomes,
                 minimum_samples=quality_min_samples,
                 possible_bad_key_minimum_samples=bad_key_min_samples,
             ) if quality_enabled else {"status": "healthy", "source_risk": 0.0, "confidence": 0.0}
-            concept_key = str(diagnosis.get("target_concept_key") or concept_key_for_question(question)[0])
-            dependent_concepts = [
-                edge.get("target_concept_key")
-                for edge in (concept_graph.get("edges") or {}).values()
-                if edge.get("status") == "active" and edge.get("edge_type") == "prerequisite_of" and edge.get("source_concept_key") == concept_key
-            ]
-            session_context = {
-                "seen_question_numbers": [int(q.get("question_number") or 0) for q in getattr(self, "questions", [])],
-                "seen_concepts": [str(q.get("smart_concept_key") or "") for q in getattr(self, "questions", [])],
-                "seen_stem_styles": [str(q.get("stem_style") or "") for q in getattr(self, "questions", [])],
-                "seen_objectives": [str(q.get("objective_code") or "") for q in getattr(self, "questions", [])],
-            }
+            concept_key = str(diagnosis.get("target_concept_key") or meta.get("base_concept_key") or "")
+            dependent_concepts = dependent_concepts_by_source.get(concept_key, [])
             info = information_value(
                 question,
                 concept_states.get(concept_key, {}),
@@ -1291,17 +1408,9 @@ class SessionBuilderMixin:
             )
             novelty_bonus = 0.0
             if is_unseen:
-                if any(
-                    int(question_meta.get(int(other.get("question_number") or 0), {}).get("record", {}).get("attempts", 0) or 0) > 0
-                    and int(other.get("question_number") or 0) != qnum
-                    and (
-                        str(question_meta.get(int(other.get("question_number") or 0), {}).get("unit_key") or "") == unit_key
-                        or (
-                            str(meta.get("objective_code") or "")
-                            and str(question_meta.get(int(other.get("question_number") or 0), {}).get("objective_code") or "") == str(meta.get("objective_code") or "")
-                        )
-                    )
-                    for other in pool
+                objective_code = str(meta.get("objective_code") or "")
+                if attempted_by_unit.get(unit_key, 0) > 0 or (
+                    objective_code and attempted_by_objective.get(objective_code, 0) > 0
                 ):
                     novelty_bonus += 6.0
                 if is_screenshot_import(question) and imported_chapter_burst_active:
@@ -1361,17 +1470,11 @@ class SessionBuilderMixin:
             policy_active_weak = is_active_weak(rec) or wrong_surplus >= int(
                 weakness_thresholds.get("active_weak_wrong_surplus", 1) or 1
             )
-            unseen_sibling_exists = any(
-                int(other.get("question_number") or 0) != qnum
-                and int(question_meta.get(int(other.get("question_number") or 0), {}).get("record", {}).get("attempts", 0) or 0) <= 0
-                and (
-                    str(question_meta.get(int(other.get("question_number") or 0), {}).get("unit_key") or "") == unit_key
-                    or (
-                        str(meta.get("objective_code") or "")
-                        and str(question_meta.get(int(other.get("question_number") or 0), {}).get("objective_code") or "") == str(meta.get("objective_code") or "")
-                    )
-                )
-                for other in pool
+            objective_code = str(meta.get("objective_code") or "")
+            unseen_sibling_exists = (
+                unseen_by_unit.get(unit_key, 0) - (1 if is_unseen else 0) > 0
+                or bool(objective_code)
+                and unseen_by_objective.get(objective_code, 0) - (1 if is_unseen else 0) > 0
             )
             if unseen_sibling_exists and (policy_active_weak or str(rec.get("last_confidence") or "").casefold() == "guessed"):
                 repetition_cost = min(15.0, repetition_cost + 10.0)
@@ -2271,7 +2374,7 @@ class SessionBuilderMixin:
             self.progress_data.setdefault("meta", {})["smart_practice_measurement"] = measurement
             final_signal_key = self._smart_practice_signal_key()
             self.smart_practice_signal_cache_key = final_signal_key
-            self.smart_practice_pool_cache[(final_signal_key, str(count), tuple(int(question.get("question_number") or 0) for question in pool), bool(randomize))] = tuple(
+            self.smart_practice_pool_cache[(final_signal_key, str(count), pool_qnums, bool(randomize))] = tuple(
                 int(question.get("question_number") or 0) for question in result
             )
             return result[:target]
