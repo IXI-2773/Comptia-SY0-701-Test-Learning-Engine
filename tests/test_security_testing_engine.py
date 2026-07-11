@@ -2034,23 +2034,29 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertEqual(rec["next_review"], rec["super_confident_until"])
         self.assertEqual(1, app.index)
 
-    def test_super_confident_action_button_is_visible_and_enabled_after_correct_answer(self):
+    def test_super_confident_button_is_in_confidence_row_after_correct_answer(self):
         app = self.make_app()
 
         app.toggle_choice("A")
 
-        self.assertEqual("normal", str(app.super_confident_action_btn.cget("state")))
-        self.assertEqual("SUPER CONFIDENT", str(app.super_confident_action_btn.cget("text")))
-        self.assertTrue(bool(app.super_confident_action_btn.winfo_manager()))
+        self.assertEqual(app.confidence_wrap, app.super_confident_btn.master)
+        self.assertEqual("normal", str(app.super_confident_btn.cget("state")))
+        self.assertEqual("Super confident", str(app.super_confident_btn.cget("text")))
+        self.assertTrue(bool(app.super_confident_btn.winfo_manager()))
+        packed = app.confidence_wrap.pack_slaves()
+        self.assertLess(packed.index(app.confidence_buttons["Guessed"]), packed.index(app.super_confident_btn))
 
-    def test_super_confident_action_button_is_disabled_after_wrong_answer(self):
+    def test_super_confident_button_is_disabled_in_confidence_row_after_wrong_answer(self):
         app = self.make_app()
 
         app.toggle_choice("B")
 
-        self.assertEqual("disabled", str(app.super_confident_action_btn.cget("state")))
-        self.assertEqual("SUPER CONFIDENT", str(app.super_confident_action_btn.cget("text")))
-        self.assertTrue(bool(app.super_confident_action_btn.winfo_manager()))
+        self.assertEqual(app.confidence_wrap, app.super_confident_btn.master)
+        self.assertEqual("disabled", str(app.super_confident_btn.cget("state")))
+        self.assertEqual("Super confident", str(app.super_confident_btn.cget("text")))
+        self.assertTrue(bool(app.super_confident_btn.winfo_manager()))
+        packed = app.confidence_wrap.pack_slaves()
+        self.assertLess(packed.index(app.confidence_buttons["Guessed"]), packed.index(app.super_confident_btn))
 
     def test_answer_recording_uses_deferred_progress_and_session_saves(self):
         app = self.make_app()
