@@ -10,6 +10,8 @@ LEGACY_LAYOUT = (LEGACY_SOURCE_DIR / 'app.py').exists()
 APP_SHELL_DIR = BASE_DIR.parent if LEGACY_LAYOUT else BASE_DIR
 ROOT_EXE = APP_SHELL_DIR / 'SecurityTestingEngine.exe'
 START_HERE = APP_SHELL_DIR / 'README - Start Here.txt'
+OUTER_ROOT_EXE = BASE_DIR.parent / 'SecurityTestingEngine.exe'
+OUTER_START_HERE = BASE_DIR.parent / 'README - Start Here.txt'
 
 
 def start_here_text() -> str:
@@ -52,7 +54,11 @@ def build_release(_bank_path=None):
     RELEASE_DIR.mkdir(parents=True)
     copy_required(DIST_DIR / 'SecurityTestingEngine.exe', RELEASE_DIR / 'SecurityTestingEngine.exe')
     copy_required(DIST_DIR / 'SecurityTestingEngine.exe', ROOT_EXE)
+    if OUTER_ROOT_EXE != ROOT_EXE and OUTER_ROOT_EXE.exists():
+        copy_required(DIST_DIR / 'SecurityTestingEngine.exe', OUTER_ROOT_EXE)
     START_HERE.write_text(start_here_text(), encoding='utf-8')
+    if OUTER_START_HERE != START_HERE and OUTER_START_HERE.exists():
+        OUTER_START_HERE.write_text(start_here_text(), encoding='utf-8')
     return RELEASE_DIR
 
 
