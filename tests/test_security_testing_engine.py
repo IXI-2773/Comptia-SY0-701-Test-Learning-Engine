@@ -23,11 +23,13 @@ from progress_store import (
     default_progress_record,
     is_review_due,
     is_active_weak,
+    is_super_confident_active,
     is_suspended,
     recovery_ladder_stage,
     select_questions_by_history,
     select_due_review_questions,
     sanitize_response_time,
+    set_progress_super_confident,
     aggregate_concept_memory,
     review_days_for_grade,
     study_status_name,
@@ -926,6 +928,15 @@ class SecurityTestingEngineTests(unittest.TestCase):
         self.assertEqual(3, len(result["pool_timings"]))
         self.assertEqual(3, len(result["analytics_timings"]))
         self.assertLess(result["warm_pool_seconds"], 0.35)
+
+    def test_merged_bank_q1105_uses_port_mirroring_answer_key(self):
+        bank = load_bank(ROOT / "public_sy0701_bank_v4_plus_studyguide_clean.json")
+        question = next(q for q in bank["questions"] if q.get("question_number") == 1105)
+
+        self.assertEqual(["A"], question["correct"])
+        self.assertIn("visibility", question["general_explanation"].lower())
+        self.assertIn("port mirroring/monitor mode", question["general_explanation"].lower())
+        self.assertIn("does not by itself make the nips see that traffic", question["choice_explanations"]["D"].lower())
 
     def test_bank_validation_flags_conflicting_and_repeated_prompts(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1866,6 +1877,10 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
                         answered = False
                     flagged = rng.choice([True, False])
                     suspended = rng.choice([True, False])
+                    if idx == len(app.questions) - 1:
+                        # Keep one truly unfinished question so the resumable session should persist.
+                        flagged = False
+                        suspended = False
                     if answered:
                         selected = ["A"] if rng.choice([True, False]) else ["B"]
                         question["selected"] = list(selected)
@@ -2003,6 +2018,45 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertTrue(any(call.args == ("after#1",) for call in cancel_mock.call_args_list))
         self.assertEqual(1, app.index)
         self.assertIsNone(app.auto_next_after_id)
+
+    def test_super_confident_button_pushes_question_far_out(self):
+        app = self.make_app()
+
+        app.toggle_choice("A")
+        first_qnum = app.questions[0]["question_number"]
+        app._set_current_index(0)
+        app.mark_current_question_super_confident()
+
+        rec = app._progress_questions()[str(first_qnum)]
+        self.assertTrue(is_super_confident_active(rec))
+        self.assertEqual("Sure", rec["last_confidence"])
+        self.assertGreaterEqual(int(rec["correct_streak"]), 6)
+        self.assertEqual(rec["next_review"], rec["super_confident_until"])
+        self.assertEqual(1, app.index)
+
+    def test_super_confident_button_is_in_confidence_row_after_correct_answer(self):
+        app = self.make_app()
+
+        app.toggle_choice("A")
+
+        self.assertEqual(app.confidence_wrap, app.super_confident_btn.master)
+        self.assertEqual("normal", str(app.super_confident_btn.cget("state")))
+        self.assertEqual("Super confident", str(app.super_confident_btn.cget("text")))
+        self.assertTrue(bool(app.super_confident_btn.winfo_manager()))
+        packed = app.confidence_wrap.pack_slaves()
+        self.assertLess(packed.index(app.confidence_buttons["Guessed"]), packed.index(app.super_confident_btn))
+
+    def test_super_confident_button_is_disabled_in_confidence_row_after_wrong_answer(self):
+        app = self.make_app()
+
+        app.toggle_choice("B")
+
+        self.assertEqual(app.confidence_wrap, app.super_confident_btn.master)
+        self.assertEqual("disabled", str(app.super_confident_btn.cget("state")))
+        self.assertEqual("Super confident", str(app.super_confident_btn.cget("text")))
+        self.assertTrue(bool(app.super_confident_btn.winfo_manager()))
+        packed = app.confidence_wrap.pack_slaves()
+        self.assertLess(packed.index(app.confidence_buttons["Guessed"]), packed.index(app.super_confident_btn))
 
     def test_answer_recording_uses_deferred_progress_and_session_saves(self):
         app = self.make_app()
@@ -3426,6 +3480,8 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         )
         app._progress_questions()["1"]["next_review"] = "2099-01-01"
         app._progress_questions()["2"]["next_review"] = "2099-01-01"
+        app._progress_questions()["1"]["learner_memory"]["next_review_at"] = "2099-01-01"
+        app._progress_questions()["2"]["learner_memory"]["next_review_at"] = "2099-01-01"
         app.master_questions[0]["selected"] = ["A"]
         app.master_questions[1]["selected"] = ["A"]
         app.append_answer_history(
@@ -3445,6 +3501,60 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
         self.assertGreater(freshness[1], freshness[2])
         self.assertEqual(3, pool[0]["question_number"])
+
+    def test_smart_practice_super_confident_questions_are_skipped_when_other_choices_exist(self):
+        app = self.make_app(start_session=False)
+        app.master_questions = [
+            {
+                "question_number": 1,
+                "prompt": "Question 1",
+                "choices": {"A": "Correct 1", "B": "Wrong 1"},
+                "correct": ["A"],
+                "domain": "Domain A",
+                "topics": ["Topic 1"],
+                "source_name": "Source One",
+                "objective_code": "1.1",
+            },
+            {
+                "question_number": 2,
+                "prompt": "Question 2",
+                "choices": {"A": "Correct 2", "B": "Wrong 2"},
+                "correct": ["A"],
+                "domain": "Domain A",
+                "topics": ["Topic 1"],
+                "source_name": "Source One",
+                "objective_code": "1.1",
+            },
+            {
+                "question_number": 3,
+                "prompt": "Question 3",
+                "choices": {"A": "Correct 3", "B": "Wrong 3"},
+                "correct": ["A"],
+                "domain": "Domain A",
+                "topics": ["Topic 1"],
+                "source_name": "Source Two",
+                "objective_code": "1.1",
+            },
+            {
+                "question_number": 4,
+                "prompt": "Question 4",
+                "choices": {"A": "Correct 4", "B": "Wrong 4"},
+                "correct": ["A"],
+                "domain": "Domain B",
+                "topics": ["Topic 2"],
+                "source_name": "Source Three",
+                "objective_code": "2.1",
+            },
+        ]
+        app._reset_runtime_question_state(app.master_questions)
+        rec = update_progress_record({}, ["A"], True, seen_on="2026-05-17", confidence="Sure")
+        rec = set_progress_super_confident(rec, seen_on="2026-05-17", cooldown_days=120)
+        app._progress_questions()["1"] = rec
+
+        pool = app.build_smart_practice_pool("2", randomize=False)
+
+        self.assertTrue(is_super_confident_active(app._progress_questions()["1"], on_date="2026-05-17"))
+        self.assertNotIn(1, [q["question_number"] for q in pool])
 
     def test_wrong_answer_queues_confusion_pair_drill_before_generic_twins(self):
         app = self.make_app(start_session=False)

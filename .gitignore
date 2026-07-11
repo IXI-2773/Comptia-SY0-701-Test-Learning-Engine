@@ -2,6 +2,13 @@ __pycache__/
 *.py[cod]
 .mypy_cache/
 .ruff_cache/
+.pytest_cache/
+.coverage
+.coverage.*
+.cache/
+*.tmp
+Thumbs.db
+.DS_Store
 
 build/
 dist/

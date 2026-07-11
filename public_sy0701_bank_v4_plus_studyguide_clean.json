@@ -198,7 +198,7 @@
         "D": "Memorandum of understanding (MOU)"
       },
       "correct": [
-        "D"
+        "A"
       ],
       "question_type": "single",
       "general_explanation": "A Memorandum of Understanding (MOU) is crucial in this scenario as it establishes the foundational terms and conditions of the partnership between TechGuard Inc. and CloudSecure. The MOU will detail the roles, responsibilities, and contribution specifics of each party, as well as outline the project's scope and objectives. This agreement serves as a formal but non-binding agreement, which is particularly useful in the early stages of a collaborative relationship, providing a framework that can be refined into detailed contracts and agreements (such as NDAs or SLAs) as the collaboration progresses.",
@@ -377,7 +377,7 @@
         "D": "Work order (WO)/statement of work (SOW)"
       },
       "correct": [
-        "D"
+        "A"
       ],
       "question_type": "single",
       "general_explanation": "The Work Order/Statement of Work (SOW) is the most appropriate document for capturing all specific details such as tasks, deliverables, timelines, and resources for a project. The SOW is designed to provide comprehensive details that outline the scope of work, expected outcomes, and deliverables in a clear and structured manner. It serves as a binding agreement that defines the exact nature of the work and the responsibilities involved, making it an essential tool for complex projects like cybersecurity infrastructure overhauls.",
@@ -2240,7 +2240,8 @@
       ],
       "duplicate_of": [
         72
-      ]
+      ],
+      "objective_code": "2.4"
     },
     {
       "question_number": 63,
@@ -38313,15 +38314,15 @@
         "D": "Isolate that segment on its own VLAN."
       },
       "correct": [
-        "D"
+        "A"
       ],
       "question_type": "single",
-      "general_explanation": "The NIPS is not seeing the traffic on that network segment. By implementing port mirroring, the traffic from that segment can be copied to the segment where the NIPS is installed. Installing a network IPS on the segment would require additional resources. This would work but is not the most efficient approach. Nothing in this scenario suggests that the NIPS is inadequate. It just is not seeing all the traffic. Finally, isolating the segment to its own VLAN would isolate that network segment but would still not allow the NIPS to analyze the traffic from that segment.",
+      "general_explanation": "The NIPS is functioning correctly, so the problem is visibility rather than capability. Enabling port mirroring/monitor mode copies traffic from that segment to where the NIPS can inspect it. Installing another NIPS would require extra hardware, upgrading the NIPS would not solve the visibility gap, and placing the segment on its own VLAN would change segmentation without automatically giving the NIPS access to that traffic.",
       "choice_explanations": {
-        "A": "Not keyed as correct in the verified screenshot. Compare against: D.",
-        "B": "Not keyed as correct in the verified screenshot. Compare against: D.",
-        "C": "Not keyed as correct in the verified screenshot. Compare against: D.",
-        "D": "Correct answer from verified Chapter 3 screenshot."
+        "A": "Correct. Port mirroring/monitor mode lets the existing NIPS inspect copied traffic from that segment without deploying another sensor.",
+        "B": "Incorrect. A second NIPS could work, but it is not the most efficient fix when the current NIPS simply lacks visibility into that segment.",
+        "C": "Incorrect. The scenario says the NIPS is properly configured and working, so the issue is not that the device is ineffective.",
+        "D": "Incorrect. Moving the segment to its own VLAN changes segmentation, but it does not by itself make the NIPS see that traffic."
       },
       "chapter": "Chapter 3",
       "subtitle": "Chapter 3 screenshot bank - Domain 3.0",
@@ -44059,48 +44060,6 @@
       "import_status": "screenshot_verified",
       "suspended": false,
       "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 02-48-53 Question 180 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png"
-    },
-    {
-      "question_number": 1253,
-      "source_question_number": 182,
-      "source_image": "Screenshot 2026-06-27 at 02-50-07 Question 182 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
-      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 02-50-07 Question 182 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
-      "source_label": "Chapter 2 screenshot bank",
-      "source_page": 182,
-      "prompt": "Chapter 2 screenshot Q182 needs transcription from the source image before it is used as a study question.",
-      "choices": {
-        "A": "Review source screenshot before studying",
-        "B": "Needs prompt transcription",
-        "C": "Needs answer-key verification",
-        "D": "Needs explanation verification"
-      },
-      "correct": [
-        "A"
-      ],
-      "question_type": "single",
-      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
-      "choice_explanations": {
-        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
-        "B": "Placeholder only. Do not study this as a real answer choice.",
-        "C": "Placeholder only. Do not study this as a real answer choice.",
-        "D": "Placeholder only. Do not study this as a real answer choice."
-      },
-      "chapter": "Chapter 2",
-      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
-      "domain": "Threats Vulnerabilities and Mitigations",
-      "topics": [
-        "General Review"
-      ],
-      "study_focus": [
-        "Threats Vulnerabilities and Mitigations",
-        "General Review"
-      ],
-      "flagged_issues": [
-        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
-      ],
-      "duplicate_of": [],
-      "suspended": true,
-      "import_status": "screenshot_review_needed"
     },
     {
       "question_number": 1254,

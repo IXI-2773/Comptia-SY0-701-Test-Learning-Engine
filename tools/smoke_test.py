@@ -1,10 +1,15 @@
 from pathlib import Path
 import sys
 
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from tools.validate_bank import validate_bank, write_markdown_report
+
 RELEASE = ROOT / 'release' / 'SecurityTestingEngine'
 REPORT = ROOT / 'reports' / 'bank_validation_report.md'
+DEFAULT_BANK = ROOT / 'public_sy0701_bank_v4_plus_studyguide_clean.json'
 
 
 def require(path: Path, label: str):
@@ -17,6 +22,9 @@ def main():
     release_items = [path.name for path in RELEASE.iterdir()]
     if release_items != ['SecurityTestingEngine.exe']:
         raise AssertionError(f'Release folder should contain only the EXE, found: {release_items}')
+    if not REPORT.exists():
+        result = validate_bank(DEFAULT_BANK)
+        write_markdown_report(result, REPORT)
     require(REPORT, 'bank validation report')
     text = REPORT.read_text(encoding='utf-8')
     if 'Issues: **0**' not in text:

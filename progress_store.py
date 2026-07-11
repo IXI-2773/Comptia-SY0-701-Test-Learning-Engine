@@ -14,6 +14,7 @@ LEARNER_MEMORY_DEFAULT = {
     "last_updated": "",
 }
 MAX_HISTORY_EVENTS = 4000
+SUPER_CONFIDENT_COOLDOWN_DAYS = 120
 CONFIDENCE_OPTIONS = ["Sure", "Unsure", "Guessed"]
 MISS_REASON_OPTIONS = ["Did not know", "Misread", "Narrowed to two", "Changed answer"]
 SESSION_SOURCE_ALIASES = {
@@ -40,6 +41,7 @@ class ProgressRecord(TypedDict):
     miss_reason_counts: dict[str, int]
     flagged: bool
     suspended: bool
+    super_confident_until: str
     learner_memory: dict[str, Any]
 
 
@@ -83,6 +85,7 @@ def default_progress_record() -> ProgressRecord:
         "miss_reason_counts": {option: 0 for option in MISS_REASON_OPTIONS},
         "flagged": False,
         "suspended": False,
+        "super_confident_until": "",
         "learner_memory": dict(LEARNER_MEMORY_DEFAULT),
     }
 
@@ -260,6 +263,7 @@ def normalize_progress_record(record: Mapping[str, Any] | None) -> ProgressRecor
     merged["miss_reason_counts"] = {str(key): int(value or 0) for key, value in merged["miss_reason_counts"].items()}
     merged["flagged"] = bool(merged.get("flagged"))
     merged["suspended"] = bool(merged.get("suspended"))
+    merged["super_confident_until"] = str(merged.get("super_confident_until", "") or "")
     legacy_next_review = str(merged.get("next_review", "") or "")
     had_learner_memory = isinstance(merged.get("learner_memory"), Mapping)
     learner_memory = normalize_learner_memory(merged.get("learner_memory"))
@@ -420,6 +424,50 @@ def set_progress_flag(record: Mapping[str, Any] | None, flagged) -> ProgressReco
 def set_progress_suspended(record: Mapping[str, Any] | None, suspended) -> ProgressRecord:
     record = normalize_progress_record(record)
     record["suspended"] = bool(suspended)
+    return record
+
+
+def is_super_confident_active(record: Mapping[str, Any] | None, on_date=None) -> bool:
+    record = record or {}
+    until = str(record.get("super_confident_until", "") or "").strip()
+    if not until:
+        return False
+    try:
+        until_day = date.fromisoformat(until)
+    except ValueError:
+        return False
+    on_date = date.fromisoformat(on_date) if isinstance(on_date, str) else (on_date or date.today())
+    return until_day >= on_date
+
+
+def set_progress_super_confident(
+    record: Mapping[str, Any] | None,
+    *,
+    seen_on=None,
+    cooldown_days: int = SUPER_CONFIDENT_COOLDOWN_DAYS,
+) -> ProgressRecord:
+    record = normalize_progress_record(record)
+    day = date.fromisoformat(seen_on) if isinstance(seen_on, str) else (seen_on or date.today())
+    until = day + timedelta(days=max(1, int(cooldown_days or SUPER_CONFIDENT_COOLDOWN_DAYS)))
+    confidence = normalize_confidence(record.get("last_confidence") or "Sure")
+    if confidence != "Sure":
+        counts = dict(record.get("confidence_counts") or {})
+        counts[confidence] = max(0, int(counts.get(confidence, 0)) - 1)
+        counts["Sure"] = int(counts.get("Sure", 0)) + 1
+        record["confidence_counts"] = counts
+    record["last_confidence"] = "Sure"
+    record["last_miss_reason"] = ""
+    record["correct_streak"] = max(6, int(record.get("correct_streak", 0) or 0))
+    record["last_correct"] = True
+    memory = normalize_learner_memory(record.get("learner_memory"))
+    memory["retrievability"] = max(0.995, float(memory.get("retrievability", 0.0) or 0.0))
+    memory["stability"] = max(0.98, float(memory.get("stability", 0.0) or 0.0))
+    memory["last_grade"] = "easy"
+    memory["next_review_at"] = until.isoformat()
+    memory["last_updated"] = day.isoformat()
+    record["learner_memory"] = memory
+    record["next_review"] = until.isoformat()
+    record["super_confident_until"] = until.isoformat()
     return record
 
 

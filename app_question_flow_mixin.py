@@ -14,7 +14,13 @@ from app_constants import (
     QUESTION_TAG_TWIN,
     QUESTION_TAG_WRONG_ANSWER_MEMORY,
 )
-from progress_store import is_active_weak, is_review_due, is_suspended, sanitize_response_time
+from progress_store import (
+    is_active_weak,
+    is_review_due,
+    is_suspended,
+    sanitize_response_time,
+    set_progress_super_confident,
+)
 from session_models import QuestionRuntimeState, SessionAnswerEvent, clear_runtime_answer_state
 from smart_practice_concept_graph import concept_key_for_question
 
@@ -849,6 +855,7 @@ class QuestionFlowMixin:
         concept_key = self.repair_concept_key_for_question(q)
         state = self.progress_repair_state()
         row = dict(state.get(concept_key) or {})
+        active_repair = bool(row) or bool(q.get("repair_stage")) or bool(q.get("repair_concept_key"))
         row["concept_key"] = concept_key
         row["last_question_number"] = int(q.get("question_number") or 0)
         row["last_seen"] = time.strftime("%Y-%m-%d")
@@ -888,6 +895,8 @@ class QuestionFlowMixin:
                 state[concept_key] = row
                 return inserted
         if is_correct:
+            if not active_repair:
+                return []
             current_stage = str(q.get("repair_stage") or row.get("stage") or "")
             if current_stage == "spaced_retrieval":
                 row["status"] = "resolved"
@@ -928,12 +937,12 @@ class QuestionFlowMixin:
         q["repair_stage"] = "contrast"
         q["repair_concept_key"] = concept_key
         repair_options = (
-            (QUESTION_TAG_CONFUSION_PAIR, self.find_confusion_pair_candidates(q, limit=1), 2),
-            (QUESTION_TAG_WRONG_ANSWER_MEMORY, self.find_wrong_answer_memory_candidates(q, limit=1), 3),
-            (QUESTION_TAG_TWIN, self.find_question_twins(q, limit=1), 3),
+            (QUESTION_TAG_CONFUSION_PAIR, self.maybe_queue_confusion_pair_drill),
+            (QUESTION_TAG_WRONG_ANSWER_MEMORY, self.maybe_queue_wrong_answer_memory),
+            (QUESTION_TAG_TWIN, self.maybe_queue_question_twins),
         )
-        for tag, candidates, delay in repair_options:
-            inserted = self._insert_delayed_followup_questions(q, candidates, tag, delay_slots=delay)
+        for tag, queue_followup in repair_options:
+            inserted = queue_followup(q)
             if inserted:
                 for item in inserted:
                     item["repair_stage"] = "contrast"
@@ -1158,6 +1167,30 @@ class QuestionFlowMixin:
             self.mark_question_list_dirty()
             self.schedule_progress_save()
             self.schedule_session_save(delay_ms=125)
+        if self._go_to_next_unanswered_silent():
+            return
+        self.render_question()
+
+    def mark_current_question_super_confident(self):
+        if not self.questions:
+            return
+        q = self.current_question()
+        if not q.get("answered") or not self._question_correct(q):
+            return
+        self.cancel_auto_next_after_answer()
+        rec = set_progress_super_confident(self._progress_record(q, create=True))
+        q["last_confidence"] = str(rec.get("last_confidence") or "Sure")
+        q["last_miss_reason"] = ""
+        for event in reversed(self._progress_history()):
+            if int(event.get("question_number") or 0) == int(q.get("question_number") or 0):
+                event["confidence"] = "Sure"
+                event["miss_reason"] = ""
+                break
+        self._progress_questions()[self._question_key(q)] = rec
+        self.mark_question_list_dirty()
+        self.invalidate_learning_state(prewarm=True, prewarm_delay_ms=350)
+        self.schedule_progress_save()
+        self.schedule_session_save(delay_ms=125)
         if self._go_to_next_unanswered_silent():
             return
         self.render_question()
