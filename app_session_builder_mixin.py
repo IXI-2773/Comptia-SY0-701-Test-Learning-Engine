@@ -1114,10 +1114,17 @@ class SessionBuilderMixin:
                 return priority_cache[qnum]
             meta = question_meta.get(qnum, {})
             rec = meta.get("record", {})
+            attempts = int(rec.get("attempts", 0) or 0)
+            is_unseen = attempts <= 0
             source_row = source_map.get(qnum, {"score": 0.8, "label": "Single-source only"})
-            source_trust = source_trust_map.get(
-                str(meta.get("source_name") or "Unknown source"), {"trust_score": 82.0, "label": "Watch"}
-            )
+            source_name_key = str(meta.get("source_name") or "Unknown source").strip()
+            source_trust = source_trust_map.get(source_name_key)
+            if source_trust is None:
+                source_trust = {
+                    str(key).strip().casefold(): value for key, value in (source_trust_map or {}).items()
+                }.get(source_name_key.casefold())
+            if source_trust is None:
+                source_trust = {"trust_score": 82.0, "label": "Watch"}
             diagnosis = diagnose_root_cause(
                 question,
                 concept_graph,
@@ -1195,6 +1202,7 @@ class SessionBuilderMixin:
             objective_row = objective_map.get(
                 str(meta.get("objective_code") or ""), {"mastery_score": 72.0, "stem_style_count": 1}
             )
+            objective_mastery_score = float(objective_row.get("mastery_score", 72.0))
             latent_row = latent_map.get(qnum, {"score": 0.0})
             difficulty_row = difficulty_map.get(qnum, {"score": 0.0, "label": "Stable"})
             phrasing_row = phrasing_map.get(qnum, {"score": 100.0, "label": "Clean"})
@@ -1222,18 +1230,25 @@ class SessionBuilderMixin:
             memory = dict((rec or {}).get("learner_memory") or {})
             retrievability = max(0.0, min(1.0, float(memory.get("retrievability", 0.0) or 0.0)))
             trust_risk = max(0.0, (profile.source_trust_baseline - trust_score) / profile.source_trust_baseline)
-            if trust_label == "Decayed":
+            if trust_label.casefold() == "decayed":
                 trust_risk += float(source_risk_settings.get("decayed_penalty", 0.22) or 0.22)
             if source_label == "Source conflict":
                 trust_risk += float(source_risk_settings.get("conflict_penalty", 0.28) or 0.28)
             if str(question.get("import_status") or "") == "screenshot_review_needed":
                 trust_risk += float(source_risk_settings.get("decayed_penalty", 0.22) or 0.22)
             trust_risk = max(0.0, min(1.0, trust_risk))
+            explicit_source_penalty = 0.0
+            if trust_score < profile.source_trust_baseline:
+                explicit_source_penalty += (profile.source_trust_baseline - trust_score) * 0.12
+            if trust_label.casefold() == "decayed":
+                explicit_source_penalty += 3.0
+            if source_name_key.casefold() == "decayed":
+                explicit_source_penalty += 3.0
             retention_risk = min(
                 25.0,
                 (18.0 if memory_due else 0.0)
-                + float(retention_stress_row.get("pressure", 0.0)) * 0.12
-                + max(0.0, 1.0 - retrievability) * 8.0,
+                + (float(retention_stress_row.get("pressure", 0.0)) * 0.12 if attempts > 0 else 0.0)
+                + (max(0.0, 1.0 - retrievability) * 8.0 if attempts > 0 else 0.0),
             ) * review_interval_multiplier
             learning_gain = min(
                 20.0,
@@ -1244,8 +1259,8 @@ class SessionBuilderMixin:
             blueprint_importance = min(
                 15.0,
                 gap_score * 0.13
-                + (5.0 if int(rec.get("attempts", 0)) <= 0 else 0.0)
-                + max(0.0, profile.objective_mastery_baseline - float(objective_row.get("mastery_score", 72.0)))
+                + (5.0 if is_unseen else 0.0)
+                + max(0.0, profile.objective_mastery_baseline - objective_mastery_score)
                 * 0.08,
             )
             misconception_repair = min(
@@ -1253,7 +1268,7 @@ class SessionBuilderMixin:
                 (8.0 if is_active_weak(rec) else 0.0)
                 + misconception_pressure * 0.08
                 + wrong_memory_pressure * 0.1
-                + wrong_recycle_pressure * 0.12
+                + wrong_recycle_pressure * 0.22
                 + near_miss_pressure * 0.12
                 + float(latent_row.get("score", 0.0)) * 0.12
                 + float(compression_row.get("compression", 0.0)) * 0.06,
@@ -1274,11 +1289,44 @@ class SessionBuilderMixin:
                 + (2.0 if str(meta.get("source_name") or "") not in objective_exposure.get("sources", set()) else 0.0)
                 + (2.0 if str(meta.get("stem_style") or "") not in objective_exposure.get("styles", set()) else 0.0),
             )
+            novelty_bonus = 0.0
+            if is_unseen:
+                if any(
+                    int(question_meta.get(int(other.get("question_number") or 0), {}).get("record", {}).get("attempts", 0) or 0) > 0
+                    and int(other.get("question_number") or 0) != qnum
+                    and (
+                        str(question_meta.get(int(other.get("question_number") or 0), {}).get("unit_key") or "") == unit_key
+                        or (
+                            str(meta.get("objective_code") or "")
+                            and str(question_meta.get(int(other.get("question_number") or 0), {}).get("objective_code") or "") == str(meta.get("objective_code") or "")
+                        )
+                    )
+                    for other in pool
+                ):
+                    novelty_bonus += 6.0
+                if is_screenshot_import(question) and imported_chapter_burst_active:
+                    novelty_bonus += 6.0
+                if gap_score >= profile.coverage_focus_gap_min:
+                    novelty_bonus += 11.0
+                if objective_mastery_score < profile.objective_focus_mastery_max:
+                    novelty_bonus += 7.0
+                if wrong_recycle_pressure >= profile.wrong_answer_recycle_focus_min:
+                    novelty_bonus += 12.0
+                elif near_miss_pressure >= profile.near_miss_focus_min:
+                    novelty_bonus += 3.0
+            boundary_bonus = 0.0
+            if str(boundary_row.get("weak_style") or "") == str(meta.get("stem_style") or ""):
+                boundary_bonus += min(8.0, float(boundary_row.get("gap", 0.0)) * 0.16)
+            counterfactual_bonus = min(4.0, counterfactual_pressure * 0.12)
+            exploration_value = min(10.0, exploration_value + novelty_bonus * 0.35 + boundary_bonus * 0.3)
             exploration_value += max(0.0, float(exploration_settings.get("transfer_min_value", 4.0) or 4.0) - 4.0) * 0.2
             if diagnosis["diagnosis"] == "transfer_failure":
                 exploration_value += graph_pressure
                 learning_gain += graph_pressure * 0.5
             exploration_value += max(0.0, info.get("transfer_evidence_value", 0.0)) * 0.2
+            learning_gain = min(20.0, learning_gain + novelty_bonus * 0.2 + boundary_bonus + counterfactual_bonus)
+            blueprint_importance = min(15.0, blueprint_importance + novelty_bonus * 0.25 + boundary_bonus * 0.6)
+            misconception_repair = min(20.0, misconception_repair + novelty_bonus * 0.3 + boundary_bonus * 0.5)
             repetition_cost = min(
                 15.0,
                 freshness_penalty * 0.18
@@ -1295,6 +1343,7 @@ class SessionBuilderMixin:
                 + phrasing_penalty * 0.06
                 + max(0.0, float(source_risk_settings.get("baseline", 85.0) or 85.0) - 85.0) * 0.01,
             )
+            source_quality_risk = min(15.0, source_quality_risk + explicit_source_penalty)
             if diagnosis["diagnosis"] == "source_quality_problem":
                 source_quality_risk += graph_pressure
             source_quality_risk += min(quality_risk_max, max(0.0, info.get("item_quality_risk", 0.0) + info.get("source_risk", 0.0)) * 0.2)
@@ -1312,6 +1361,20 @@ class SessionBuilderMixin:
             policy_active_weak = is_active_weak(rec) or wrong_surplus >= int(
                 weakness_thresholds.get("active_weak_wrong_surplus", 1) or 1
             )
+            unseen_sibling_exists = any(
+                int(other.get("question_number") or 0) != qnum
+                and int(question_meta.get(int(other.get("question_number") or 0), {}).get("record", {}).get("attempts", 0) or 0) <= 0
+                and (
+                    str(question_meta.get(int(other.get("question_number") or 0), {}).get("unit_key") or "") == unit_key
+                    or (
+                        str(meta.get("objective_code") or "")
+                        and str(question_meta.get(int(other.get("question_number") or 0), {}).get("objective_code") or "") == str(meta.get("objective_code") or "")
+                    )
+                )
+                for other in pool
+            )
+            if unseen_sibling_exists and (policy_active_weak or str(rec.get("last_confidence") or "").casefold() == "guessed"):
+                repetition_cost = min(15.0, repetition_cost + 10.0)
             if is_super_confident_active(rec) and not memory_due and not policy_active_weak:
                 repetition_cost = 15.0
             repair_recent_delay = int(repair_spacing_settings.get("contrast_delay", 2) or 2)
@@ -1364,6 +1427,13 @@ class SessionBuilderMixin:
                     "fatigue_cost", fatigue_cost * float(utility_scales.get("fatigue_cost", 1.0))
                 ),
             }
+            breakdown["source_quality_risk"] = policy_clamp_component(
+                "source_quality_risk",
+                max(
+                    float(breakdown.get("source_quality_risk", 0.0) or 0.0),
+                    explicit_source_penalty * float(utility_scales.get("source_quality_risk", 1.0)),
+                ),
+            )
             total = policy_utility_total(breakdown)
             positive_reasons = [
                 ("retention", retention_risk),
@@ -1901,6 +1971,22 @@ class SessionBuilderMixin:
         ):
             fallback.extend(group)
 
+        def selection_priority_bonus(question: QuestionRuntimeState) -> float:
+            qnum = int(question.get("question_number") or 0)
+            attempts = int((question_meta.get(qnum, {}).get("record") or {}).get("attempts", 0) or 0)
+            if attempts > 0:
+                return 0.0
+            bonus = 0.0
+            if question in screenshot_focus:
+                bonus += 10.0
+            if question in coverage_focus:
+                bonus += 8.0
+            if question in objective_focus:
+                bonus += 8.0
+            if question in wrong_recycle_focus:
+                bonus += 18.0
+            return bonus
+
         def allocate_by_primary_role(candidates: list[QuestionRuntimeState]) -> list[QuestionRuntimeState]:
             allocations = smart_practice_role_allocation(target, role_shares=role_shares)
             buckets = {role: [] for role in allocations}
@@ -1919,7 +2005,12 @@ class SessionBuilderMixin:
                 buckets[role].append(question)
                 unique.append(question)
             for bucket in buckets.values():
-                bucket.sort(key=lambda question: (-smart_priority(question), int(question.get("question_number") or 0)))
+                bucket.sort(
+                    key=lambda question: (
+                        -(smart_priority(question) + selection_priority_bonus(question)),
+                        int(question.get("question_number") or 0),
+                    )
+                )
             selected: list[QuestionRuntimeState] = []
             selected_qnums = set()
 
@@ -1936,7 +2027,10 @@ class SessionBuilderMixin:
                     add(question)
             remaining = sorted(
                 [question for question in unique if question.get("question_number") not in selected_qnums],
-                key=lambda question: (-smart_priority(question), int(question.get("question_number") or 0)),
+                key=lambda question: (
+                    -(smart_priority(question) + selection_priority_bonus(question)),
+                    int(question.get("question_number") or 0),
+                ),
             )
             for question in remaining:
                 if len(selected) >= target:
@@ -1962,7 +2056,12 @@ class SessionBuilderMixin:
                         continue
                     used_qnums.add(qnum)
                     candidates.append(item)
-            candidates.sort(key=lambda question: (-smart_priority(question), int(question.get("question_number") or 0)))
+            candidates.sort(
+                key=lambda question: (
+                    -(smart_priority(question) + selection_priority_bonus(question)),
+                    int(question.get("question_number") or 0),
+                )
+            )
             return candidates
 
         def shape_for_variety(selected: list[QuestionRuntimeState]) -> list[QuestionRuntimeState]:
@@ -2126,7 +2225,7 @@ class SessionBuilderMixin:
                 remaining.sort(
                     key=lambda question: (
                         source_counts.get(source_label_for_question(question), 0),
-                        -smart_priority(question),
+                        -(smart_priority(question) + selection_priority_bonus(question)),
                     )
                 )
                 question = remaining.pop(0)
