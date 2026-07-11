@@ -1222,6 +1222,19 @@ class TestingEngineApp(
             command=self.next_unanswered,
         )
         self.next_unanswered_btn.pack(side="left", padx=(8, 0))
+        self.super_confident_action_btn = tk.Button(
+            self.action_left,
+            text="SUPER CONFIDENT",
+            font=("Segoe UI", 9, "bold"),
+            bd=1,
+            relief="solid",
+            bg="#f7f9fc",
+            fg="#17643a",
+            padx=12,
+            pady=6,
+            command=self.mark_current_question_super_confident,
+        )
+        self.super_confident_action_btn.pack(side="left", padx=(8, 0))
         self.prev_btn = tk.Button(
             self.action_right,
             text="PREVIOUS",
@@ -2701,6 +2714,7 @@ class TestingEngineApp(
             self.report_issue_btn,
             self.redo_btn,
             self.next_unanswered_btn,
+            self.super_confident_action_btn,
         ):
             button.pack_forget()
         if self.submit_btn_visible:
@@ -2711,6 +2725,7 @@ class TestingEngineApp(
             self.report_issue_btn.pack(side="left", padx=(8, 0))
             self.redo_btn.pack(side="left", padx=(8, 0))
         self.next_unanswered_btn.pack(side="left", padx=(8, 0))
+        self.super_confident_action_btn.pack(side="left", padx=(8, 0))
         self._rebuild_more_menu(include_maintenance=narrow)
 
     def _ensure_sticky_action_bar(self):

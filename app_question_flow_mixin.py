@@ -855,6 +855,7 @@ class QuestionFlowMixin:
         concept_key = self.repair_concept_key_for_question(q)
         state = self.progress_repair_state()
         row = dict(state.get(concept_key) or {})
+        active_repair = bool(row) or bool(q.get("repair_stage")) or bool(q.get("repair_concept_key"))
         row["concept_key"] = concept_key
         row["last_question_number"] = int(q.get("question_number") or 0)
         row["last_seen"] = time.strftime("%Y-%m-%d")
@@ -894,6 +895,8 @@ class QuestionFlowMixin:
                 state[concept_key] = row
                 return inserted
         if is_correct:
+            if not active_repair:
+                return []
             current_stage = str(q.get("repair_stage") or row.get("stage") or "")
             if current_stage == "spaced_retrieval":
                 row["status"] = "resolved"
@@ -934,12 +937,12 @@ class QuestionFlowMixin:
         q["repair_stage"] = "contrast"
         q["repair_concept_key"] = concept_key
         repair_options = (
-            (QUESTION_TAG_CONFUSION_PAIR, self.find_confusion_pair_candidates(q, limit=1), 2),
-            (QUESTION_TAG_WRONG_ANSWER_MEMORY, self.find_wrong_answer_memory_candidates(q, limit=1), 3),
-            (QUESTION_TAG_TWIN, self.find_question_twins(q, limit=1), 3),
+            (QUESTION_TAG_CONFUSION_PAIR, self.maybe_queue_confusion_pair_drill),
+            (QUESTION_TAG_WRONG_ANSWER_MEMORY, self.maybe_queue_wrong_answer_memory),
+            (QUESTION_TAG_TWIN, self.maybe_queue_question_twins),
         )
-        for tag, candidates, delay in repair_options:
-            inserted = self._insert_delayed_followup_questions(q, candidates, tag, delay_slots=delay)
+        for tag, queue_followup in repair_options:
+            inserted = queue_followup(q)
             if inserted:
                 for item in inserted:
                     item["repair_stage"] = "contrast"

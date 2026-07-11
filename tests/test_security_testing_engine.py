@@ -1877,6 +1877,10 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
                         answered = False
                     flagged = rng.choice([True, False])
                     suspended = rng.choice([True, False])
+                    if idx == len(app.questions) - 1:
+                        # Keep one truly unfinished question so the resumable session should persist.
+                        flagged = False
+                        suspended = False
                     if answered:
                         selected = ["A"] if rng.choice([True, False]) else ["B"]
                         question["selected"] = list(selected)
@@ -2029,6 +2033,24 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertGreaterEqual(int(rec["correct_streak"]), 6)
         self.assertEqual(rec["next_review"], rec["super_confident_until"])
         self.assertEqual(1, app.index)
+
+    def test_super_confident_action_button_is_visible_and_enabled_after_correct_answer(self):
+        app = self.make_app()
+
+        app.toggle_choice("A")
+
+        self.assertEqual("normal", str(app.super_confident_action_btn.cget("state")))
+        self.assertEqual("SUPER CONFIDENT", str(app.super_confident_action_btn.cget("text")))
+        self.assertTrue(bool(app.super_confident_action_btn.winfo_manager()))
+
+    def test_super_confident_action_button_is_disabled_after_wrong_answer(self):
+        app = self.make_app()
+
+        app.toggle_choice("B")
+
+        self.assertEqual("disabled", str(app.super_confident_action_btn.cget("state")))
+        self.assertEqual("SUPER CONFIDENT", str(app.super_confident_action_btn.cget("text")))
+        self.assertTrue(bool(app.super_confident_action_btn.winfo_manager()))
 
     def test_answer_recording_uses_deferred_progress_and_session_saves(self):
         app = self.make_app()

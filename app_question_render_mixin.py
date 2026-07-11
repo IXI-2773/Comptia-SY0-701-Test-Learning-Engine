@@ -219,6 +219,14 @@ class QuestionRenderMixin:
         report_open = self.question_has_open_issue_report(q)
         self.report_issue_btn.configure(text=('REPORTED' if report_open else 'REPORT ISSUE'), state=('disabled' if report_open else 'normal'))
         self.redo_btn.configure(state='normal' if q.get('answered') and (self.active_session_mode != MODE_EXAM or self.exam_reveal) else 'disabled')
+        super_active = is_super_confident_active(self._progress_record(q, create=False))
+        can_super = bool(q.get('answered') and self._question_correct(q))
+        self.super_confident_action_btn.configure(
+            state=('normal' if can_super else 'disabled'),
+            bg=('#dff6e8' if super_active and can_super else '#f7f9fc'),
+            fg=('#17643a' if can_super else '#8aa0b7'),
+            text=('SUPER CONFIDENT ON' if super_active and can_super else 'SUPER CONFIDENT'),
+        )
         self.submit_btn_visible = bool(q.get('question_type') == 'multi' and not q.get('answered'))
         if self.submit_btn_visible:
             self.action_hint.configure(text='Select all that apply, then Submit.')
