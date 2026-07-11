@@ -12,10 +12,10 @@ from tkinter import filedialog, messagebox, ttk
 from typing import cast
 
 BASE_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = BASE_DIR.parent
-if str(PROJECT_ROOT) not in sys.path:
-    # Allow the app and tests to import Smart Practice modules stored one level above this folder.
-    sys.path.insert(0, str(PROJECT_ROOT))
+LEGACY_PROJECT_ROOT = BASE_DIR.parent
+if not (BASE_DIR / "smart_practice_concept_graph.py").exists() and str(LEGACY_PROJECT_ROOT) not in sys.path:
+    # Support the older nested source layout where Smart Practice modules lived one level above app.py.
+    sys.path.insert(0, str(LEGACY_PROJECT_ROOT))
 
 from app_analytics_mixin import AnalyticsMixin
 from app_constants import (
@@ -1109,6 +1109,19 @@ class TestingEngineApp(
             )
             btn.pack(side="left", padx=(0, 6))
             self.confidence_buttons[option] = btn
+        self.super_confident_btn = tk.Button(
+            self.confidence_wrap,
+            text="Super confident",
+            font=("Segoe UI", 8, "bold"),
+            bd=1,
+            relief="solid",
+            bg="#f7f9fc",
+            fg="#17643a",
+            padx=8,
+            pady=3,
+            command=self.mark_current_question_super_confident,
+        )
+        self.super_confident_btn.pack(side="left", padx=(10, 0))
         self.answer_meta_label = tk.Label(
             self.review_panel,
             text="",

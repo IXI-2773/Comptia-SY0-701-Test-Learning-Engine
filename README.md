@@ -185,6 +185,18 @@ Run the code-quality checks:
 py tools\run_quality_checks.py
 ```
 
+Clean generated repo/runtime artifacts:
+
+```powershell
+py tools\cleanup_runtime_files.py
+```
+
+Also remove generated log files:
+
+```powershell
+py tools\cleanup_runtime_files.py --prune-logs
+```
+
 Build the Windows release:
 
 ```powershell
@@ -193,7 +205,7 @@ build_windows_v8.bat
 
 The Windows release folder is intentionally clean: `release\SecurityTestingEngine\` contains only `SecurityTestingEngine.exe`. The default question bank is bundled into the executable, and runtime progress/session data is written to local app data instead of beside the EXE.
 
-If the repo is kept inside a clean app shell folder, `tools\build_release.py` also refreshes the root `SecurityTestingEngine.exe` and `README - Start Here.txt`. Packaged builds can automatically migrate stronger legacy progress from `Project Files\user_data` into `%LOCALAPPDATA%\SecurityTestingEngine\` when the packaged runtime has little or no progress.
+If the repo is kept inside a clean app shell folder, `tools\build_release.py` also refreshes the root `SecurityTestingEngine.exe` and `README - Start Here.txt`. Packaged builds can automatically migrate stronger legacy progress from `user_data` and the older `Project Files\user_data` layout into `%LOCALAPPDATA%\SecurityTestingEngine\` when the packaged runtime has little or no progress.
 
 **Project Layout**
 
@@ -207,6 +219,7 @@ If the repo is kept inside a clean app shell folder, `tools\build_release.py` al
 - `tools/`: validation, import, benchmark, build, and utility scripts
 - `tests/`: unit and GUI regression coverage
 - `reports/`: generated reports such as validation and benchmark output
+- `user_data/`: local runtime state for source/dev runs and not meant for version control
 
 **Project Quality Status**
 

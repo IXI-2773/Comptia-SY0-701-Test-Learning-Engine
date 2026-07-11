@@ -14,7 +14,13 @@ from app_constants import (
     QUESTION_TAG_TWIN,
     QUESTION_TAG_WRONG_ANSWER_MEMORY,
 )
-from progress_store import is_active_weak, is_review_due, is_suspended, sanitize_response_time
+from progress_store import (
+    is_active_weak,
+    is_review_due,
+    is_suspended,
+    sanitize_response_time,
+    set_progress_super_confident,
+)
 from session_models import QuestionRuntimeState, SessionAnswerEvent, clear_runtime_answer_state
 from smart_practice_concept_graph import concept_key_for_question
 
@@ -1158,6 +1164,30 @@ class QuestionFlowMixin:
             self.mark_question_list_dirty()
             self.schedule_progress_save()
             self.schedule_session_save(delay_ms=125)
+        if self._go_to_next_unanswered_silent():
+            return
+        self.render_question()
+
+    def mark_current_question_super_confident(self):
+        if not self.questions:
+            return
+        q = self.current_question()
+        if not q.get("answered") or not self._question_correct(q):
+            return
+        self.cancel_auto_next_after_answer()
+        rec = set_progress_super_confident(self._progress_record(q, create=True))
+        q["last_confidence"] = str(rec.get("last_confidence") or "Sure")
+        q["last_miss_reason"] = ""
+        for event in reversed(self._progress_history()):
+            if int(event.get("question_number") or 0) == int(q.get("question_number") or 0):
+                event["confidence"] = "Sure"
+                event["miss_reason"] = ""
+                break
+        self._progress_questions()[self._question_key(q)] = rec
+        self.mark_question_list_dirty()
+        self.invalidate_learning_state(prewarm=True, prewarm_delay_ms=350)
+        self.schedule_progress_save()
+        self.schedule_session_save(delay_ms=125)
         if self._go_to_next_unanswered_silent():
             return
         self.render_question()

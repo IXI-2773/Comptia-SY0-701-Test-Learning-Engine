@@ -2,7 +2,7 @@ import time
 import tkinter as tk
 
 from app_constants import MODE_EXAM
-from progress_store import recovery_ladder_stage, study_status_name
+from progress_store import is_super_confident_active, recovery_ladder_stage, study_status_name
 from render_cache import ChoiceRenderSnapshot, QuestionRenderSnapshot
 from source_trust import derive_source_trust_warning
 from ui_theme import BLUE, DARK, RED, TEXT
@@ -257,6 +257,15 @@ class QuestionRenderMixin:
                     bg, fg = palette.get(option, ('#f7f9fc', BLUE))
                     active = option == current_conf
                     btn.configure(bg=(bg if active else '#f7f9fc'), fg=(fg if active else BLUE), relief='solid', bd=(2 if active else 1))
+                super_active = is_super_confident_active(self._progress_record(q, create=False))
+                can_super = bool(self._question_correct(q))
+                self.super_confident_btn.configure(
+                    state=('normal' if can_super else 'disabled'),
+                    bg=('#dff6e8' if super_active and can_super else '#f7f9fc'),
+                    fg=('#17643a' if can_super else '#8aa0b7'),
+                    bd=(2 if super_active and can_super else 1),
+                    text=('Super confident on' if super_active and can_super else 'Super confident'),
+                )
                 self.confidence_wrap.pack(fill='x')
             else:
                 self.confidence_wrap.pack_forget()

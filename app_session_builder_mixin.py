@@ -8,6 +8,7 @@ from progress_store import (
     is_active_weak,
     is_ever_wrong,
     is_review_due,
+    is_super_confident_active,
     is_suspended,
     select_due_review_questions,
     select_questions_by_history,
@@ -1311,6 +1312,8 @@ class SessionBuilderMixin:
             policy_active_weak = is_active_weak(rec) or wrong_surplus >= int(
                 weakness_thresholds.get("active_weak_wrong_surplus", 1) or 1
             )
+            if is_super_confident_active(rec) and not memory_due and not policy_active_weak:
+                repetition_cost = 15.0
             repair_recent_delay = int(repair_spacing_settings.get("contrast_delay", 2) or 2)
             if int(recent_concept_cooldown_map.get(unit_key, 0) or 0) and int(recent_concept_cooldown_map.get(unit_key, 0) or 0) < repair_recent_delay:
                 misconception_repair *= 0.5
@@ -1754,15 +1757,26 @@ class SessionBuilderMixin:
         if target <= 0:
             return []
 
-        suppressed_qnums = {
+        super_confident_qnums = {
+            q.get("question_number")
+            for q in pool
+            if is_super_confident_active(question_meta.get(int(q.get("question_number") or 0), {}).get("record", {}))
+            and not is_active_weak(question_meta.get(int(q.get("question_number") or 0), {}).get("record", {}))
+            and not is_review_due(question_meta.get(int(q.get("question_number") or 0), {}).get("record", {}))
+        }
+        freshness_suppressed_qnums = {
             q.get("question_number")
             for q in pool
             if float(freshness_map.get(int(q.get("question_number") or 0), 0.0)) >= profile.freshness_suppression_min
             and not is_active_weak(question_meta.get(int(q.get("question_number") or 0), {}).get("record", {}))
             and not is_review_due(question_meta.get(int(q.get("question_number") or 0), {}).get("record", {}))
         }
+        suppressed_qnums = super_confident_qnums | freshness_suppressed_qnums
+        non_super_count = len(pool) - len(super_confident_qnums)
         available_count = len(pool) - len(suppressed_qnums)
-        if available_count >= max(1, target):
+        if super_confident_qnums and non_super_count >= max(1, target):
+            working_pool = [q for q in pool if q.get("question_number") not in super_confident_qnums]
+        elif available_count >= max(1, target):
             working_pool = [q for q in pool if q.get("question_number") not in suppressed_qnums]
         else:
             working_pool = list(pool)
