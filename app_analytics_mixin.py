@@ -103,6 +103,13 @@ TEXT = '#1f1f1f'
 class AnalyticsMixin:
     STEM_STYLE_LADDER = ('Definition', 'Scenario', 'Troubleshooting', 'Best fit', 'Order', 'Exception', 'General')
 
+    def _analytics_runtime_cache(self):
+        cache = getattr(self, "_analytics_runtime_cache_store", None)
+        if cache is None:
+            cache = {}
+            self._analytics_runtime_cache_store = cache
+        return cache
+
     def policy_governance(self):
         meta = self.progress_data.setdefault("meta", {})
         governance = normalize_governance(meta.get("smart_practice_policy_governance"))
@@ -280,9 +287,16 @@ class AnalyticsMixin:
         return now <= target <= (now + timedelta(days=days))
 
     def _normalized_prompt_key(self, prompt: str) -> str:
-        text = sanitize_text(prompt or '').lower()
+        prompt = str(prompt or '')
+        cache = self._analytics_runtime_cache().setdefault("normalized_prompt_key", {})
+        cached = cache.get(prompt)
+        if cached is not None:
+            return cached
+        text = sanitize_text(prompt).lower()
         text = re.sub(r'[^a-z0-9]+', ' ', text)
-        return re.sub(r'\s+', ' ', text).strip()
+        normalized = re.sub(r'\s+', ' ', text).strip()
+        cache[prompt] = normalized
+        return normalized
 
     def _normalized_study_label(self, value: str) -> str:
         text = ' '.join(str(value or '').replace('&', 'and').replace(',', ' ').split()).casefold()
@@ -294,19 +308,39 @@ class AnalyticsMixin:
         return aliases.get(text, text)
 
     def _primary_topic_label(self, q) -> str:
-        topics = [str(topic).strip() for topic in q.get('topics', []) if str(topic).strip()]
-        if topics:
-            return self._normalized_study_label(topics[0])
-        return self._normalized_study_label(str(q.get('domain') or 'Unsorted'))
+        topics_tuple = tuple(str(topic).strip() for topic in q.get('topics', []) if str(topic).strip())
+        domain = str(q.get('domain') or 'Unsorted')
+        cache_key = (int(q.get('question_number') or 0), topics_tuple, domain)
+        cache = self._analytics_runtime_cache().setdefault("primary_topic_label", {})
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return cached
+        if topics_tuple:
+            label = self._normalized_study_label(topics_tuple[0])
+        else:
+            label = self._normalized_study_label(domain)
+        cache[cache_key] = label
+        return label
 
     def _coverage_unit_for_question(self, q) -> tuple[str, str]:
         objective_code = str(q.get('objective_code') or '').strip()
+        topics_tuple = tuple(str(topic).strip() for topic in q.get('topics', []) if str(topic).strip())
+        domain = str(q.get('domain') or 'Unsorted')
+        cache_key = (int(q.get('question_number') or 0), objective_code, topics_tuple, domain)
+        cache = self._analytics_runtime_cache().setdefault("coverage_unit", {})
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return cached
         if objective_code:
-            return 'Objective', objective_code
-        primary_topic = self._primary_topic_label(q)
-        if primary_topic and primary_topic != 'Unsorted':
-            return 'Topic', primary_topic
-        return 'Domain', self._normalized_study_label(str(q.get('domain') or 'Unsorted'))
+            unit = ('Objective', objective_code)
+        else:
+            primary_topic = self._primary_topic_label(q)
+            if primary_topic and primary_topic != 'Unsorted':
+                unit = ('Topic', primary_topic)
+            else:
+                unit = ('Domain', self._normalized_study_label(domain))
+        cache[cache_key] = unit
+        return unit
 
     def _canonical_concept_id(self, q_or_kind, unit: str | None = None) -> str:
         if isinstance(q_or_kind, dict):
@@ -319,35 +353,57 @@ class AnalyticsMixin:
         return f"{kind.lower()}::{normalized or 'unsorted'}"
 
     def _stem_style_for_question(self, q) -> str:
-        prompt = sanitize_text(str((q or {}).get('prompt') or '')).lower()
+        prompt_raw = str((q or {}).get('prompt') or '')
+        cache_key = (int((q or {}).get('question_number') or 0), prompt_raw)
+        cache = self._analytics_runtime_cache().setdefault("stem_style", {})
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return cached
+        prompt = sanitize_text(prompt_raw).lower()
         if not prompt:
+            cache[cache_key] = 'General'
             return 'General'
         if re.search(r'\b(except|least|not)\b', prompt):
-            return 'Exception'
-        if re.search(r'\b(best|most|primary)\b', prompt):
-            return 'Best fit'
-        if re.search(r'\b(first|next|initial|immediate)\b', prompt):
-            return 'Order'
-        if re.search(r'\b(root cause|likely|why|cause|diagnos|issue|failure|problem)\b', prompt):
-            return 'Troubleshooting'
-        if re.search(r'^(what|which)\s', prompt) and re.search(r'\b(defines?|describes?|term|acronym|stands for|known as)\b', prompt):
-            return 'Definition'
-        if len(prompt.split()) >= 22 or re.search(r'\b(should|implement|use|respond|handle|mitigate)\b', prompt):
-            return 'Scenario'
-        return 'General'
+            style = 'Exception'
+        elif re.search(r'\b(best|most|primary)\b', prompt):
+            style = 'Best fit'
+        elif re.search(r'\b(first|next|initial|immediate)\b', prompt):
+            style = 'Order'
+        elif re.search(r'\b(root cause|likely|why|cause|diagnos|issue|failure|problem)\b', prompt):
+            style = 'Troubleshooting'
+        elif re.search(r'^(what|which)\s', prompt) and re.search(r'\b(defines?|describes?|term|acronym|stands for|known as)\b', prompt):
+            style = 'Definition'
+        elif len(prompt.split()) >= 22 or re.search(r'\b(should|implement|use|respond|handle|mitigate)\b', prompt):
+            style = 'Scenario'
+        else:
+            style = 'General'
+        cache[cache_key] = style
+        return style
 
     def _choice_concept_label(self, text: str) -> str:
-        cleaned = sanitize_text(text or '')
+        text = str(text or '')
+        cache = self._analytics_runtime_cache().setdefault("choice_concept_label", {})
+        cached = cache.get(text)
+        if cached is not None:
+            return cached
+        cleaned = sanitize_text(text)
         if not cleaned:
+            cache[text] = ''
             return ''
         acronym_match = re.search(r'\(([A-Z0-9]{2,8})\)', cleaned)
         if acronym_match:
-            return acronym_match.group(1).upper()
+            label = acronym_match.group(1).upper()
+            cache[text] = label
+            return label
         caps_tokens = [token for token in re.findall(r'\b[A-Z0-9]{2,8}\b', cleaned) if not token.isdigit()]
         if caps_tokens:
-            return caps_tokens[0].upper()
+            label = caps_tokens[0].upper()
+            cache[text] = label
+            return label
         words = re.sub(r'[^A-Za-z0-9 ]+', ' ', cleaned).split()
-        return ' '.join(words[:4]).title()
+        label = ' '.join(words[:4]).title()
+        cache[text] = label
+        return label
 
     def _question_mentions_label(self, q, label: str) -> bool:
         needle = str(label or '').strip()

@@ -339,6 +339,8 @@ class TestingEngineApp(
         self.sidebar_visible = True
         self.sidebar_auto_collapsed = False
         self.submit_btn_visible = False
+        self.last_action_layout_signature = None
+        self.last_more_menu_signature = None
         self.sidebar_width_options = {"Full": 320, "Narrow": 248}
         self.sidebar_width_mode = str(self.config.get("sidebar_width_mode", "Full") or "Full")
 
@@ -1471,8 +1473,15 @@ class TestingEngineApp(
         return cast(list[QuestionHistoryEvent], history)
 
     def _progress_meta(self) -> ProgressMeta:
-        meta = normalize_progress_meta(self.progress_data.setdefault("meta", {}))
+        raw_meta = self.progress_data.setdefault("meta", {})
+        cached_raw = getattr(self, "_progress_meta_cache_raw", None)
+        cached_meta = getattr(self, "_progress_meta_cache_value", None)
+        if raw_meta is cached_raw and cached_meta is not None:
+            return cached_meta
+        meta = normalize_progress_meta(raw_meta)
         self.progress_data["meta"] = meta
+        self._progress_meta_cache_raw = meta
+        self._progress_meta_cache_value = meta
         return meta
 
     def _progress_snapshot_payload(self):
@@ -1490,13 +1499,22 @@ class TestingEngineApp(
             target_qnum = int(qnum or 0)
         except (TypeError, ValueError):
             return []
-        return [
-            report
-            for report in self._issue_reports()
-            if str(report.get("status") or "open") == "open"
-            and str(report.get("question_number", "")).isdigit()
-            and int(report.get("question_number", 0)) == target_qnum
-        ]
+        issue_reports = self._issue_reports()
+        cached_reports = getattr(self, "_open_issue_reports_cache_source", None)
+        indexed_reports = getattr(self, "_open_issue_reports_cache_value", None)
+        if issue_reports is not cached_reports or indexed_reports is None:
+            indexed_reports = {}
+            for report in issue_reports:
+                if str(report.get("status") or "open") != "open":
+                    continue
+                try:
+                    report_qnum = int(report.get("question_number", 0) or 0)
+                except (TypeError, ValueError):
+                    continue
+                indexed_reports.setdefault(report_qnum, []).append(report)
+            self._open_issue_reports_cache_source = issue_reports
+            self._open_issue_reports_cache_value = indexed_reports
+        return list(indexed_reports.get(target_qnum, []))
 
     def question_has_open_issue_report(self, q):
         return bool(self._open_issue_reports_for_question(q.get("question_number")))
@@ -2067,11 +2085,12 @@ class TestingEngineApp(
         return cast(ProgressRecord, record)
 
     def _show_bad_json_warning(self, label, path, backup, err):
+        backup_name = backup.name if backup is not None else 'not created'
         messagebox.showwarning(
             f"{label} reset",
             f"{label} file could not be read and was moved aside.\n\n"
             f"Original: {path.name}\n"
-            f"Backup: {backup.name}\n\n"
+            f"Backup: {backup_name}\n\n"
             f"The app will start fresh for that file.\n\n{err}",
         )
 
@@ -2663,6 +2682,18 @@ class TestingEngineApp(
         self.general_card.pack(fill="x", pady=(0, 10))
 
     def _rebuild_more_menu(self, include_maintenance=False):
+        signature = (
+            bool(include_maintenance),
+            str(self.flag_btn.cget("text") or ""),
+            str(self.flag_btn.cget("state") or "normal"),
+            str(self.suspend_btn.cget("text") or ""),
+            str(self.suspend_btn.cget("state") or "normal"),
+            str(self.report_issue_btn.cget("text") or ""),
+            str(self.report_issue_btn.cget("state") or "normal"),
+            str(self.redo_btn.cget("state") or "normal"),
+        )
+        if signature == self.last_more_menu_signature:
+            return
         self.more_menu.delete(0, tk.END)
         self.more_menu.add_command(label="Save Session", command=lambda: self.save_session(show_notice=True))
         self.more_menu.add_command(label="Analytics Dashboard", command=self.open_analytics_window)
@@ -2687,6 +2718,7 @@ class TestingEngineApp(
             self.more_menu.add_command(
                 label="Redo Question", command=self.redo_question, state=str(self.redo_btn.cget("state") or "normal")
             )
+        self.last_more_menu_signature = signature
 
     def _layout_action_buttons(self, width=None):
         if not hasattr(self, "card_action_panel"):
@@ -2694,6 +2726,17 @@ class TestingEngineApp(
         self._ensure_sticky_action_bar()
         width = width or self.card_action_panel.winfo_width() or self.card.winfo_width()
         narrow = bool(width) and width < 1120
+        signature = (
+            bool(narrow),
+            bool(self.submit_btn_visible),
+            str(self.flag_btn.cget("text") or ""),
+            str(self.suspend_btn.cget("text") or ""),
+            str(self.report_issue_btn.cget("text") or ""),
+            str(self.redo_btn.cget("state") or "normal"),
+        )
+        if signature == self.last_action_layout_signature:
+            self._rebuild_more_menu(include_maintenance=narrow)
+            return
         for button in (
             self.submit_btn,
             self.flag_btn,
@@ -2711,6 +2754,7 @@ class TestingEngineApp(
             self.report_issue_btn.pack(side="left", padx=(8, 0))
             self.redo_btn.pack(side="left", padx=(8, 0))
         self.next_unanswered_btn.pack(side="left", padx=(8, 0))
+        self.last_action_layout_signature = signature
         self._rebuild_more_menu(include_maintenance=narrow)
 
     def _ensure_sticky_action_bar(self):

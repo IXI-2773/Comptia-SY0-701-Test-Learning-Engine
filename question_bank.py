@@ -3,12 +3,16 @@ import hashlib
 import json
 import random
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import cast
 
 from bank_models import BankQuestion, QuestionBankData, as_bank_question
 
 EMBEDDED_QUESTION_RE = re.compile(r"\bQUESTION\s+\d+\b")
+INLINE_WHITESPACE_RE = re.compile(r"[ \t]+")
+LINE_WHITESPACE_RE = re.compile(r" *\n *")
+EXCESS_BLANK_LINES_RE = re.compile(r"\n{3,}")
 MOJIBAKE_MARKERS = ("\u00e2", "\u00c3", "\u00c2")
 PUNCTUATION_TRANSLATION = str.maketrans(
     {
@@ -58,12 +62,12 @@ def _repair_mojibake(text):
     return repaired, repaired != text
 
 
-def sanitize_text(value, trim_embedded_questions=False, collect_notes=False):
-    text = str(value or "")
+@lru_cache(maxsize=32768)
+def _sanitize_text_cached(text: str, trim_embedded_questions: bool) -> tuple[str, tuple[str, ...]]:
     notes: list[str] = []
-    text = text.replace("\r\n", "\n").replace("\r", "\n").strip()
+    text = str(text or "").replace("\r\n", "\n").replace("\r", "\n").strip()
     if not text:
-        return ("", notes) if collect_notes else ""
+        return "", tuple()
 
     text, repaired = _repair_mojibake(text)
     if repaired:
@@ -81,10 +85,17 @@ def sanitize_text(value, trim_embedded_questions=False, collect_notes=False):
             text = text[: match.start()].rstrip()
             notes.append("embedded follow-on question removed")
 
-    text = re.sub(r"[ \t]+", " ", text)
-    text = re.sub(r" *\n *", "\n", text)
-    text = re.sub(r"\n{3,}", "\n\n", text).strip()
-    return (text, notes) if collect_notes else text
+    text = INLINE_WHITESPACE_RE.sub(" ", text)
+    text = LINE_WHITESPACE_RE.sub("\n", text)
+    text = EXCESS_BLANK_LINES_RE.sub("\n\n", text).strip()
+    return text, tuple(notes)
+
+
+def sanitize_text(value, trim_embedded_questions=False, collect_notes=False):
+    text, notes = _sanitize_text_cached(str(value or ""), bool(trim_embedded_questions))
+    if collect_notes:
+        return text, list(notes)
+    return text
 
 
 def sanitize_explanation_text(value):

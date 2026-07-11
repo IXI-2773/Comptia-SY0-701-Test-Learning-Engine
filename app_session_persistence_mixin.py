@@ -384,8 +384,6 @@ class SessionPersistenceMixin:
             expected_values = [str(question.get('domain') or '').strip().casefold()]
         else:
             raise ValueError(f'Unknown repair_concept_key format: {legacy_key}')
-        if legacy_value not in [value for value in expected_values if value]:
-            raise ValueError(f'Unknown legacy repair_concept_key for restored question: {legacy_key}')
         answer_state['legacy_repair_concept_key'] = legacy_key
         answer_state['repair_concept_key'] = canonical_key
         snapshot = answer_state.get('prediction_snapshot')
