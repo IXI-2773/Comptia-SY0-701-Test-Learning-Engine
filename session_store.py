@@ -3,6 +3,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any, cast
 
+from app_constants import MODE_EXAM, MODE_PRACTICE, MODE_SMART_PRACTICE
 from session_models import (
     AnswerState,
     BuilderContext,
@@ -13,6 +14,7 @@ from session_models import (
 )
 
 SESSION_SCHEMA_VERSION = 3
+SUPPORTED_SESSION_MODES = {MODE_PRACTICE, MODE_SMART_PRACTICE, MODE_EXAM}
 
 
 def calculate_session_question_limit(base_count: int) -> int:
@@ -81,19 +83,64 @@ def normalize_builder_context(
     }
 
 
+def _coerce_int(value: Any, *, field: str, default: int = 0, minimum: int | None = None) -> int:
+    if value in (None, ""):
+        number = default
+    else:
+        try:
+            number = int(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"Invalid integer for {field}: {value!r}") from exc
+    if minimum is not None and number < minimum:
+        raise ValueError(f"Invalid integer for {field}: {number!r}")
+    return number
+
+
+def _coerce_str_list(value: Any, *, field: str) -> list[str]:
+    if value in (None, ""):
+        return []
+    if not isinstance(value, list):
+        raise ValueError(f"Invalid list for {field}")
+    return [str(item) for item in value]
+
+
+def _coerce_int_list(value: Any, *, field: str, minimum: int = 0) -> list[int]:
+    if value in (None, ""):
+        return []
+    if not isinstance(value, list):
+        raise ValueError(f"Invalid list for {field}")
+    return [_coerce_int(item, field=field, minimum=minimum) for item in value]
+
+
 def migrate_session_snapshot(
     saved: Mapping[str, Any] | None, mode: str, question_numbers: list[Any]
 ) -> SessionSnapshot:
     payload = dict(saved or {})
-    current_qnums = [int(qnum) for qnum in question_numbers]
-    saved_qnums = [int(qnum) for qnum in payload.get("question_numbers", []) if str(qnum).strip()]
+    current_qnums = [_coerce_int(qnum, field="question_numbers", minimum=1) for qnum in question_numbers if str(qnum).strip()]
+    saved_mode = str(payload.get("mode") or mode or "")
+    if saved_mode not in SUPPORTED_SESSION_MODES:
+        raise ValueError(f"Unsupported session mode: {saved_mode!r}")
+    raw_saved_qnums = payload.get("question_numbers", [])
+    if raw_saved_qnums not in (None, "") and not isinstance(raw_saved_qnums, list):
+        raise ValueError("Session question_numbers must be a list.")
+    saved_qnums = [_coerce_int(qnum, field="question_numbers", minimum=1) for qnum in raw_saved_qnums if str(qnum).strip()]
+    raw_restore_qnums = payload.get("restore_question_numbers", [])
+    if raw_restore_qnums not in (None, "") and not isinstance(raw_restore_qnums, list):
+        raise ValueError("Session restore_question_numbers must be a list.")
     restore_qnums = (
-        [int(qnum) for qnum in payload.get("restore_question_numbers", []) if str(qnum).strip()]
+        [_coerce_int(qnum, field="restore_question_numbers", minimum=1) for qnum in raw_restore_qnums if str(qnum).strip()]
         or saved_qnums
         or current_qnums
     )
-    base_count = int(
-        payload.get("session_base_question_count") or len(restore_qnums) or len(saved_qnums) or len(current_qnums)
+    if current_qnums:
+        available_qnums = set(current_qnums)
+        for qnum in saved_qnums + restore_qnums:
+            if qnum not in available_qnums:
+                raise ValueError(f"Unknown question reference in session snapshot: {qnum}")
+    base_count = _coerce_int(
+        payload.get("session_base_question_count") or len(restore_qnums) or len(saved_qnums) or len(current_qnums),
+        field="session_base_question_count",
+        minimum=0,
     )
     limit = payload.get("session_question_limit")
     try:
@@ -102,23 +149,56 @@ def migrate_session_snapshot(
         session_limit = 0
     if session_limit <= 0:
         session_limit = calculate_session_question_limit(base_count)
-    answers = [cast(AnswerState, dict(answer)) for answer in payload.get("answers", [])]
-    answer_history = [cast(SessionAnswerEvent, dict(event)) for event in payload.get("session_answer_history", [])]
-    quests = [cast(QuestProgressState, dict(quest)) for quest in payload.get("current_quests", [])]
+    raw_answers = payload.get("answers", [])
+    raw_answer_history = payload.get("session_answer_history", [])
+    raw_quests = payload.get("current_quests", [])
+    if raw_answers not in (None, "") and not isinstance(raw_answers, list):
+        raise ValueError("Session answers must be a list.")
+    if raw_answer_history not in (None, "") and not isinstance(raw_answer_history, list):
+        raise ValueError("Session session_answer_history must be a list.")
+    if raw_quests not in (None, "") and not isinstance(raw_quests, list):
+        raise ValueError("Session current_quests must be a list.")
+    answers = []
+    for answer in raw_answers if isinstance(raw_answers, list) else []:
+        if not isinstance(answer, Mapping):
+            raise ValueError("Session answer row must be a mapping.")
+        answers.append(cast(AnswerState, dict(answer)))
+    answer_history = []
+    for event in raw_answer_history if isinstance(raw_answer_history, list) else []:
+        if not isinstance(event, Mapping):
+            raise ValueError("Session answer history row must be a mapping.")
+        answer_history.append(cast(SessionAnswerEvent, dict(event)))
+    quests = []
+    for quest in raw_quests if isinstance(raw_quests, list) else []:
+        if not isinstance(quest, Mapping):
+            raise ValueError("Session quest row must be a mapping.")
+        quests.append(cast(QuestProgressState, dict(quest)))
+    raw_builder_context = payload.get("builder_context")
+    if raw_builder_context not in (None, "") and not isinstance(raw_builder_context, Mapping):
+        raise ValueError("Session builder_context must be a mapping.")
     builder_context = normalize_builder_context(
-        payload.get("builder_context"),
-        mode=str(payload.get("mode") or mode),
+        raw_builder_context,
+        mode=saved_mode,
         source_label=str(payload.get("source_label") or ""),
         question_count=base_count,
     )
+    current_index = _coerce_int(payload.get("current_index", 0), field="current_index", minimum=0)
+    max_index = max(0, len(saved_qnums or current_qnums) - 1)
+    if current_index > max_index:
+        raise ValueError(f"Session current_index is out of bounds: {current_index}")
+    elapsed_seconds = _coerce_int(payload.get("elapsed_seconds", 0), field="elapsed_seconds", minimum=0)
     return {
-        "schema_version": int(payload.get("schema_version") or 1),
+        "schema_version": _coerce_int(payload.get("schema_version") or 1, field="schema_version", default=1, minimum=1),
         "app_version": str(payload.get("app_version") or ""),
         "bank_file": str(payload.get("bank_file") or ""),
-        "mode": str(payload.get("mode") or mode),
+        "mode": saved_mode,
         "builder_context": builder_context,
         "source_label": str(payload.get("source_label") or ""),
-        "question_count": int(payload.get("question_count") or len(saved_qnums) or len(current_qnums)),
+        "question_count": _coerce_int(
+            payload.get("question_count") or len(saved_qnums) or len(current_qnums),
+            field="question_count",
+            minimum=0,
+        ),
         "question_numbers": saved_qnums or current_qnums,
         "restore_question_numbers": restore_qnums,
         "session_base_question_count": base_count,
@@ -127,18 +207,18 @@ def migrate_session_snapshot(
         "session_signature": str(
             payload.get("session_signature") or session_signature(mode, saved_qnums or current_qnums)
         ),
-        "current_index": int(payload.get("current_index", 0) or 0),
-        "elapsed_seconds": int(payload.get("elapsed_seconds", 0) or 0),
+        "current_index": current_index,
+        "elapsed_seconds": elapsed_seconds,
         "exam_reveal": bool(payload.get("exam_reveal", mode != "Exam")),
-        "checkpoints_saved": [str(value) for value in payload.get("checkpoints_saved", [])],
-        "session_rewards": [str(value) for value in payload.get("session_rewards", [])],
-        "unlocked_rewards": [str(value) for value in payload.get("unlocked_rewards", [])],
+        "checkpoints_saved": _coerce_str_list(payload.get("checkpoints_saved", []), field="checkpoints_saved"),
+        "session_rewards": _coerce_str_list(payload.get("session_rewards", []), field="session_rewards"),
+        "unlocked_rewards": _coerce_str_list(payload.get("unlocked_rewards", []), field="unlocked_rewards"),
         "session_answer_history": answer_history,
         "current_quests": quests,
-        "quest_completion_keys": [str(value) for value in payload.get("quest_completion_keys", [])],
-        "session_boss_markers": [int(value) for value in payload.get("session_boss_markers", [])],
-        "session_stealth_markers": [int(value) for value in payload.get("session_stealth_markers", [])],
-        "session_xp_gained": int(payload.get("session_xp_gained", 0) or 0),
+        "quest_completion_keys": _coerce_str_list(payload.get("quest_completion_keys", []), field="quest_completion_keys"),
+        "session_boss_markers": _coerce_int_list(payload.get("session_boss_markers", []), field="session_boss_markers", minimum=0),
+        "session_stealth_markers": _coerce_int_list(payload.get("session_stealth_markers", []), field="session_stealth_markers", minimum=0),
+        "session_xp_gained": _coerce_int(payload.get("session_xp_gained", 0), field="session_xp_gained", minimum=0),
         "answers": answers,
     }
 
@@ -214,5 +294,9 @@ def saved_session_matches_current(
     raw_session_signature = str(saved.get("session_signature") or "").strip()
     if raw_session_signature:
         return raw_session_signature == session_signature(mode, list(current_question_numbers))
-    saved_qnums = [int(qnum) for qnum in saved.get("question_numbers", []) if str(qnum).strip()]
-    return bool(saved_qnums) and saved_qnums == [int(qnum) for qnum in current_question_numbers]
+    try:
+        saved_qnums = [_coerce_int(qnum, field="question_numbers", minimum=1) for qnum in saved.get("question_numbers", []) if str(qnum).strip()]
+        current_qnums = [_coerce_int(qnum, field="current_question_numbers", minimum=1) for qnum in current_question_numbers]
+    except (TypeError, ValueError):
+        return False
+    return bool(saved_qnums) and saved_qnums == current_qnums

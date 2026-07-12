@@ -82,6 +82,40 @@ def blank_progress_stats() -> ProgressStats:
     }
 
 
+def _coerce_int(value: Any, *, field: str, default: int = 0, minimum: int | None = None) -> int:
+    if value in (None, ""):
+        number = default
+    else:
+        try:
+            number = int(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"Invalid integer for {field}: {value!r}") from exc
+    if minimum is not None and number < minimum:
+        raise ValueError(f"Invalid integer for {field}: {number!r}")
+    return number
+
+
+def _coerce_float(value: Any, *, field: str, default: float = 0.0, minimum: float | None = None) -> float:
+    if value in (None, ""):
+        number = default
+    else:
+        try:
+            number = float(value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"Invalid float for {field}: {value!r}") from exc
+    if minimum is not None and number < minimum:
+        raise ValueError(f"Invalid float for {field}: {number!r}")
+    return number
+
+
+def _coerce_str_list(value: Any, *, field: str) -> list[str]:
+    if value in (None, ""):
+        return []
+    if not isinstance(value, list):
+        raise ValueError(f"Invalid list for {field}")
+    return [str(item) for item in value if str(item).strip()]
+
+
 def normalize_progress_meta(meta: MutableMapping[str, Any] | Mapping[str, Any] | None) -> ProgressMeta:
     payload: MutableMapping[str, Any]
     if isinstance(meta, MutableMapping):
@@ -89,10 +123,10 @@ def normalize_progress_meta(meta: MutableMapping[str, Any] | Mapping[str, Any] |
     else:
         payload = dict(meta or {})
 
-    payload["xp"] = int(payload.get("xp", 0) or 0)
-    payload["level"] = max(1, int(payload.get("level", 1) or 1))
-    payload["badges"] = [str(value) for value in payload.get("badges", []) if str(value).strip()]
-    payload["milestones"] = [str(value) for value in payload.get("milestones", []) if str(value).strip()]
+    payload["xp"] = _coerce_int(payload.get("xp", 0), field="meta.xp", minimum=0)
+    payload["level"] = max(1, _coerce_int(payload.get("level", 1), field="meta.level", default=1))
+    payload["badges"] = _coerce_str_list(payload.get("badges", []), field="meta.badges")
+    payload["milestones"] = _coerce_str_list(payload.get("milestones", []), field="meta.milestones")
     repair_state = payload.get("repair_state", {})
     payload["repair_state"] = dict(repair_state) if isinstance(repair_state, Mapping) else {}
     measurement = payload.get("smart_practice_measurement", {})
@@ -105,53 +139,68 @@ def normalize_progress_meta(meta: MutableMapping[str, Any] | Mapping[str, Any] |
     payload["smart_practice_question_calibration"] = dict(calibration) if isinstance(calibration, Mapping) else {}
 
     raw_session_history = payload.get("session_history", [])
+    if raw_session_history not in (None, "") and not isinstance(raw_session_history, list):
+        raise ValueError("Invalid list for meta.session_history")
     session_history: list[SessionHistoryEntry] = []
     for item in raw_session_history if isinstance(raw_session_history, list) else []:
+        if not isinstance(item, Mapping):
+            raise ValueError("Invalid session history row")
         row = dict(item or {})
         session_history.append(
             {
                 "at": str(row.get("at") or ""),
                 "mode": str(row.get("mode") or ""),
                 "source": str(row.get("source") or ""),
-                "answered": int(row.get("answered", 0) or 0),
-                "correct": int(row.get("correct", 0) or 0),
-                "accuracy": float(row.get("accuracy", 0.0) or 0.0),
-                "recoveries": int(row.get("recoveries", 0) or 0),
+                "answered": _coerce_int(row.get("answered", 0), field="meta.session_history.answered", minimum=0),
+                "correct": _coerce_int(row.get("correct", 0), field="meta.session_history.correct", minimum=0),
+                "accuracy": _coerce_float(row.get("accuracy", 0.0), field="meta.session_history.accuracy", minimum=0.0),
+                "recoveries": _coerce_int(row.get("recoveries", 0), field="meta.session_history.recoveries", minimum=0),
                 "medal": str(row.get("medal") or ""),
-                "xp_gained": int(row.get("xp_gained", 0) or 0),
+                "xp_gained": _coerce_int(row.get("xp_gained", 0), field="meta.session_history.xp_gained", minimum=0),
                 "quest_key": str(row.get("quest_key") or ""),
-                "quests_completed": int(row.get("quests_completed", 0) or 0),
-                "boss_hits": int(row.get("boss_hits", 0) or 0),
-                "speed_risk": int(row.get("speed_risk", 0) or 0),
+                "quests_completed": _coerce_int(row.get("quests_completed", 0), field="meta.session_history.quests_completed", minimum=0),
+                "boss_hits": _coerce_int(row.get("boss_hits", 0), field="meta.session_history.boss_hits", minimum=0),
+                "speed_risk": _coerce_int(row.get("speed_risk", 0), field="meta.session_history.speed_risk", minimum=0),
             }
         )
     payload["session_history"] = session_history
 
     raw_quest_stats = payload.get("quest_stats", {})
+    if raw_quest_stats not in (None, "") and not isinstance(raw_quest_stats, Mapping):
+        raise ValueError("Invalid mapping for meta.quest_stats")
     quest_stats: dict[str, QuestStat] = {}
     if isinstance(raw_quest_stats, Mapping):
         for key, value in raw_quest_stats.items():
+            if not isinstance(value, Mapping):
+                raise ValueError("Invalid quest stat row")
             stat = dict(value or {})
             quest_stats[str(key)] = {
-                "offered": int(stat.get("offered", 0) or 0),
-                "completed": int(stat.get("completed", 0) or 0),
+                "offered": _coerce_int(stat.get("offered", 0), field=f"meta.quest_stats.{key}.offered", minimum=0),
+                "completed": _coerce_int(stat.get("completed", 0), field=f"meta.quest_stats.{key}.completed", minimum=0),
             }
     payload["quest_stats"] = quest_stats
 
     raw_issue_reports = payload.get("issue_reports", [])
+    if raw_issue_reports not in (None, "") and not isinstance(raw_issue_reports, list):
+        raise ValueError("Invalid list for meta.issue_reports")
     issue_reports: list[IssueReport] = []
     for item in raw_issue_reports if isinstance(raw_issue_reports, list) else []:
+        if not isinstance(item, Mapping):
+            raise ValueError("Invalid issue report row")
         row = dict(item or {})
+        source_notes = row.get("source_notes", [])
+        if source_notes not in (None, "") and not isinstance(source_notes, list):
+            raise ValueError("Invalid list for meta.issue_reports.source_notes")
         issue_reports.append(
             {
-                "question_number": int(row.get("question_number", 0) or 0),
+                "question_number": _coerce_int(row.get("question_number", 0), field="meta.issue_reports.question_number", minimum=0),
                 "source_page": str(row.get("source_page") or ""),
                 "domain": str(row.get("domain") or ""),
                 "prompt": str(row.get("prompt") or ""),
                 "reported_at": str(row.get("reported_at") or ""),
                 "status": str(row.get("status") or "open"),
                 "exclude_from_scoring": bool(row.get("exclude_from_scoring")),
-                "source_notes": [str(note) for note in row.get("source_notes", []) if str(note).strip()],
+                "source_notes": [str(note) for note in source_notes if str(note).strip()],
                 "reviewed_at": str(row.get("reviewed_at") or ""),
                 "restored_scoring": bool(row.get("restored_scoring")) if "restored_scoring" in row else False,
             }
@@ -161,12 +210,12 @@ def normalize_progress_meta(meta: MutableMapping[str, Any] | Mapping[str, Any] |
     raw_stats = payload.get("stats", {})
     stats_source = dict(raw_stats or {}) if isinstance(raw_stats, Mapping) else {}
     stats = blank_progress_stats()
-    stats["total_answered"] = int(stats_source.get("total_answered", 0) or 0)
-    stats["total_correct"] = int(stats_source.get("total_correct", 0) or 0)
-    stats["total_recovered"] = int(stats_source.get("total_recovered", 0) or 0)
-    stats["sessions_completed"] = int(stats_source.get("sessions_completed", 0) or 0)
-    stats["perfect_sessions"] = int(stats_source.get("perfect_sessions", 0) or 0)
-    stats["domains_seen"] = [str(value) for value in stats_source.get("domains_seen", []) if str(value).strip()]
+    stats["total_answered"] = _coerce_int(stats_source.get("total_answered", 0), field="meta.stats.total_answered", minimum=0)
+    stats["total_correct"] = _coerce_int(stats_source.get("total_correct", 0), field="meta.stats.total_correct", minimum=0)
+    stats["total_recovered"] = _coerce_int(stats_source.get("total_recovered", 0), field="meta.stats.total_recovered", minimum=0)
+    stats["sessions_completed"] = _coerce_int(stats_source.get("sessions_completed", 0), field="meta.stats.sessions_completed", minimum=0)
+    stats["perfect_sessions"] = _coerce_int(stats_source.get("perfect_sessions", 0), field="meta.stats.perfect_sessions", minimum=0)
+    stats["domains_seen"] = _coerce_str_list(stats_source.get("domains_seen", []), field="meta.stats.domains_seen")
     payload["stats"] = stats
 
     return cast(ProgressMeta, payload)

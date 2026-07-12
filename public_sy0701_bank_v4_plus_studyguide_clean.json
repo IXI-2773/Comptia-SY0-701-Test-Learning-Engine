@@ -198,7 +198,7 @@
         "D": "Memorandum of understanding (MOU)"
       },
       "correct": [
-        "A"
+        "D"
       ],
       "question_type": "single",
       "general_explanation": "A Memorandum of Understanding (MOU) is crucial in this scenario as it establishes the foundational terms and conditions of the partnership between TechGuard Inc. and CloudSecure. The MOU will detail the roles, responsibilities, and contribution specifics of each party, as well as outline the project's scope and objectives. This agreement serves as a formal but non-binding agreement, which is particularly useful in the early stages of a collaborative relationship, providing a framework that can be refined into detailed contracts and agreements (such as NDAs or SLAs) as the collaboration progresses.",
@@ -377,7 +377,7 @@
         "D": "Work order (WO)/statement of work (SOW)"
       },
       "correct": [
-        "A"
+        "D"
       ],
       "question_type": "single",
       "general_explanation": "The Work Order/Statement of Work (SOW) is the most appropriate document for capturing all specific details such as tasks, deliverables, timelines, and resources for a project. The SOW is designed to provide comprehensive details that outline the scope of work, expected outcomes, and deliverables in a clear and structured manner. It serves as a binding agreement that defines the exact nature of the work and the responsibilities involved, making it an essential tool for complex projects like cybersecurity infrastructure overhauls.",
@@ -44060,6 +44060,48 @@
       "import_status": "screenshot_verified",
       "suspended": false,
       "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 02-48-53 Question 180 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png"
+    },
+    {
+      "question_number": 1253,
+      "source_question_number": 182,
+      "source_image": "Screenshot 2026-06-27 at 02-50-07 Question 182 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
+      "source_label": "Chapter 2 screenshot bank",
+      "source_page": 182,
+      "prompt": "Chapter 2 screenshot Q182 needs transcription from the source image before it is used as a study question.",
+      "choices": {
+        "A": "Review source screenshot before studying",
+        "B": "Needs prompt transcription",
+        "C": "Needs answer-key verification",
+        "D": "Needs explanation verification"
+      },
+      "correct": [
+        "A"
+      ],
+      "question_type": "single",
+      "general_explanation": "This screenshot has been imported as a quarantined review item. Verify the prompt, choices, keyed answer, and explanation against the source image before enabling it for practice.",
+      "choice_explanations": {
+        "A": "Placeholder only. This item is suspended until the screenshot is verified.",
+        "B": "Placeholder only. Do not study this as a real answer choice.",
+        "C": "Placeholder only. Do not study this as a real answer choice.",
+        "D": "Placeholder only. Do not study this as a real answer choice."
+      },
+      "chapter": "Chapter 2",
+      "subtitle": "Chapter 2 screenshot bank - Domain 2.0",
+      "domain": "Threats Vulnerabilities and Mitigations",
+      "topics": [
+        "General Review"
+      ],
+      "study_focus": [
+        "Threats Vulnerabilities and Mitigations",
+        "General Review"
+      ],
+      "flagged_issues": [
+        "Screenshot imported as review-needed placeholder; verify OCR/transcription before enabling."
+      ],
+      "duplicate_of": [],
+      "import_status": "screenshot_review_needed",
+      "suspended": true,
+      "source_image_path": "C:\\Users\\14422\\Downloads\\Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations\\Screenshot 2026-06-27 at 02-50-07 Question 182 - Chapter 2 Domain 2.0 Threats Vulnerabilities and Mitigations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png"
     },
     {
       "question_number": 1254,

@@ -1,9 +1,9 @@
-from tkinter import messagebox
-
+import copy
 import random
 import threading
+from tkinter import messagebox
 
-from app_constants import MODE_EXAM, MODE_PRACTICE, MODE_SMART_PRACTICE
+from app_constants import MODE_PRACTICE, MODE_SMART_PRACTICE
 from progress_store import (
     is_active_weak,
     is_ever_wrong,
@@ -14,41 +14,83 @@ from progress_store import (
     select_questions_by_history,
 )
 from session_models import QuestionRuntimeState, reset_runtime_question_state
-from smart_practice_profile import (
-    SMART_PRACTICE_POLICY_VERSION,
-    SMART_PRACTICE_SCORING,
-    clamp_utility_component,
-    smart_practice_utility_total,
-    smart_practice_objective_cap,
-    smart_practice_role_allocation,
-)
-from smart_practice_measurement import attach_prediction_to_question, normalize_measurement_store
 from smart_practice_concept_graph import (
-    GRAPH_VERSION,
     audit_graph,
     concept_key_for_question,
-    diagnose_root_cause,
     normalize_graph,
     store_diagnosis,
 )
+from smart_practice_core import (
+    SmartPracticeCandidate,
+    build_smart_practice_score,
+    build_smart_practice_selection,
+)
+from smart_practice_measurement import attach_prediction_to_question, normalize_measurement_store
 from smart_practice_policy import active_policy, normalize_governance
+from smart_practice_profile import (
+    SMART_PRACTICE_POLICY_VERSION,
+    SMART_PRACTICE_SCORING,
+    smart_practice_objective_cap,
+)
 from smart_practice_question_value import (
-    empty_calibration_store,
-    information_value,
     normalize_calibration_store,
-    question_quality_record,
+)
+from smart_practice_worker import (
+    SmartPracticeWorkerSnapshot,
+    build_detached_signal_payload,
+    create_detached_context,
+)
+from study_question_utils import (
+    coverage_unit_for_question,
+    normalized_study_label,
+    primary_topic_label,
+    question_mentions_label,
+    stem_style_for_question,
 )
 
 
 class SessionBuilderMixin:
+    def _smart_practice_worker_revision(self):
+        return self._freeze_signal_value(
+            {
+                "signal_key": self._smart_practice_signal_key(),
+                "progress_history": list(self._progress_history())[-28:],
+                "session_answer_history": list(self.session_answer_history or [])[-12:],
+            }
+        )
+
+    def _smart_practice_worker_snapshot(self, *, base_pool=None):
+        meta = self.progress_data.setdefault("meta", {})
+        return SmartPracticeWorkerSnapshot(
+            master_questions=copy.deepcopy(self.master_questions),
+            questions=copy.deepcopy(self.questions),
+            progress_data=copy.deepcopy(self.progress_data),
+            session_answer_history=copy.deepcopy(list(self.session_answer_history or [])),
+            active_session_mode=str(self.active_session_mode or ""),
+            smart_practice_signal_cache_key=copy.deepcopy(getattr(self, "smart_practice_signal_cache_key", None)),
+            smart_practice_signal_cache_payload=copy.deepcopy(
+                getattr(self, "smart_practice_signal_cache_payload", None)
+            ),
+            smart_practice_pool_cache=copy.deepcopy(getattr(self, "smart_practice_pool_cache", {})),
+            progress_meta_cache_raw=copy.deepcopy(meta if isinstance(meta, dict) else {}),
+            progress_meta_cache_value=None,
+            base_pool=copy.deepcopy(list(base_pool) if base_pool is not None else None),
+        )
+
     def _normalized_study_label(self, value: str) -> str:
-        text = " ".join(str(value or "").replace("&", "and").replace(",", " ").split()).casefold()
-        aliases = {
-            "security program management and oversight": "security program management and oversight",
-            "threats vulnerabilities and mitigations": "threats vulnerabilities and mitigations",
-            "threats vulnerability and mitigations": "threats vulnerabilities and mitigations",
-        }
-        return aliases.get(text, text)
+        return normalized_study_label(value)
+
+    def _freeze_signal_value(self, value):
+        if isinstance(value, dict):
+            return tuple(
+                (str(key), self._freeze_signal_value(nested_value))
+                for key, nested_value in sorted(value.items(), key=lambda item: str(item[0]))
+            )
+        if isinstance(value, (list, tuple)):
+            return tuple(self._freeze_signal_value(item) for item in value)
+        if isinstance(value, set):
+            return tuple(sorted(self._freeze_signal_value(item) for item in value))
+        return value
 
     def _smart_practice_signal_key(self):
         records_key = tuple(
@@ -67,24 +109,15 @@ class SessionBuilderMixin:
             sorted(
                 (
                     str(key),
-                    tuple(sorted((dict(value or {})).items())) if isinstance(value, dict) else str(value),
+                    self._freeze_signal_value(value),
                 )
                 for key, value in (self.progress_data.get("meta", {}).get("repair_state", {}) or {}).items()
             )
         )
-        measurement_policy = tuple(
-            sorted(
-                (
-                    self.progress_data.get("meta", {})
-                    .get("smart_practice_measurement", {})
-                    .get("active_policy", {})
-                    or {}
-                ).items()
-            )
+        measurement_policy = self._freeze_signal_value(
+            self.progress_data.get("meta", {}).get("smart_practice_measurement", {}).get("active_policy", {}) or {}
         )
-        governance = normalize_governance(
-            self.progress_data.get("meta", {}).get("smart_practice_policy_governance")
-        )
+        governance = normalize_governance(self.progress_data.get("meta", {}).get("smart_practice_policy_governance"))
         active_smart_policy = active_policy(governance)
         governance_policy = (
             str(active_smart_policy.get("policy_id") or ""),
@@ -95,7 +128,8 @@ class SessionBuilderMixin:
             (self.progress_data.get("meta", {}).get("smart_practice_concept_graph") or {}).get("graph_signature") or ""
         )
         calibration_key = str(
-            (self.progress_data.get("meta", {}).get("smart_practice_question_calibration") or {}).get("last_updated_at") or ""
+            (self.progress_data.get("meta", {}).get("smart_practice_question_calibration") or {}).get("last_updated_at")
+            or ""
         )
         session_answer_key = tuple(
             (
@@ -285,9 +319,7 @@ class SessionBuilderMixin:
         near_miss_unit_map, near_miss_question_map = self._build_near_miss_pressure_maps(
             recent_history, signal_questions
         )
-        wrong_answer_recycling_map = self._build_wrong_answer_recycling_map(
-            wrong_answer_memory_rows, signal_questions
-        )
+        wrong_answer_recycling_map = self._build_wrong_answer_recycling_map(wrong_answer_memory_rows, signal_questions)
         wrong_answer_memory_example_qnums = {
             int(qnum)
             for row in wrong_answer_memory_rows
@@ -468,6 +500,10 @@ class SessionBuilderMixin:
         }
 
     def _publish_smart_practice_signal_snapshot(self, snapshot) -> None:
+        if getattr(self, "_app_closing", False):
+            return
+        if snapshot.get("revision") != self._smart_practice_worker_revision():
+            return
         if snapshot["key"] != self._smart_practice_signal_key():
             return
         self.smart_practice_signal_cache_key = snapshot["key"]
@@ -477,9 +513,16 @@ class SessionBuilderMixin:
         if not self.master_questions or not getattr(self, "smart_practice_prewarm", None):
             return
         key = self._smart_practice_signal_key()
+        revision = self._smart_practice_worker_revision()
+        snapshot = self._smart_practice_worker_snapshot()
+
+        def build_payload():
+            return build_detached_signal_payload(type(self), snapshot)
+
         self.smart_practice_prewarm.schedule(
             key,
-            self._build_smart_practice_signal_payload,
+            build_payload,
+            revision=revision,
             delay_ms=delay_ms,
         )
 
@@ -560,7 +603,9 @@ class SessionBuilderMixin:
             return "cancel"
         return bool(answer)
 
-    def _start_smart_practice_async(self, count, randomize, base_pool, *, preserve_if_saved=True, builder_context=None) -> None:
+    def _start_smart_practice_async(
+        self, count, randomize, base_pool, *, preserve_if_saved=True, builder_context=None
+    ) -> None:
         if getattr(self, "_session_start_busy", False):
             return
         builder_context = builder_context or self.current_builder_context(
@@ -595,16 +640,42 @@ class SessionBuilderMixin:
         self._set_session_start_busy_state(
             True, "Building your adaptive set. The app should stay responsive while the tutor scores the bank."
         )
+        self._smart_practice_async_generation = int(getattr(self, "_smart_practice_async_generation", 0) or 0) + 1
+        generation = self._smart_practice_async_generation
+        signal_key = self._smart_practice_signal_key()
+        revision = self._smart_practice_worker_revision()
+        snapshot = self._smart_practice_worker_snapshot(base_pool=base_pool)
 
         def worker():
             error = None
             pool = []
+            worker_meta = {}
             try:
-                pool = self._build_smart_practice_pool_compat(count, randomize=randomize, base_pool=base_pool)
+                context = create_detached_context(type(self), snapshot)
+                pool = context._build_smart_practice_pool_compat(
+                    count,
+                    randomize=randomize,
+                    base_pool=snapshot.base_pool,
+                )
+                detached_signal_payload = context._build_smart_practice_signal_payload()
+                worker_meta = {
+                    "progress_meta": copy.deepcopy(snapshot.progress_data.get("meta", {})),
+                    "signal_cache_key": copy.deepcopy(signal_key),
+                    "signal_cache_payload": copy.deepcopy(detached_signal_payload),
+                    "pool_cache": copy.deepcopy(snapshot.smart_practice_pool_cache),
+                }
             except Exception as exc:
                 error = exc
 
             def finish():
+                if getattr(self, "_app_closing", False):
+                    return
+                if generation != getattr(self, "_smart_practice_async_generation", 0):
+                    return
+                if revision != self._smart_practice_worker_revision():
+                    self._set_session_start_busy_state(False)
+                    self.session_label.configure(text="Smart Practice build discarded because learner state changed.")
+                    return
                 self._set_session_start_busy_state(False)
                 if error is not None:
                     messagebox.showerror("Smart Practice", f"Could not build Smart Practice set.\n\n{error}")
@@ -616,6 +687,13 @@ class SessionBuilderMixin:
                     )
                     self.render_question()
                     return
+                if isinstance(worker_meta.get("progress_meta"), dict):
+                    self.progress_data["meta"] = worker_meta["progress_meta"]
+                    self._progress_meta_cache_raw = self.progress_data["meta"]
+                    self._progress_meta_cache_value = self.progress_data["meta"]
+                self.smart_practice_signal_cache_key = worker_meta.get("signal_cache_key")
+                self.smart_practice_signal_cache_payload = worker_meta.get("signal_cache_payload")
+                self.smart_practice_pool_cache = worker_meta.get("pool_cache", {})
                 self.save_app_config()
                 self.start_session_from_pool(
                     pool,
@@ -685,13 +763,13 @@ class SessionBuilderMixin:
         while remaining:
             prev = ordered[-1]
             prev_domain = str(prev.get("domain") or "")
-            prev_topic = self._primary_topic_label(prev)
+            prev_topic = primary_topic_label(prev)
             prev_objective = str(prev.get("objective_code") or "").strip()
             prev_source = str(prev.get("source_name") or "")
             prev_source_label = source_label(prev)
-            prev_stem = self._stem_style_for_question(prev)
+            prev_stem = stem_style_for_question(prev)
             recent = ordered[-3:]
-            recent_topics = {self._primary_topic_label(item) for item in recent}
+            recent_topics = {primary_topic_label(item) for item in recent}
             recent_source_labels = {source_label(item) for item in recent}
             best_idx = 0
             best_score = None
@@ -699,7 +777,7 @@ class SessionBuilderMixin:
                 score = 0.0
                 if str(candidate.get("domain") or "") != prev_domain:
                     score += 4.0
-                if self._primary_topic_label(candidate) != prev_topic:
+                if primary_topic_label(candidate) != prev_topic:
                     score += 5.0
                 if (
                     str(candidate.get("objective_code") or "").strip()
@@ -713,9 +791,9 @@ class SessionBuilderMixin:
                     score += profile.interleave_source_label_bonus
                 elif candidate_source_label in recent_source_labels:
                     score -= profile.interleave_recent_source_penalty
-                if self._stem_style_for_question(candidate) != prev_stem:
+                if stem_style_for_question(candidate) != prev_stem:
                     score += 2.5
-                if self._primary_topic_label(candidate) in recent_topics:
+                if primary_topic_label(candidate) in recent_topics:
                     score -= profile.interleave_recent_topic_penalty
                 score -= idx * 0.01
                 if best_score is None or score > best_score:
@@ -915,7 +993,9 @@ class SessionBuilderMixin:
 
     def build_smart_practice_pool(self, count, randomize=True, base_pool=None) -> list[QuestionRuntimeState]:
         profile = SMART_PRACTICE_SCORING
-        governance = normalize_governance(self.progress_data.setdefault("meta", {}).get("smart_practice_policy_governance"))
+        governance = normalize_governance(
+            self.progress_data.setdefault("meta", {}).get("smart_practice_policy_governance")
+        )
         self.progress_data.setdefault("meta", {})["smart_practice_policy_governance"] = governance
         active_smart_policy = active_policy(governance)
         active_policy_values = active_smart_policy.get("policy_values") or {}
@@ -994,20 +1074,16 @@ class SessionBuilderMixin:
         concept_memory_map = signal_payload["concept_memory_map"]
         wrong_answer_memory_pressure_map = signal_payload["wrong_answer_memory_pressure_map"]
         wrong_answer_recycling_map = signal_payload["wrong_answer_recycling_map"]
-        wrong_answer_memory_example_qnums = set(signal_payload.get("wrong_answer_memory_example_qnums", set()))
         near_miss_unit_map = signal_payload["near_miss_unit_map"]
         near_miss_question_map = signal_payload["near_miss_question_map"]
         recognition_retrieval_map = signal_payload["recognition_retrieval_map"]
         confidence_compression_map = signal_payload["confidence_compression_map"]
         abstraction_ladder_map = signal_payload["abstraction_ladder_map"]
-        compression_point_map = signal_payload["compression_point_map"]
         decision_latency_map = signal_payload["decision_latency_map"]
         error_boundary_map = signal_payload["error_boundary_map"]
         counterfactual_pressure_map = signal_payload["counterfactual_pressure_map"]
         contrast_pressure_map = signal_payload["contrast_pressure_map"]
         prerequisite_debt_map = signal_payload["prerequisite_debt_map"]
-        concept_half_life_map = signal_payload["concept_half_life_map"]
-        leverage_map = signal_payload["leverage_map"]
         blind_spot_map = signal_payload["blind_spot_map"]
         misconception_pressure_map = signal_payload["misconception_pressure_map"]
         latent_map = signal_payload["latent_map"]
@@ -1016,12 +1092,10 @@ class SessionBuilderMixin:
         generalization_map = signal_payload["generalization_map"]
         difficulty_map = signal_payload["difficulty_map"]
         phrasing_map = signal_payload["phrasing_map"]
-        effort_efficiency_map = signal_payload["effort_efficiency_map"]
         reinforcement_map = signal_payload["reinforcement_map"]
         synthesis_map = signal_payload["synthesis_map"]
         cue_dependence_map = signal_payload["cue_dependence_map"]
         delayed_probe_map = signal_payload["delayed_probe_map"]
-        counterexample_training_map = signal_payload["counterexample_training_map"]
         failure_mode_map = signal_payload["failure_mode_map"]
         expected_learning_gain_map = signal_payload["expected_learning_gain_map"]
         retention_stress_map = signal_payload["retention_stress_map"]
@@ -1030,14 +1104,11 @@ class SessionBuilderMixin:
         recent_concept_cooldown_map = signal_payload["recent_concept_cooldown_map"]
         burnout_risk = signal_payload["burnout_risk"]
         momentum_profile = signal_payload["momentum_profile"]
-        session_intent = signal_payload.get("session_intent", {"label": "Build coverage"})
 
         def interference_priority(question: QuestionRuntimeState) -> float:
             score = 0.0
             for row in interference_rows[:8]:
-                if self._question_mentions_label(question, row["left"]) or self._question_mentions_label(
-                    question, row["right"]
-                ):
+                if question_mentions_label(question, row["left"]) or question_mentions_label(question, row["right"]):
                     score = max(score, float(row["pressure"]))
             return score
 
@@ -1050,14 +1121,14 @@ class SessionBuilderMixin:
         outcomes_by_qnum = {}
         for question in pool:
             qnum = int(question.get("question_number") or 0)
-            kind, unit = self._coverage_unit_for_question(question)
+            kind, unit = coverage_unit_for_question(question)
             objective_code = str(question.get("objective_code") or "").strip()
-            stem_style = self._stem_style_for_question(question)
+            stem_style = stem_style_for_question(question)
             source_name = str(question.get("source_name") or "Unknown source")
             source_label = str(question.get("source_label") or "")
-            normalized_domain = self._normalized_study_label(str(question.get("domain") or ""))
+            normalized_domain = normalized_study_label(str(question.get("domain") or ""))
             normalized_topics = tuple(
-                self._normalized_study_label(str(topic)) for topic in question.get("topics", []) if str(topic).strip()
+                normalized_study_label(str(topic)) for topic in question.get("topics", []) if str(topic).strip()
             )
             record = records.get(self._question_key(question), {})
             attempts = int(record.get("attempts", 0) or 0)
@@ -1093,7 +1164,11 @@ class SessionBuilderMixin:
             int(question.get("question_number") or 0): interference_priority(question) for question in pool
         }
         concept_keys = sorted(
-            {str(meta.get("base_concept_key") or "") for meta in question_meta.values() if str(meta.get("base_concept_key") or "")}
+            {
+                str(meta.get("base_concept_key") or "")
+                for meta in question_meta.values()
+                if str(meta.get("base_concept_key") or "")
+            }
         )
         concept_groups = {}
         for question in pool:
@@ -1171,7 +1246,9 @@ class SessionBuilderMixin:
                 "distinct_stem_style_count": len(styles),
                 "last_reviewed_at": max((row["last"] for row in per_question), default=""),
                 "next_review_at": min((row["next"] for row in per_question if row["next"]), default=""),
-                "evidence_strength": "strong" if len(per_question) >= 3 else "moderate" if len(per_question) >= 2 else "weak",
+                "evidence_strength": (
+                    "strong" if len(per_question) >= 3 else "moderate" if len(per_question) >= 2 else "weak"
+                ),
             }
         graph_audit = audit_graph(concept_graph, pool)
         normalized_source_trust_map = {
@@ -1213,399 +1290,89 @@ class SessionBuilderMixin:
             and screenshot_unseen / max(1, screenshot_total) >= profile.imported_chapter_burst_unseen_min_ratio
         )
 
-        def policy_clamp_component(name, value):
-            low, high = utility_bounds.get(name, (0.0, 0.0))
-            try:
-                number = float(value)
-            except (TypeError, ValueError):
-                number = float(low)
-            if number != number:
-                number = float(low)
-            return round(max(float(low), min(float(high), number)), 3)
-
-        def policy_utility_total(components):
-            clean = {name: policy_clamp_component(name, components.get(name, 0.0)) for name in utility_bounds}
-            total = (
-                clean.get("retention_risk", 0.0)
-                + clean.get("expected_learning_gain", 0.0)
-                + clean.get("blueprint_importance", 0.0)
-                + clean.get("misconception_repair_value", 0.0)
-                + clean.get("exploration_value", 0.0)
-                - clean.get("repetition_cost", 0.0)
-                - clean.get("source_quality_risk", 0.0)
-                - clean.get("fatigue_cost", 0.0)
-            )
-            return round(total, 3)
+        score_context = {
+            "profile": profile,
+            "source_map": source_map,
+            "source_trust_map": source_trust_map,
+            "normalized_source_trust_map": normalized_source_trust_map,
+            "graph_enabled": graph_enabled,
+            "concept_graph": concept_graph,
+            "concept_states": concept_states,
+            "progress_history": progress_history,
+            "active_smart_policy": active_smart_policy,
+            "graph_max_utility": graph_max_utility,
+            "outcomes_by_qnum": outcomes_by_qnum,
+            "quality_min_samples": quality_min_samples,
+            "bad_key_min_samples": bad_key_min_samples,
+            "quality_enabled": quality_enabled,
+            "dependent_concepts_by_source": dependent_concepts_by_source,
+            "graph_audit": graph_audit,
+            "session_context": session_context,
+            "information_enabled": information_enabled,
+            "info_max": info_max,
+            "gap_map": gap_map,
+            "transfer_map": transfer_map,
+            "misconception_pressure_map": misconception_pressure_map,
+            "knowledge_trace_map": knowledge_trace_map,
+            "concept_memory_map": concept_memory_map,
+            "wrong_answer_memory_pressure_map": wrong_answer_memory_pressure_map,
+            "wrong_answer_recycling_map": wrong_answer_recycling_map,
+            "near_miss_unit_map": near_miss_unit_map,
+            "near_miss_question_map": near_miss_question_map,
+            "confidence_compression_map": confidence_compression_map,
+            "error_boundary_map": error_boundary_map,
+            "counterfactual_pressure_map": counterfactual_pressure_map,
+            "objective_map": objective_map,
+            "latent_map": latent_map,
+            "difficulty_map": difficulty_map,
+            "phrasing_map": phrasing_map,
+            "generalization_map": generalization_map,
+            "expected_learning_gain_map": expected_learning_gain_map,
+            "retention_stress_map": retention_stress_map,
+            "freshness_map": freshness_map,
+            "momentum_profile": momentum_profile,
+            "source_risk_settings": source_risk_settings,
+            "fatigue_settings": fatigue_settings,
+            "review_interval_multiplier": review_interval_multiplier,
+            "utility_scales": utility_scales,
+            "utility_bounds": utility_bounds,
+            "quality_risk_max": quality_risk_max,
+            "burnout_risk": burnout_risk,
+            "repetition_settings": repetition_settings,
+            "recent_concept_cooldown_map": recent_concept_cooldown_map,
+            "weakness_thresholds": weakness_thresholds,
+            "unseen_by_unit": unseen_by_unit,
+            "unseen_by_objective": unseen_by_objective,
+            "repair_spacing_settings": repair_spacing_settings,
+            "repair_trigger_settings": repair_trigger_settings,
+            "role_shares": role_shares,
+            "prediction_calibration": prediction_calibration,
+            "exploration_settings": exploration_settings,
+            "active_policy_values": active_policy_values,
+            "attempted_by_unit": attempted_by_unit,
+            "attempted_by_objective": attempted_by_objective,
+            "objective_exposure_map": objective_exposure_map,
+            "imported_chapter_burst_active": imported_chapter_burst_active,
+        }
 
         def smart_priority(question: QuestionRuntimeState) -> float:
             qnum = int(question.get("question_number") or 0)
             if qnum in priority_cache:
                 return priority_cache[qnum]
             meta = question_meta.get(qnum, {})
-            rec = meta.get("record", {})
-            attempts = int(rec.get("attempts", 0) or 0)
-            is_unseen = attempts <= 0
-            source_row = source_map.get(qnum, {"score": 0.8, "label": "Single-source only"})
-            source_name_key = str(meta.get("source_name") or "Unknown source").strip()
-            source_trust = source_trust_map.get(source_name_key)
-            if source_trust is None:
-                source_trust = normalized_source_trust_map.get(source_name_key.casefold())
-            if source_trust is None:
-                source_trust = {"trust_score": 82.0, "label": "Watch"}
-            diagnosis = diagnose_root_cause(
-                question,
-                concept_graph,
-                concept_states,
-                progress_history,
-                source_trust=source_trust,
-                policy=active_smart_policy,
-            ) if graph_enabled else {
-                "diagnosis": "insufficient_evidence",
-                "confidence": 0.0,
-                "target_concept_key": str(meta.get("base_concept_key") or ""),
-                "supporting_concept_keys": [],
-                "graph_version": GRAPH_VERSION,
-            }
-            graph_pressure = min(graph_max_utility, graph_max_utility * float(diagnosis.get("confidence", 0.0) or 0.0))
-            qnum_outcomes = outcomes_by_qnum.get(qnum, [])
-            quality = question_quality_record(
-                question,
-                qnum_outcomes,
-                minimum_samples=quality_min_samples,
-                possible_bad_key_minimum_samples=bad_key_min_samples,
-            ) if quality_enabled else {"status": "healthy", "source_risk": 0.0, "confidence": 0.0}
-            concept_key = str(diagnosis.get("target_concept_key") or meta.get("base_concept_key") or "")
-            dependent_concepts = dependent_concepts_by_source.get(concept_key, [])
-            info = information_value(
-                question,
-                concept_states.get(concept_key, {}),
-                {**graph_audit, "dependent_concepts": dependent_concepts},
-                session_context,
-                quality,
-                policy=active_smart_policy,
-            ) if information_enabled else {"total": 0.0, "reasons": []}
-            info_pressure = max(-info_max, min(info_max, float(info.get("total", 0.0) or 0.0)))
-            unit_key = str(meta.get("unit_key") or "")
-            gap_score = float(gap_map.get(unit_key, 0.0))
-            transfer_row = transfer_map.get(unit_key, {"score": 72.0})
-            prerequisite_row = prerequisite_debt_map.get(unit_key, {"severity": 0.0})
-            half_life_row = concept_half_life_map.get(unit_key, {"half_life_days": profile.half_life_target_days})
-            blind_spot_row = blind_spot_map.get(unit_key, {"severity": 0.0})
-            robustness_row = robustness_map.get(unit_key, {"score": profile.robustness_baseline})
-            leverage_row = leverage_map.get(unit_key, {"leverage": 0.0})
-            misconception_pressure = float(misconception_pressure_map.get(unit_key, 0.0))
-            knowledge_row = knowledge_trace_map.get(
-                unit_key, {"mastery_prob": profile.knowledge_trace_baseline, "uncertainty": 50.0}
-            )
-            concept_memory_row = concept_memory_map.get(
-                unit_key, {"state": "new", "next_ramp": "recognition", "durability_signal": 0.0}
-            )
-            memory_state = str(concept_memory_row.get("state") or "new")
-            wrong_memory_pressure = float(wrong_answer_memory_pressure_map.get(unit_key, 0.0))
-            wrong_recycle_pressure = float(wrong_answer_recycling_map.get(qnum, 0.0))
-            near_miss_pressure = max(
-                float(near_miss_unit_map.get(unit_key, 0.0)),
-                float(near_miss_question_map.get(qnum, 0.0)),
-            )
-            recognition_row = recognition_retrieval_map.get(unit_key, {"gap": 0.0})
-            compression_row = confidence_compression_map.get(unit_key, {"compression": 0.0})
-            compression_point_row = compression_point_map.get(unit_key, {"gap": 0.0})
-            ladder_row = abstraction_ladder_map.get(
-                unit_key, {"score": 72.0, "rung_count": 1, "available_style_count": 1}
-            )
-            boundary_row = error_boundary_map.get(unit_key, {"gap": 0.0, "weak_style": ""})
-            counterfactual_pressure = float(counterfactual_pressure_map.get(unit_key, 0.0))
-            contrast_pressure = float(contrast_pressure_map.get(unit_key, 0.0))
-            objective_row = objective_map.get(
-                str(meta.get("objective_code") or ""), {"mastery_score": 72.0, "stem_style_count": 1}
-            )
-            objective_mastery_score = float(objective_row.get("mastery_score", 72.0))
-            latent_row = latent_map.get(qnum, {"score": 0.0})
-            difficulty_row = difficulty_map.get(qnum, {"score": 0.0, "label": "Stable"})
-            phrasing_row = phrasing_map.get(qnum, {"score": 100.0, "label": "Clean"})
-            effort_row = effort_efficiency_map.get(unit_key, {"score": profile.effort_efficiency_baseline})
-            reinforcement_row = reinforcement_map.get(qnum, {"priority": 0.0})
-            synthesis_row = synthesis_map.get(qnum, {"score": 0.0})
-            generalization_row = generalization_map.get(unit_key, {"score": profile.generalization_baseline})
-            cue_row = cue_dependence_map.get(qnum, {"score": 0.0})
-            delayed_probe_row = delayed_probe_map.get(qnum, {"pressure": 0.0})
-            counterexample_row = counterexample_training_map.get(qnum, {"pressure": 0.0})
-            failure_mode_row = failure_mode_map.get(unit_key, {"pressure": 0.0})
-            expected_gain_row = expected_learning_gain_map.get(qnum, {"expected_gain": 0.0})
-            retention_stress_row = retention_stress_map.get(qnum, {"pressure": 0.0})
-            concept_state_row = concept_state_map.get(unit_key, {"state": "stable"})
-            latency_row = decision_latency_map.get(unit_key, {"drag": 0.0})
-            freshness_penalty = float(freshness_map.get(qnum, 0.0))
-            interference_score = float(interference_priority_map.get(qnum, 0.0))
-            difficulty_score = float(difficulty_row.get("score", 0.0))
-            phrasing_penalty = max(0.0, 82.0 - float(phrasing_row.get("score", 100.0)))
-            momentum_bias = float(momentum_profile.get("difficulty_bias", 0.0))
-            trust_score = max(0.0, min(100.0, float(source_trust.get("trust_score", 82.0))))
-            trust_label = str(source_trust.get("label") or "Watch")
-            source_label = str(source_row.get("label") or "")
-            memory_due = is_review_due(rec)
-            memory = dict((rec or {}).get("learner_memory") or {})
-            retrievability = max(0.0, min(1.0, float(memory.get("retrievability", 0.0) or 0.0)))
-            trust_risk = max(0.0, (profile.source_trust_baseline - trust_score) / profile.source_trust_baseline)
-            if trust_label.casefold() == "decayed":
-                trust_risk += float(source_risk_settings.get("decayed_penalty", 0.22) or 0.22)
-            if source_label == "Source conflict":
-                trust_risk += float(source_risk_settings.get("conflict_penalty", 0.28) or 0.28)
-            if str(question.get("import_status") or "") == "screenshot_review_needed":
-                trust_risk += float(source_risk_settings.get("decayed_penalty", 0.22) or 0.22)
-            trust_risk = max(0.0, min(1.0, trust_risk))
-            explicit_source_penalty = 0.0
-            if trust_score < profile.source_trust_baseline:
-                explicit_source_penalty += (profile.source_trust_baseline - trust_score) * 0.12
-            if trust_label.casefold() == "decayed":
-                explicit_source_penalty += 3.0
-            if source_name_key.casefold() == "decayed":
-                explicit_source_penalty += 3.0
-            retention_risk = min(
-                25.0,
-                (18.0 if memory_due else 0.0)
-                + (float(retention_stress_row.get("pressure", 0.0)) * 0.12 if attempts > 0 else 0.0)
-                + (max(0.0, 1.0 - retrievability) * 8.0 if attempts > 0 else 0.0),
-            ) * review_interval_multiplier
-            learning_gain = min(
-                20.0,
-                float(expected_gain_row.get("expected_gain", 0.0)) * 0.16
-                + float(knowledge_row.get("uncertainty", 0.0)) * 0.06
-                + max(0.0, profile.knowledge_trace_baseline - float(knowledge_row.get("mastery_prob", 70.0))) * 0.08,
-            )
-            blueprint_importance = min(
-                15.0,
-                gap_score * 0.13
-                + (5.0 if is_unseen else 0.0)
-                + max(0.0, profile.objective_mastery_baseline - objective_mastery_score)
-                * 0.08,
-            )
-            misconception_repair = min(
-                20.0,
-                (8.0 if is_active_weak(rec) else 0.0)
-                + misconception_pressure * 0.08
-                + wrong_memory_pressure * 0.1
-                + wrong_recycle_pressure * 0.22
-                + near_miss_pressure * 0.12
-                + float(latent_row.get("score", 0.0)) * 0.12
-                + float(compression_row.get("compression", 0.0)) * 0.06,
-            )
-            if diagnosis["diagnosis"] in {"missing_prerequisite", "target_concept_weakness", "concept_confusion"}:
-                misconception_repair += graph_pressure
-                learning_gain += graph_pressure * 0.5
-            learning_gain += max(0.0, info_pressure) * 0.4
-            blueprint_importance += max(0.0, info.get("graph_bottleneck_value", 0.0)) * 0.2 + max(0.0, info.get("coverage_value", 0.0)) * 0.2
-            objective_exposure = objective_exposure_map.get(
-                str(meta.get("objective_code") or ""), {"sources": set(), "styles": set()}
-            )
-            exploration_value = min(
-                10.0,
-                max(0.0, profile.transfer_baseline - float(transfer_row.get("score", 72.0))) * 0.06
-                + max(0.0, profile.generalization_baseline - float(generalization_row.get("score", 72.0))) * 0.05
-                + (2.5 if source_label == "Cross-source agreement" else 0.0)
-                + (2.0 if str(meta.get("source_name") or "") not in objective_exposure.get("sources", set()) else 0.0)
-                + (2.0 if str(meta.get("stem_style") or "") not in objective_exposure.get("styles", set()) else 0.0),
-            )
-            novelty_bonus = 0.0
-            if is_unseen:
-                objective_code = str(meta.get("objective_code") or "")
-                if attempted_by_unit.get(unit_key, 0) > 0 or (
-                    objective_code and attempted_by_objective.get(objective_code, 0) > 0
-                ):
-                    novelty_bonus += 6.0
-                if is_screenshot_import(question) and imported_chapter_burst_active:
-                    novelty_bonus += 6.0
-                if gap_score >= profile.coverage_focus_gap_min:
-                    novelty_bonus += 11.0
-                if objective_mastery_score < profile.objective_focus_mastery_max:
-                    novelty_bonus += 7.0
-                if wrong_recycle_pressure >= profile.wrong_answer_recycle_focus_min:
-                    novelty_bonus += 12.0
-                elif near_miss_pressure >= profile.near_miss_focus_min:
-                    novelty_bonus += 3.0
-            boundary_bonus = 0.0
-            if str(boundary_row.get("weak_style") or "") == str(meta.get("stem_style") or ""):
-                boundary_bonus += min(8.0, float(boundary_row.get("gap", 0.0)) * 0.16)
-            counterfactual_bonus = min(4.0, counterfactual_pressure * 0.12)
-            exploration_value = min(10.0, exploration_value + novelty_bonus * 0.35 + boundary_bonus * 0.3)
-            exploration_value += max(0.0, float(exploration_settings.get("transfer_min_value", 4.0) or 4.0) - 4.0) * 0.2
-            if diagnosis["diagnosis"] == "transfer_failure":
-                exploration_value += graph_pressure
-                learning_gain += graph_pressure * 0.5
-            exploration_value += max(0.0, info.get("transfer_evidence_value", 0.0)) * 0.2
-            learning_gain = min(20.0, learning_gain + novelty_bonus * 0.2 + boundary_bonus + counterfactual_bonus)
-            blueprint_importance = min(15.0, blueprint_importance + novelty_bonus * 0.25 + boundary_bonus * 0.6)
-            misconception_repair = min(20.0, misconception_repair + novelty_bonus * 0.3 + boundary_bonus * 0.5)
-            repetition_cost = min(
-                15.0,
-                freshness_penalty * 0.18
-                + int(rec.get("correct_streak", 0)) * float(repetition_settings.get("correct_streak_penalty", 1.4) or 1.4)
-                + max(0, int(recent_concept_cooldown_map.get(unit_key, 0) or 0) - 1)
-                * float(repetition_settings.get("recent_concept_penalty", 2.0) or 2.0),
-            )
-            if diagnosis["diagnosis"] == "item_specific_failure":
-                repetition_cost += graph_pressure
-            repetition_cost += max(0.0, info.get("redundancy_cost", 0.0)) * 0.2
-            source_quality_risk = min(
-                15.0,
-                trust_risk * 15.0
-                + phrasing_penalty * 0.06
-                + max(0.0, float(source_risk_settings.get("baseline", 85.0) or 85.0) - 85.0) * 0.01,
-            )
-            source_quality_risk = min(15.0, source_quality_risk + explicit_source_penalty)
-            if diagnosis["diagnosis"] == "source_quality_problem":
-                source_quality_risk += graph_pressure
-            source_quality_risk += min(quality_risk_max, max(0.0, info.get("item_quality_risk", 0.0) + info.get("source_risk", 0.0)) * 0.2)
-            fatigue_cost = 0.0
-            if burnout_risk.get("label") == "High":
-                fatigue_cost += max(0.0, difficulty_score - profile.burnout_difficulty_floor) * float(
-                    fatigue_settings.get("high_burnout_difficulty_penalty", 0.12) or 0.12
-                )
-            if momentum_bias < 0:
-                fatigue_cost += max(0.0, difficulty_score - profile.negative_momentum_difficulty_floor) * float(
-                    fatigue_settings.get("negative_momentum_penalty", 0.08) or 0.08
-                )
-            fatigue_cost = min(10.0, fatigue_cost)
-            wrong_surplus = max(0, int(rec.get("wrong_count", 0) or 0) - int(rec.get("correct_count", 0) or 0))
-            policy_active_weak = is_active_weak(rec) or wrong_surplus >= int(
-                weakness_thresholds.get("active_weak_wrong_surplus", 1) or 1
-            )
-            objective_code = str(meta.get("objective_code") or "")
-            unseen_sibling_exists = (
-                unseen_by_unit.get(unit_key, 0) - (1 if is_unseen else 0) > 0
-                or bool(objective_code)
-                and unseen_by_objective.get(objective_code, 0) - (1 if is_unseen else 0) > 0
-            )
-            if unseen_sibling_exists and (policy_active_weak or str(rec.get("last_confidence") or "").casefold() == "guessed"):
-                repetition_cost = min(15.0, repetition_cost + 10.0)
-            if is_super_confident_active(rec) and not memory_due and not policy_active_weak:
-                repetition_cost = 15.0
-            repair_recent_delay = int(repair_spacing_settings.get("contrast_delay", 2) or 2)
-            if int(recent_concept_cooldown_map.get(unit_key, 0) or 0) and int(recent_concept_cooldown_map.get(unit_key, 0) or 0) < repair_recent_delay:
-                misconception_repair *= 0.5
-            if (
-                policy_active_weak
-                or diagnosis["diagnosis"] in {"missing_prerequisite", "target_concept_weakness", "concept_confusion"}
-                or wrong_memory_pressure >= float(repair_trigger_settings.get("wrong_memory_min_pressure", 35.0) or 35.0)
-                or near_miss_pressure >= float(repair_trigger_settings.get("weak_repair_min_pressure", 20.0) or 20.0)
-            ):
-                primary_role = "weak_repair"
-            elif memory_due or float(retention_stress_row.get("pressure", 0.0)) >= 24.0:
-                primary_role = "due_retention"
-            elif int(rec.get("attempts", 0)) <= 0 or gap_score >= profile.coverage_focus_gap_min:
-                primary_role = "blueprint_coverage"
-            elif diagnosis["diagnosis"] == "transfer_failure" or exploration_value >= float(exploration_settings.get("transfer_min_value", 4.0) or 4.0) or memory_state in {"retrievable", "transferable"}:
-                primary_role = "transfer"
-            elif burnout_risk.get("label") != "High" and not memory_due:
-                primary_role = "controlled_stretch"
-            else:
-                primary_role = "blueprint_coverage"
-            breakdown = {
-                "retention_risk": policy_clamp_component(
-                    "retention_risk", retention_risk * float(utility_scales.get("retention_risk", 1.0))
-                ),
-                "expected_learning_gain": policy_clamp_component(
-                    "expected_learning_gain",
-                    learning_gain * float(utility_scales.get("expected_learning_gain", 1.0)),
-                ),
-                "blueprint_importance": policy_clamp_component(
-                    "blueprint_importance",
-                    blueprint_importance * float(utility_scales.get("blueprint_importance", 1.0)),
-                ),
-                "misconception_repair_value": policy_clamp_component(
-                    "misconception_repair_value",
-                    misconception_repair * float(utility_scales.get("misconception_repair_value", 1.0)),
-                ),
-                "exploration_value": policy_clamp_component(
-                    "exploration_value", exploration_value * float(utility_scales.get("exploration_value", 1.0))
-                ),
-                "repetition_cost": policy_clamp_component(
-                    "repetition_cost", repetition_cost * float(utility_scales.get("repetition_cost", 1.0))
-                ),
-                "source_quality_risk": policy_clamp_component(
-                    "source_quality_risk",
-                    source_quality_risk * float(utility_scales.get("source_quality_risk", 1.0)),
-                ),
-                "fatigue_cost": policy_clamp_component(
-                    "fatigue_cost", fatigue_cost * float(utility_scales.get("fatigue_cost", 1.0))
-                ),
-            }
-            breakdown["source_quality_risk"] = policy_clamp_component(
-                "source_quality_risk",
-                max(
-                    float(breakdown.get("source_quality_risk", 0.0) or 0.0),
-                    explicit_source_penalty * float(utility_scales.get("source_quality_risk", 1.0)),
-                ),
-            )
-            total = policy_utility_total(breakdown)
-            positive_reasons = [
-                ("retention", retention_risk),
-                ("learning gain", learning_gain),
-                ("coverage", blueprint_importance),
-                ("repair", misconception_repair),
-                ("transfer", exploration_value),
-            ]
-            cost_reasons = [
-                ("recent repetition", repetition_cost),
-                ("source risk", source_quality_risk),
-                ("fatigue guard", fatigue_cost),
-            ]
-            reasons = [
-                label
-                for label, _value in sorted(positive_reasons, key=lambda row: row[1], reverse=True)
-                if _value > 1.0
-            ][:2]
-            reasons.extend(
-                f"penalty: {label}"
-                for label, _value in sorted(cost_reasons, key=lambda row: row[1], reverse=True)
-                if _value > 2.0
-            )
-            question["smart_primary_role"] = primary_role
-            question["smart_selection_reasons"] = reasons[:3]
-            question["smart_utility"] = round(total, 3)
-            question["smart_utility_breakdown"] = breakdown
-            question["smart_policy_version"] = SMART_PRACTICE_POLICY_VERSION
-            question["smart_policy_id"] = str(active_smart_policy.get("policy_id") or "")
-            question["smart_concept_key"] = str(diagnosis.get("target_concept_key") or "")
-            question["smart_root_cause"] = str(diagnosis.get("diagnosis") or "")
-            question["smart_root_cause_confidence"] = float(diagnosis.get("confidence", 0.0) or 0.0)
-            question["smart_supporting_concepts"] = [str(value) for value in diagnosis.get("supporting_concept_keys", [])]
-            question["smart_graph_version"] = str(diagnosis.get("graph_version") or GRAPH_VERSION)
-            question["smart_information_value"] = round(float(info.get("total", 0.0) or 0.0), 4)
-            question["smart_information_breakdown"] = dict(info)
-            question["smart_question_quality_status"] = str(quality.get("status") or "insufficient_data")
-            question["smart_question_quality_confidence"] = float(quality.get("confidence", 0.0) or 0.0)
-            question["smart_graph_bottleneck"] = float(info.get("graph_bottleneck_value", 0.0) or 0.0)
-            calibration_store.setdefault("question_quality", {})[str(qnum)] = quality
-            info_id = f"{qnum}:{active_smart_policy.get('policy_id','')}"
-            calibration_store.setdefault("information_value_history", {})[info_id] = {
-                "record_id": info_id,
-                "question_number": qnum,
-                "smart_policy_id": str(active_smart_policy.get("policy_id") or ""),
-                "information_value": question["smart_information_value"],
-                "breakdown": dict(info),
-            }
+            score_result = build_smart_practice_score(question, qnum=qnum, meta=meta, context=score_context)
+            question.update(score_result.question_updates)
+            calibration_store.setdefault("question_quality", {})[str(qnum)] = score_result.question_quality
+            info_entry = score_result.information_history_entry
+            calibration_store.setdefault("information_value_history", {})[info_entry["record_id"]] = info_entry
             self.progress_data.setdefault("meta", {})["smart_practice_question_calibration"] = calibration_store
-            question["smart_prediction_offset"] = float(prediction_calibration.get("recall_probability_offset", 0.0) or 0.0)
-            question["smart_runtime_policy_controls"] = {
-                "role_shares": role_shares,
-                "utility_component_scales": utility_scales,
-                "utility_component_bounds": utility_bounds,
-                "source_risk_settings": source_risk_settings,
-                "fatigue_settings": fatigue_settings,
-                "review_interval_multiplier": review_interval_multiplier,
-                "repair_trigger_settings": repair_trigger_settings,
-                "repair_spacing_settings": repair_spacing_settings,
-                "weakness_thresholds": weakness_thresholds,
-                "prediction_calibration": prediction_calibration,
-                "exploration_settings": exploration_settings,
-                "repetition_settings": repetition_settings,
-                "minimum_evidence_thresholds": dict(active_policy_values.get("minimum_evidence_thresholds") or {}),
-            }
             if graph_enabled and question["smart_root_cause"] != "insufficient_evidence":
-                stored_graph = store_diagnosis(self.progress_data.setdefault("meta", {}).get("smart_practice_concept_graph"), diagnosis)
+                stored_graph = store_diagnosis(
+                    self.progress_data.setdefault("meta", {}).get("smart_practice_concept_graph"),
+                    score_result.diagnosis,
+                )
                 self.progress_data.setdefault("meta", {})["smart_practice_concept_graph"] = stored_graph
-            priority_cache[qnum] = round(total, 3)
+            priority_cache[qnum] = score_result.priority
             return priority_cache[qnum]
 
         unseen = [
@@ -1627,7 +1394,9 @@ class SessionBuilderMixin:
             and not is_active_weak(question_meta.get(int(q.get("question_number") or 0), {}).get("record", {}))
         ]
         screenshot_focus = [
-            q for q in pool if is_screenshot_import(q) and str(q.get("import_status") or "") != "screenshot_review_needed"
+            q
+            for q in pool
+            if is_screenshot_import(q) and str(q.get("import_status") or "") != "screenshot_review_needed"
         ]
         coverage_focus = [
             q
@@ -2090,219 +1859,53 @@ class SessionBuilderMixin:
                 bonus += 18.0
             return bonus
 
-        def allocate_by_primary_role(candidates: list[QuestionRuntimeState]) -> list[QuestionRuntimeState]:
-            allocations = smart_practice_role_allocation(target, role_shares=role_shares)
-            buckets = {role: [] for role in allocations}
-            unique: list[QuestionRuntimeState] = []
-            used = set()
-            for question in candidates:
-                qnum = question.get("question_number")
-                if qnum in used:
-                    continue
-                used.add(qnum)
-                smart_priority(question)
-                role = str(question.get("smart_primary_role") or "blueprint_coverage")
-                if role not in buckets:
-                    role = "blueprint_coverage"
-                    question["smart_primary_role"] = role
-                buckets[role].append(question)
-                unique.append(question)
-            for bucket in buckets.values():
-                bucket.sort(
-                    key=lambda question: (
-                        -(smart_priority(question) + selection_priority_bonus(question)),
-                        int(question.get("question_number") or 0),
-                    )
-                )
-            selected: list[QuestionRuntimeState] = []
-            selected_qnums = set()
+        candidate_cache: dict[int, SmartPracticeCandidate] = {}
 
-            def add(question: QuestionRuntimeState) -> bool:
-                qnum = question.get("question_number")
-                if qnum in selected_qnums or len(selected) >= target:
-                    return False
-                selected_qnums.add(qnum)
-                selected.append(question)
-                return True
-
-            for role in ("weak_repair", "due_retention", "blueprint_coverage", "transfer", "controlled_stretch"):
-                for question in buckets.get(role, [])[: allocations.get(role, 0)]:
-                    add(question)
-            remaining = sorted(
-                [question for question in unique if question.get("question_number") not in selected_qnums],
-                key=lambda question: (
-                    -(smart_priority(question) + selection_priority_bonus(question)),
-                    int(question.get("question_number") or 0),
-                ),
+        def build_candidate(question: QuestionRuntimeState) -> SmartPracticeCandidate:
+            qnum = int(question.get("question_number") or 0)
+            cached = candidate_cache.get(qnum)
+            if cached is not None:
+                return cached
+            smart_priority(question)
+            meta = question_meta.get(qnum, {})
+            candidate = SmartPracticeCandidate(
+                question=question,
+                qnum=qnum,
+                priority=float(priority_cache.get(qnum, 0.0)),
+                selection_bonus=selection_priority_bonus(question),
+                primary_role=str(question.get("smart_primary_role") or "blueprint_coverage"),
+                objective_code=str(meta.get("objective_code") or ""),
+                source_label=str(
+                    question.get("source_label") or question.get("source_name") or "Unknown source"
+                ).strip(),
+                primary_topic=primary_topic_label(question),
+                normalized_domain=normalized_study_label(str(question.get("domain") or "")),
+                raw_domain=str(question.get("domain") or "").strip(),
             )
-            for question in remaining:
-                if len(selected) >= target:
-                    break
-                add(question)
-            return selected[:target]
+            candidate_cache[qnum] = candidate
+            return candidate
 
-        ordered = allocate_by_primary_role(working_pool)
-
-        def source_label_for_question(question: QuestionRuntimeState) -> str:
-            return str(question.get("source_label") or question.get("source_name") or "Unknown source").strip()
-
-        def source_label_cap() -> int:
-            return max(1, int(target * profile.variety_source_label_cap_ratio + 0.999))
-
-        def unique_candidates() -> list[QuestionRuntimeState]:
-            candidates: list[QuestionRuntimeState] = []
-            used_qnums = set()
-            for group in (ordered, fallback, working_pool):
-                for item in group:
-                    qnum = item.get("question_number")
-                    if qnum in used_qnums:
-                        continue
-                    used_qnums.add(qnum)
-                    candidates.append(item)
-            candidates.sort(
-                key=lambda question: (
-                    -(smart_priority(question) + selection_priority_bonus(question)),
-                    int(question.get("question_number") or 0),
-                )
-            )
-            return candidates
-
-        def shape_for_variety(selected: list[QuestionRuntimeState]) -> list[QuestionRuntimeState]:
-            if target < profile.variety_min_target_size:
-                return selected[:target]
-            candidates = unique_candidates()
-            available_topics = {
-                self._primary_topic_label(question)
-                for question in candidates
-                if self._primary_topic_label(question)
-            }
-            available_domains = {
-                self._normalized_study_label(str(question.get("domain") or ""))
-                for question in candidates
-                if question.get("domain")
-            }
-            desired_topics = min(profile.variety_min_topics, target, len(available_topics))
-            desired_domains = min(profile.variety_min_domains, target, len(available_domains))
-            max_source = source_label_cap()
-            shaped: list[QuestionRuntimeState] = []
-            shaped_qnums = set()
-            shaped_objectives: dict[str, int] = {}
-            shaped_source_labels: dict[str, int] = {}
-            pinned_count = min(target, max(profile.variety_pinned_min, round(target * profile.variety_pinned_ratio)))
-
-            def can_add(question: QuestionRuntimeState, strict_source: bool, strict_objective: bool = True) -> bool:
-                qnum = question.get("question_number")
-                if qnum in shaped_qnums or len(shaped) >= target:
-                    return False
-                objective_code = str(question_meta.get(int(qnum or 0), {}).get("objective_code") or "")
-                if strict_objective and objective_code and shaped_objectives.get(objective_code, 0) >= objective_cap:
-                    return False
-                label = source_label_for_question(question)
-                if strict_source and shaped_source_labels.get(label, 0) >= max_source:
-                    return False
-                return True
-
-            def add(
-                question: QuestionRuntimeState, strict_source: bool = True, strict_objective: bool = True
-            ) -> bool:
-                if not can_add(question, strict_source, strict_objective):
-                    return False
-                qnum = question.get("question_number")
-                shaped_qnums.add(qnum)
-                shaped.append(question)
-                objective_code = str(question_meta.get(int(qnum or 0), {}).get("objective_code") or "")
-                if objective_code:
-                    shaped_objectives[objective_code] = shaped_objectives.get(objective_code, 0) + 1
-                label = source_label_for_question(question)
-                shaped_source_labels[label] = shaped_source_labels.get(label, 0) + 1
-                return True
-
-            def best_values(value_fn, desired_count: int) -> list[str]:
-                best_by_value: dict[str, float] = {}
-                for question in candidates:
-                    value = value_fn(question)
-                    if not value:
-                        continue
-                    best_by_value[value] = max(best_by_value.get(value, 0.0), smart_priority(question))
-                ranked = [(score, value) for value, score in best_by_value.items()]
-                ranked.sort(reverse=True)
-                return [value for _score, value in ranked[:desired_count]]
-
-            for question in selected[:pinned_count]:
-                add(question, strict_source=True)
-                if len(shaped) >= pinned_count:
-                    break
-            for topic in best_values(lambda question: self._primary_topic_label(question), desired_topics):
-                for question in candidates:
-                    if self._primary_topic_label(question) == topic and add(question, strict_source=True):
-                        break
-            for domain in best_values(
-                lambda question: self._normalized_study_label(str(question.get("domain") or "")), desired_domains
-            ):
-                if domain in {self._normalized_study_label(str(question.get("domain") or "")) for question in shaped}:
-                    continue
-                for question in candidates:
-                    if self._normalized_study_label(str(question.get("domain") or "")) == domain and add(
-                        question, strict_source=True
-                    ):
-                        break
-            for question in selected + candidates:
-                add(question, strict_source=True)
-                if len(shaped) >= target:
-                    break
-            for question in selected + candidates:
-                add(question, strict_source=False)
-                if len(shaped) >= target:
-                    break
-            for question in selected + candidates:
-                add(question, strict_source=False, strict_objective=False)
-                if len(shaped) >= target:
-                    break
-            return shaped[:target]
-
-        def smart_practice_set_quality(selection: list[QuestionRuntimeState]) -> float:
-            if not selection:
-                return 0.0
-            selected_qnums = {int(question.get("question_number") or 0) for question in selection}
-            topics = {self._primary_topic_label(question) for question in selection if self._primary_topic_label(question)}
-            domains = {str(question.get("domain") or "").strip() for question in selection if question.get("domain")}
-            source_counts: dict[str, int] = {}
-            for question in selection:
-                label = source_label_for_question(question)
-                source_counts[label] = source_counts.get(label, 0) + 1
-            max_source_count = max(source_counts.values()) if source_counts else 0
-            max_source = source_label_cap()
-            available_sources = {source_label_for_question(question) for question in unique_candidates()}
-            high_signal_qnums = {
-                int(question.get("question_number") or 0)
-                for question in (active_weak + due)
-                if int(question.get("question_number") or 0)
-            }
-            desired_high_signal = min(len(high_signal_qnums), max(1, round(target * 0.25))) if high_signal_qnums else 0
-            high_signal_hits = len(selected_qnums & high_signal_qnums)
-            freshness_average = sum(float(freshness_map.get(qnum, 0.0)) for qnum in selected_qnums) / max(
-                1, len(selected_qnums)
-            )
-            fresh_question_target = round(target * profile.fresh_question_target_ratio)
-            fresh_question_hits = sum(
-                1
-                for qnum in selected_qnums
-                if float(freshness_map.get(qnum, 0.0)) < profile.freshness_suppression_min
-                or qnum in high_signal_qnums
-            )
-            desired_topics = min(profile.variety_min_topics, target)
-            desired_domains = min(profile.variety_min_domains, target)
-            score = 100.0
-            score -= max(0, target - len(selected_qnums)) * 8.0
-            if desired_high_signal:
-                score -= max(0, desired_high_signal - high_signal_hits) * 10.0
-            score -= max(0, fresh_question_target - fresh_question_hits) * profile.fresh_question_quality_penalty
-            score -= max(0, desired_topics - len(topics)) * 4.0
-            score -= max(0, desired_domains - len(domains)) * 6.0
-            if len(available_sources) > 1 and max_source_count > max_source:
-                score -= (max_source_count - max_source) * 5.0
-            score -= min(18.0, freshness_average * 0.15)
-            return round(max(0.0, min(100.0, score)), 2)
+        high_signal_qnums = {
+            int(question.get("question_number") or 0)
+            for question in (active_weak + due)
+            if int(question.get("question_number") or 0)
+        }
+        selection_result = build_smart_practice_selection(
+            [build_candidate(question) for question in working_pool],
+            [build_candidate(question) for question in fallback],
+            target=target,
+            role_shares=role_shares,
+            objective_cap=objective_cap,
+            profile=profile,
+            high_signal_qnums=high_signal_qnums,
+            freshness_map=freshness_map,
+        )
+        ordered = list(selection_result.ordered_questions)
+        role_seed = list(selection_result.role_seed_questions)
+        self.last_smart_practice_set_quality = {
+            "score": selection_result.quality_score,
+            "retry_used": selection_result.retry_used,
+        }
 
         def protected_role_counts(selection: list[QuestionRuntimeState]) -> dict[str, int]:
             counts = {"weak_repair": 0, "due_retention": 0, "blueprint_coverage": 0}
@@ -2318,46 +1921,6 @@ class SessionBuilderMixin:
             candidate_counts = protected_role_counts(candidate)
             baseline_counts = protected_role_counts(baseline)
             return all(candidate_counts[role] >= baseline_counts[role] for role in baseline_counts)
-
-        def source_balanced_seed() -> list[QuestionRuntimeState]:
-            remaining = unique_candidates()
-            seeded: list[QuestionRuntimeState] = []
-            used_qnums = set()
-            source_counts: dict[str, int] = {}
-            while remaining and len(seeded) < target:
-                remaining.sort(
-                    key=lambda question: (
-                        source_counts.get(source_label_for_question(question), 0),
-                        -(smart_priority(question) + selection_priority_bonus(question)),
-                    )
-                )
-                question = remaining.pop(0)
-                qnum = question.get("question_number")
-                if qnum in used_qnums:
-                    continue
-                used_qnums.add(qnum)
-                seeded.append(question)
-                label = source_label_for_question(question)
-                source_counts[label] = source_counts.get(label, 0) + 1
-            return seeded
-
-        role_seed = list(ordered)
-        ordered = shape_for_variety(ordered)
-        if not preserves_protected_roles(ordered, role_seed):
-            ordered = role_seed[:target]
-        primary_quality = smart_practice_set_quality(ordered)
-        retry_used = False
-        if primary_quality < profile.set_quality_retry_threshold:
-            alternate = shape_for_variety(source_balanced_seed())
-            alternate_quality = smart_practice_set_quality(alternate)
-            if (
-                alternate_quality >= primary_quality + profile.set_quality_retry_margin
-                and preserves_protected_roles(alternate, ordered)
-            ):
-                ordered = alternate
-                primary_quality = alternate_quality
-                retry_used = True
-        self.last_smart_practice_set_quality = {"score": primary_quality, "retry_used": retry_used}
 
         def final_selection(selection: list[QuestionRuntimeState]) -> list[QuestionRuntimeState]:
             result = self._interleave_questions(selection[:target])
