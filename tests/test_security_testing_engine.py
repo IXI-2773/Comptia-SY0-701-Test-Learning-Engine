@@ -158,27 +158,42 @@ class SecurityTestingEngineTests(unittest.TestCase):
 
     def test_release_packager_outputs_single_exe_folder(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            dist = root / "dist"
-            release = root / "release" / "SecurityTestingEngine"
-            root_exe = root / "SecurityTestingEngine.exe"
-            start_here = root / "README - Start Here.txt"
-            dist.mkdir()
+            checkout = Path(tmp) / "Checkout"
+            source_root = checkout / "Project Files"
+            dist = source_root / "dist"
+            release = source_root / "release" / "SecurityTestingEngine"
+            checkout_exe = checkout / "SecurityTestingEngine.exe"
+            checkout_readme = checkout / "README - Start Here.txt"
+            source_readme = source_root / "README - Start Here.txt"
+            source_tree_exe = source_root / "SecurityTestingEngine.exe"
+            dist.mkdir(parents=True)
             release.mkdir(parents=True)
-            (dist / "SecurityTestingEngine.exe").write_bytes(b"exe")
+            (dist / "SecurityTestingEngine.exe").write_bytes(b"MZ" + (b"\0" * 2048))
             (release / "old_bank.json").write_text("{}", encoding="utf-8")
+            source_tree_exe.write_bytes(b"stale")
 
             with (
-                mock.patch.object(build_release_module, "DIST_DIR", dist),
+                mock.patch.object(build_release_module, "DIST_EXE", dist / "SecurityTestingEngine.exe"),
                 mock.patch.object(build_release_module, "RELEASE_DIR", release),
-                mock.patch.object(build_release_module, "ROOT_EXE", root_exe),
-                mock.patch.object(build_release_module, "START_HERE", start_here),
+                mock.patch.object(build_release_module, "RELEASE_EXE", release / "SecurityTestingEngine.exe"),
+                mock.patch.object(build_release_module, "RELEASE_README", release / "README - Start Here.txt"),
+                mock.patch.object(build_release_module, "CHECKOUT_EXE", checkout_exe),
+                mock.patch.object(build_release_module, "CHECKOUT_README", checkout_readme),
+                mock.patch.object(build_release_module, "SOURCE_README", source_readme),
+                mock.patch.object(build_release_module, "SOURCE_TREE_EXE", source_tree_exe),
             ):
                 build_release_module.build_release()
 
-            self.assertEqual(["SecurityTestingEngine.exe"], [path.name for path in release.iterdir()])
-            self.assertEqual(b"exe", root_exe.read_bytes())
-            self.assertIn("Double-click SecurityTestingEngine.exe", start_here.read_text(encoding="utf-8"))
+            self.assertEqual(
+                ["README - Start Here.txt", "SecurityTestingEngine.exe"],
+                sorted(path.name for path in release.iterdir()),
+            )
+            self.assertEqual((dist / "SecurityTestingEngine.exe").read_bytes(), checkout_exe.read_bytes())
+            self.assertFalse(source_tree_exe.exists())
+            self.assertIn(
+                "Project Files\\release\\SecurityTestingEngine",
+                checkout_readme.read_text(encoding="utf-8"),
+            )
 
 
     def test_chapter_screenshot_filename_parses_source_question_number(self):
@@ -429,6 +444,46 @@ class SecurityTestingEngineTests(unittest.TestCase):
         self.assertEqual(1, len(published))
         self.assertEqual("new", published[0]["key"])
         self.assertEqual(2, published[0]["payload"]["value"])
+
+    def test_smart_practice_prewarm_rejects_stale_generation_after_newer_schedule(self):
+        class FakeRoot:
+            def __init__(self):
+                self.callbacks = {}
+                self.next_id = 0
+
+            def after(self, delay, callback):
+                self.next_id += 1
+                callback_id = f"after-{self.next_id}"
+                self.callbacks[callback_id] = (delay, callback)
+                return callback_id
+
+            def after_cancel(self, callback_id):
+                self.callbacks.pop(callback_id, None)
+
+            def run_delay(self, delay):
+                callback_id, (_delay, callback) = next((item for item in self.callbacks.items() if item[1][0] == delay))
+                self.callbacks.pop(callback_id)
+                callback()
+
+        class ImmediateThread:
+            def __init__(self, target, **_kwargs):
+                self.target = target
+
+            def start(self):
+                self.target()
+
+        root = FakeRoot()
+        published = []
+        with mock.patch("smart_practice_cache.threading.Thread", ImmediateThread):
+            service = SmartPracticePrewarmService(root, published.append, debounce_ms=140)
+            service.schedule("old", lambda: {"value": 1}, revision="old")
+            service.schedule("new", lambda: {"value": 2}, revision="new")
+            root.run_delay(140)
+            root.run_delay(50)
+            service.close()
+
+        self.assertEqual(1, len(published))
+        self.assertEqual("new", published[0]["key"])
 
     def test_deferred_save_queue_coalesces_and_flushes_callbacks(self):
         events = []
@@ -773,6 +828,44 @@ class SecurityTestingEngineTests(unittest.TestCase):
             self.assertTrue(first)
             self.assertFalse(second)
             self.assertEqual({"ok": True}, json.loads(new_path.read_text(encoding="utf-8")))
+
+    def test_runtime_persistence_can_quarantine_invalid_runtime_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmpdir = Path(tmp)
+            persistence = RuntimePersistence(checkpoint_dir=tmpdir / "checkpoints", backup_dir=tmpdir / "backups")
+            session_path = tmpdir / "session.json"
+            session_path.write_text('{"xp":"bad"}', encoding="utf-8")
+
+            backup = persistence.quarantine_invalid_runtime_file(session_path, label="session")
+
+            self.assertIsNotNone(backup)
+            self.assertFalse(session_path.exists())
+            self.assertTrue(backup.exists())
+            self.assertIn(".bad.json", backup.name)
+
+    def test_progress_file_strength_rejects_malformed_numeric_xp(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "bad_progress.json"
+            path.write_text(json.dumps({"questions": {"1": {}}, "history": [], "meta": {"xp": "not-a-number"}}), encoding="utf-8")
+
+            self.assertEqual((0, 0, 0, 0), app_module.progress_file_strength(path))
+
+    def test_best_progress_strength_prefers_valid_candidate_when_other_is_malformed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            user_data = Path(tmp)
+            (user_data / "bad_progress.json").write_text(
+                json.dumps({"questions": {"1": {}}, "history": [], "meta": {"xp": "bad"}}),
+                encoding="utf-8",
+            )
+            good_path = user_data / "good_progress.json"
+            good_path.write_text(
+                json.dumps({"questions": {"1": {}, "2": {}}, "history": [{"question_number": 1}], "meta": {"xp": 40}}),
+                encoding="utf-8",
+            )
+
+            best = app_module.best_progress_strength(user_data)
+
+            self.assertEqual(good_path, best[4])
 
     def test_session_snapshot_migration_backfills_restore_identity_and_limit(self):
         migrated = migrate_session_snapshot(
@@ -1247,6 +1340,78 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         finish_mock.assert_called_once_with(force=True)
         analytics_mock.assert_called_once()
 
+    def test_forced_exam_finish_finalizes_unresolved_session_once(self):
+        app = self.make_app(start_session=False)
+        app.session_mode_var.set(app_module.MODE_EXAM)
+        app.session_count_var.set("2")
+        app.session_source_var.set("All")
+        app.session_random_var.set(False)
+        app.start_custom_session()
+        session_path = app.session_path
+        starting_sessions = len(app._progress_meta()["session_history"])
+        starting_xp = app._progress_meta()["xp"]
+
+        correct = app.current_question()["correct"][0]
+        app.toggle_choice(correct)
+
+        with mock.patch.object(app, "open_analytics_window"):
+            app.finish_exam()
+
+        self.assertFalse(session_path.exists())
+        self.assertIsNone(app.session_path)
+        self.assertEqual("Session complete: progress saved", app.session_label.cget("text"))
+        self.assertEqual(1, app.last_session_summary["answered"])
+        self.assertEqual(1, app.last_session_summary["correct"])
+        self.assertEqual(0, app.last_session_summary["wrong"])
+        self.assertEqual(starting_sessions + 1, len(app._progress_meta()["session_history"]))
+        self.assertGreaterEqual(app._progress_meta()["xp"], starting_xp)
+        first_signature = app.session_completion_signature
+        first_xp = app._progress_meta()["xp"]
+        first_history_len = len(app._progress_meta()["session_history"])
+
+        app.maybe_finish_session(force=True)
+
+        self.assertEqual(first_signature, app.session_completion_signature)
+        self.assertEqual(first_xp, app._progress_meta()["xp"])
+        self.assertEqual(first_history_len, len(app._progress_meta()["session_history"]))
+
+    def test_exam_finish_without_force_keeps_unresolved_session_active(self):
+        app = self.make_app(start_session=False)
+        app.session_mode_var.set(app_module.MODE_EXAM)
+        app.session_count_var.set("2")
+        app.session_source_var.set("All")
+        app.session_random_var.set(False)
+        app.start_custom_session()
+        session_path = app.session_path
+        app.save_session(show_notice=False)
+
+        completed = app.maybe_finish_session(force=False)
+
+        self.assertFalse(completed)
+        self.assertTrue(session_path.exists())
+        self.assertEqual([], app._progress_meta()["session_history"])
+        self.assertIsNone(app.last_session_summary)
+
+    def test_resolved_exam_still_completes_normally_without_force(self):
+        app = self.make_app(start_session=False)
+        app.session_mode_var.set(app_module.MODE_EXAM)
+        app.session_count_var.set("2")
+        app.session_source_var.set("All")
+        app.session_random_var.set(False)
+        app.start_custom_session()
+        session_path = app.session_path
+
+        for idx in range(len(app.questions)):
+            app._set_current_index(idx)
+            correct = app.current_question()["correct"][0]
+            app.toggle_choice(correct)
+
+        completed = app.maybe_finish_session(force=False)
+
+        self.assertFalse(completed)
+        self.assertFalse(session_path.exists())
+        self.assertIsNone(app.session_path)
+
     def test_smart_practice_finish_set_allows_flagged_or_suspended_unanswered_items(self):
         app = self.make_app()
         app.active_session_mode = app_module.MODE_SMART_PRACTICE
@@ -1312,6 +1477,91 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertIsNone(app.session_path)
         self.assertEqual("Session complete: progress saved", app.session_label.cget("text"))
         self.assertIsNone(app.find_resumable_session_for_builder(builder_context))
+
+    def test_async_smart_practice_worker_does_not_mutate_live_state_before_commit(self):
+        app = self.make_app(start_session=False)
+        app.root.state = lambda: "normal"
+        base_pool = app.get_filtered_master_pool()
+        original_meta = copy.deepcopy(app.progress_data.get("meta", {}))
+        original_master = copy.deepcopy(app.master_questions)
+        scheduled = []
+        worker_targets = []
+
+        class DeferredThread:
+            def __init__(self, target, **_kwargs):
+                self.target = target
+
+            def start(self):
+                worker_targets.append(self.target)
+
+        with (
+            mock.patch("app_session_builder_mixin.threading.Thread", DeferredThread),
+            mock.patch.object(app.root, "after", side_effect=lambda delay, callback: scheduled.append(callback)),
+        ):
+            app._start_smart_practice_async("2", False, base_pool, preserve_if_saved=False)
+            self.assertEqual(original_meta, app.progress_data.get("meta", {}))
+            self.assertEqual(original_master, app.master_questions)
+            self.assertEqual(1, len(worker_targets))
+            worker_targets[0]()
+            self.assertEqual(original_meta, app.progress_data.get("meta", {}))
+            self.assertEqual(original_master, app.master_questions)
+            self.assertEqual(1, len(scheduled))
+            scheduled[0]()
+
+        self.assertTrue(app.questions)
+        self.assertTrue(any(question.get("prediction_id") for question in app.questions))
+
+    def test_async_smart_practice_worker_rejects_stale_revision(self):
+        app = self.make_app(start_session=False)
+        app.root.state = lambda: "normal"
+        scheduled = []
+        worker_targets = []
+
+        class DeferredThread:
+            def __init__(self, target, **_kwargs):
+                self.target = target
+
+            def start(self):
+                worker_targets.append(self.target)
+
+        with (
+            mock.patch("app_session_builder_mixin.threading.Thread", DeferredThread),
+            mock.patch.object(app.root, "after", side_effect=lambda delay, callback: scheduled.append(callback)),
+        ):
+            app._start_smart_practice_async("2", False, app.get_filtered_master_pool(), preserve_if_saved=False)
+            app._progress_history().append({"question_number": 1, "correct": True, "confidence": "Sure"})
+            worker_targets[0]()
+            self.assertEqual(1, len(scheduled))
+            scheduled[0]()
+
+        self.assertEqual("Smart Practice build discarded because learner state changed.", app.session_label.cget("text"))
+        self.assertFalse(app.questions)
+
+    def test_async_smart_practice_worker_skips_commit_when_closing(self):
+        app = self.make_app(start_session=False)
+        app.root.state = lambda: "normal"
+        scheduled = []
+        worker_targets = []
+
+        class DeferredThread:
+            def __init__(self, target, **_kwargs):
+                self.target = target
+
+            def start(self):
+                worker_targets.append(self.target)
+
+        with (
+            mock.patch("app_session_builder_mixin.threading.Thread", DeferredThread),
+            mock.patch.object(app.root, "after", side_effect=lambda delay, callback: scheduled.append(callback)),
+            mock.patch.object(app, "save_app_config") as save_config,
+        ):
+            app._start_smart_practice_async("2", False, app.get_filtered_master_pool(), preserve_if_saved=False)
+            app._app_closing = True
+            worker_targets[0]()
+            scheduled[0]()
+
+        save_config.assert_not_called()
+        self.assertFalse(app.questions)
 
     def test_finished_smart_practice_does_not_remain_resumable(self):
         app = self.make_app(start_session=False)
@@ -1480,6 +1730,39 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         app.refresh_question_list()
 
         self.assertEqual([1], self.visible_qnums(app))
+
+    def test_with_issues_filter_drops_question_after_issue_is_resolved(self):
+        app = self.make_app()
+
+        app.report_current_question_issue()
+        app.open_issue_review_window()
+        app._resolve_issue_report(False)
+        app.status_filter_var.set("With issues")
+        app.refresh_question_list()
+
+        self.assertEqual([], self.visible_qnums(app))
+
+    def test_with_issues_filter_sees_replaced_issue_report_list(self):
+        app = self.make_app()
+
+        self.assertFalse(app.question_has_any_issue(app.current_question()))
+        app._open_issue_reports_for_question(1)
+        app.progress_data["meta"]["issue_reports"] = [
+            {
+                "question_number": 1,
+                "source_page": "",
+                "domain": "General Security Concepts",
+                "prompt": "Question 1",
+                "reported_at": "2026-01-01T00:00:00",
+                "status": "open",
+                "exclude_from_scoring": False,
+                "source_notes": [],
+            }
+        ]
+        app._progress_meta_cache_raw = None
+        app._progress_meta_cache_value = None
+
+        self.assertTrue(app.question_has_any_issue(app.current_question()))
 
     def test_followup_questions_replace_future_regular_question_at_cap(self):
         app = self.make_app(start_session=False)
@@ -1800,6 +2083,59 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
         self.assertFalse(app.questions[0]["answered"])
         self.assertEqual(0, app.index)
+
+    def test_session_restore_quarantines_invalid_current_index_without_partial_commit(self):
+        app = self.make_app(start_session=False)
+        subset = [app.master_questions[0], app.master_questions[1]]
+        app.start_session_from_pool(
+            subset, mode="Practice", count="All visible", randomize=False, reset_clock=False, preserve_if_saved=False
+        )
+        before_snapshot = [dict(question) for question in app.questions]
+        payload = {
+            "app_version": "test",
+            "bank_file": app.bank_path.name,
+            "mode": "Practice",
+            "question_count": 2,
+            "question_numbers": [q.get("question_number") for q in app.questions],
+            "current_index": 99,
+            "elapsed_seconds": 33,
+            "answers": [{"answered": False}, {"answered": False}],
+        }
+        app.session_path.write_text(json.dumps(payload), encoding="utf-8")
+
+        with mock.patch.object(app, "_show_bad_json_warning") as warning:
+            app.load_session_if_present(skip_identity_check=True)
+
+        warning.assert_called_once()
+        self.assertEqual(before_snapshot[0]["question_number"], app.questions[0]["question_number"])
+        self.assertFalse(app.questions[0]["answered"])
+        self.assertEqual(0, app.index)
+        self.assertFalse(app.session_path.exists())
+
+    def test_session_restore_quarantines_invalid_elapsed_time(self):
+        app = self.make_app(start_session=False)
+        subset = [app.master_questions[0], app.master_questions[1]]
+        app.start_session_from_pool(
+            subset, mode="Practice", count="All visible", randomize=False, reset_clock=False, preserve_if_saved=False
+        )
+        payload = {
+            "app_version": "test",
+            "bank_file": app.bank_path.name,
+            "mode": "Practice",
+            "question_count": 2,
+            "question_numbers": [q.get("question_number") for q in app.questions],
+            "current_index": 0,
+            "elapsed_seconds": -5,
+            "answers": [{"answered": False}, {"answered": False}],
+        }
+        app.session_path.write_text(json.dumps(payload), encoding="utf-8")
+
+        with mock.patch.object(app, "_show_bad_json_warning") as warning:
+            app.load_session_if_present(skip_identity_check=True)
+
+        warning.assert_called_once()
+        self.assertEqual(0, app.elapsed_base)
+        self.assertFalse(app.session_path.exists())
 
     def test_legacy_session_payload_restores_without_new_schema_fields(self):
         app = self.make_app(start_session=False)
@@ -5367,11 +5703,19 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         import app_session_builder_mixin
         import smart_practice_measurement
 
-        repo_root = ROOT.parent
+        source_root = ROOT.resolve()
+        forbidden_roots = {"build", "dist", "release", "__pycache__"}
 
-        self.assertEqual(repo_root / "Project Files" / "app_question_flow_mixin.py", Path(app_question_flow_mixin.__file__).resolve())
-        self.assertEqual(repo_root / "Project Files" / "app_session_builder_mixin.py", Path(app_session_builder_mixin.__file__).resolve())
-        self.assertEqual(repo_root / "smart_practice_measurement.py", Path(smart_practice_measurement.__file__).resolve())
+        for module, filename in (
+            (app_question_flow_mixin, "app_question_flow_mixin.py"),
+            (app_session_builder_mixin, "app_session_builder_mixin.py"),
+            (smart_practice_measurement, "smart_practice_measurement.py"),
+        ):
+            module_path = Path(module.__file__).resolve()
+            self.assertTrue(source_root in module_path.parents)
+            self.assertEqual(filename, module_path.name)
+            self.assertEqual(source_root, module_path.parent)
+            self.assertTrue(forbidden_roots.isdisjoint(module_path.relative_to(source_root).parts))
 
     def test_sp9_measurement_02e_prediction_identity_survives_resume_and_answer_link(self):
         app = self._sp9_app_with_role_pool()
@@ -5459,6 +5803,7 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         app = self._sp9_app_with_role_pool()
         pool = app.build_smart_practice_pool("1", randomize=False)
         app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
+        snapshot_before = dict(app.questions[0].get("prediction_snapshot") or {})
         app.save_session(show_notice=False)
         payload = json.loads(app.session_path.read_text(encoding="utf-8"))
         payload["answers"][0]["repair_concept_key"] = "Topic::Not This Question"
@@ -5468,6 +5813,8 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
             app.load_session_if_present(skip_identity_check=True)
 
         warning.assert_called_once()
+        self.assertEqual("", app.questions[0].get("repair_concept_key", ""))
+        self.assertEqual(snapshot_before, app.questions[0].get("prediction_snapshot") or {})
 
     def test_sp9_measurement_02h1_mismatched_canonical_repair_key_fails_visibly(self):
         app = self._sp9_app_with_role_pool()
@@ -5833,6 +6180,25 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         app.progress_data["meta"]["smart_practice_measurement"] = {"active_policy": {"policy_version": "changed"}}
         after = app._smart_practice_signal_key()
         self.assertNotEqual(before, after)
+
+    def test_sp9_measurement_50b_signal_key_is_hashable_with_nested_metadata(self):
+        app = self._sp9_app_with_role_pool()
+        app.progress_data["meta"]["repair_state"] = {
+            "repair-1": {
+                "scheduled_transfer_qnums": [7, 8],
+                "history": [{"stage": "contrast"}, {"stage": "transfer"}],
+                "tags": {"weak", "late"},
+            }
+        }
+        app.progress_data["meta"]["smart_practice_measurement"] = {
+            "active_policy": {
+                "policy_version": "changed",
+                "reasons": ["coverage", "repair"],
+                "limits": {"roles": ["weak_repair", "due_retention"]},
+            }
+        }
+        signal_key = app._smart_practice_signal_key()
+        self.assertIsInstance(hash(signal_key), int)
 
     def _sp10_governance(self):
         return empty_governance(created_at="2026-01-01T00:00:00")

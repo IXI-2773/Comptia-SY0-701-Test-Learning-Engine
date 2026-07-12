@@ -124,7 +124,12 @@ class SessionPersistenceMixin:
                     logging.warning('Skipped resumable session candidate after read failure: %s', path)
                     self._show_bad_json_warning('Session', path, backup, err)
                 continue
-            migrated = migrate_session_snapshot(saved, desired.get('mode', self.active_session_mode), [])
+            try:
+                migrated = migrate_session_snapshot(saved, desired.get('mode', self.active_session_mode), [])
+            except (TypeError, ValueError, KeyError, IndexError) as exc:
+                backup = self.persistence.quarantine_invalid_runtime_file(path, label='session')
+                self._show_bad_json_warning('Session', path, backup, exc)
+                continue
             answers = list(migrated.get('answers', []) or [])
             if answers and all(bool(state.get('answered')) for state in answers):
                 continue
@@ -144,7 +149,11 @@ class SessionPersistenceMixin:
             saved, _backup, err = self.persistence.load_json_with_backup(path)
             if err or not saved:
                 continue
-            migrated = migrate_session_snapshot(saved, desired.get('mode', self.active_session_mode), [])
+            try:
+                migrated = migrate_session_snapshot(saved, desired.get('mode', self.active_session_mode), [])
+            except (TypeError, ValueError, KeyError, IndexError):
+                self.persistence.quarantine_invalid_runtime_file(path, label='session')
+                continue
             if not self._builder_context_matches(migrated.get('builder_context'), desired):
                 continue
             try:
@@ -264,7 +273,13 @@ class SessionPersistenceMixin:
             return
         if not skip_identity_check and not self._saved_session_matches_current(saved):
             return
-        migrated = migrate_session_snapshot(saved, self.active_session_mode, [q.get('question_number') for q in self.questions])
+        try:
+            migrated = migrate_session_snapshot(saved, self.active_session_mode, [q.get('question_number') for q in self.questions])
+        except (TypeError, ValueError, KeyError, IndexError) as exc:
+            backup = self.persistence.quarantine_invalid_runtime_file(self.session_path, label='session')
+            logging.warning('Session file quarantined after validation failure: %s', self.session_path)
+            self._show_bad_json_warning('Session', self.session_path, backup, exc)
+            return
         saved_answers = list(migrated.get('answers', []) or [])
         if saved_answers and all(bool(state.get('answered')) for state in saved_answers):
             return
@@ -384,17 +399,22 @@ class SessionPersistenceMixin:
             expected_values = [str(question.get('domain') or '').strip().casefold()]
         else:
             raise ValueError(f'Unknown repair_concept_key format: {legacy_key}')
+        if legacy_value not in [value for value in expected_values if value]:
+            raise ValueError(f'Unknown legacy repair_concept_key for restored question: {legacy_key}')
         answer_state['legacy_repair_concept_key'] = legacy_key
         answer_state['repair_concept_key'] = canonical_key
         snapshot = answer_state.get('prediction_snapshot')
         if isinstance(snapshot, dict) and snapshot.get('concept_key') == legacy_key:
             snapshot['concept_key'] = answer_state['repair_concept_key']
 
-    def save_session(self, show_notice=False):
+    def save_session(self, show_notice=False, *, force_complete=False):
         if not self.questions or not self.session_path:
             return
         self.save_queue.cancel('session')
-        if self._all_session_questions_resolved_for_finish():
+        is_complete = self._all_session_questions_resolved_for_finish() or bool(
+            force_complete and self.active_session_mode == MODE_EXAM
+        )
+        if is_complete:
             self.clear_resumable_sessions_for_builder(self.current_builder_context_data)
             if self.session_path.exists():
                 self.session_path.unlink()

@@ -11,12 +11,6 @@ from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 from typing import cast
 
-BASE_DIR = Path(__file__).resolve().parent
-LEGACY_PROJECT_ROOT = BASE_DIR.parent
-if not (BASE_DIR / "smart_practice_concept_graph.py").exists() and str(LEGACY_PROJECT_ROOT) not in sys.path:
-    # Support the older nested source layout where Smart Practice modules lived one level above app.py.
-    sys.path.insert(0, str(LEGACY_PROJECT_ROOT))
-
 from app_analytics_mixin import AnalyticsMixin
 from app_constants import (
     ABSOLUTE_DISTRACTOR_WORDS,
@@ -40,8 +34,10 @@ from app_question_flow_mixin import QuestionFlowMixin
 from app_question_render_mixin import QuestionRenderMixin
 from app_session_builder_mixin import SessionBuilderMixin
 from app_session_persistence_mixin import SessionPersistenceMixin
+from application_bootstrap import BootstrapConfig, BootstrapResult, prepare_application_bootstrap
 from bank_models import QuestionBankData
 from config_store import DEFAULT_CONFIG, load_config, save_config
+from legacy_source_layout import BASE_DIR
 from progress_models import (
     IssueReport,
     ProgressMeta,
@@ -116,6 +112,7 @@ from widget_models import (
     RewardHistoryWidgetRegistry,
     ScreenshotReviewWidgetRegistry,
 )
+
 RESOURCE_DIR = Path(getattr(sys, "_MEIPASS", BASE_DIR))
 APP_DIR = Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else BASE_DIR
 
@@ -140,11 +137,22 @@ def progress_file_strength(path: Path) -> tuple[int, int, int, int]:
         data = json.loads(path.read_text(encoding="utf-8"))
     except Exception:
         return 0, 0, 0, 0
-    meta = data.get("meta") if isinstance(data, dict) else {}
-    questions = len(data.get("questions") or {}) if isinstance(data, dict) else 0
-    history = len(data.get("history") or []) if isinstance(data, dict) else 0
-    xp = int((meta or {}).get("xp", 0) or 0) if isinstance(meta, dict) else 0
-    sessions = len((meta or {}).get("session_history") or []) if isinstance(meta, dict) else 0
+    if not isinstance(data, dict):
+        return 0, 0, 0, 0
+    questions_raw = data.get("questions", {})
+    history_raw = data.get("history", [])
+    if ("questions" in data and not isinstance(questions_raw, dict)) or (
+        "history" in data and not isinstance(history_raw, list)
+    ):
+        return 0, 0, 0, 0
+    try:
+        meta = normalize_progress_meta(data.get("meta"))
+    except Exception:
+        return 0, 0, 0, 0
+    questions = len(questions_raw or {})
+    history = len(history_raw or [])
+    xp = int(meta.get("xp", 0) or 0)
+    sessions = len(meta.get("session_history", []) or [])
     return questions * 5 + history * 3 + xp + sessions * 50, questions, history, xp
 
 
@@ -205,13 +213,11 @@ def auto_migrate_packaged_runtime_data(target_dir: Path) -> str:
 
 
 USER_DATA_DIR = resolve_user_data_dir()
+LOG_BASE_DIR = USER_DATA_DIR
 CHECKPOINT_DIR = USER_DATA_DIR / "checkpoints"
 BACKUP_DIR = USER_DATA_DIR / "backups"
 CONFIG_PATH = USER_DATA_DIR / "config.json"
-USER_DATA_DIR.mkdir(parents=True, exist_ok=True)
-CHECKPOINT_DIR.mkdir(parents=True, exist_ok=True)
-BACKUP_DIR.mkdir(parents=True, exist_ok=True)
-RUNTIME_MIGRATION_NOTICE = auto_migrate_packaged_runtime_data(USER_DATA_DIR)
+RUNTIME_MIGRATION_NOTICE = ""
 DEFAULT_BANK_CLEAN = first_existing_path(
     APP_DIR / "public_sy0701_bank_v4_clean.json",
     RESOURCE_DIR / "public_sy0701_bank_v4_clean.json",
@@ -225,8 +231,34 @@ DEFAULT_BANK_LEGACY = first_existing_path(
     RESOURCE_DIR / "public_sy0701_bank_v4.json",
 )
 DEFAULT_BANK = first_existing_path(DEFAULT_BANK_MERGED, DEFAULT_BANK_CLEAN, DEFAULT_BANK_LEGACY)
-LOG_PATH = setup_logging(USER_DATA_DIR)
-logging.info("%s %s starting", APP_NAME, APP_VERSION)
+LOG_PATH = USER_DATA_DIR / "logs" / "security_testing_engine.log"
+_BOOTSTRAP_RESULT: BootstrapResult | None = None
+_BOOTSTRAP_KEY: tuple[Path, Path, Path] | None = None
+
+
+def ensure_application_bootstrap() -> BootstrapResult:
+    global CONFIG_PATH, LOG_PATH, RUNTIME_MIGRATION_NOTICE, _BOOTSTRAP_KEY, _BOOTSTRAP_RESULT
+    current_key = (USER_DATA_DIR, CHECKPOINT_DIR, BACKUP_DIR)
+    if _BOOTSTRAP_RESULT is not None and _BOOTSTRAP_KEY == current_key:
+        return _BOOTSTRAP_RESULT
+    result = prepare_application_bootstrap(
+        BootstrapConfig(
+            user_data_dir=USER_DATA_DIR,
+            checkpoint_dir=CHECKPOINT_DIR,
+            backup_dir=BACKUP_DIR,
+            log_base_dir=LOG_BASE_DIR,
+        ),
+        migrate_runtime=auto_migrate_packaged_runtime_data,
+        setup_logging_fn=setup_logging,
+    )
+    _BOOTSTRAP_KEY = current_key
+    _BOOTSTRAP_RESULT = result
+    CONFIG_PATH = result.config_path
+    LOG_PATH = result.log_path
+    RUNTIME_MIGRATION_NOTICE = result.runtime_migration_notice
+    logging.info("%s %s starting", APP_NAME, APP_VERSION)
+    return result
+
 
 QUEST_VARIANTS = APP_QUEST_VARIANTS
 MILESTONE_SPECS = APP_MILESTONE_SPECS
@@ -241,18 +273,19 @@ class TestingEngineApp(
     AnalyticsMixin,
 ):
     def __init__(self, root):
+        bootstrap = ensure_application_bootstrap()
         self.root = root
         self.root.title(f"{APP_NAME} {APP_VERSION}")
-        self.config = load_config(CONFIG_PATH)
+        self.config = load_config(bootstrap.config_path)
         self.startup_warnings = self.startup_check()
         self.root.geometry(str(self.config.get("window_geometry") or "1500x940"))
         self.root.minsize(760, 620)
         self.root.configure(bg=BG)
         self.root.protocol("WM_DELETE_WINDOW", self.close_app)
         self.root.bind("<Configure>", self._on_root_configure)
-        self.user_data_dir = USER_DATA_DIR
-        self.checkpoint_dir = CHECKPOINT_DIR
-        self.backup_dir = BACKUP_DIR
+        self.user_data_dir = bootstrap.config.user_data_dir
+        self.checkpoint_dir = bootstrap.config.checkpoint_dir
+        self.backup_dir = bootstrap.config.backup_dir
         self.persistence = RuntimePersistence(checkpoint_dir=self.checkpoint_dir, backup_dir=self.backup_dir)
 
         self.bank_path = DEFAULT_BANK if DEFAULT_BANK.exists() else None
@@ -285,6 +318,8 @@ class TestingEngineApp(
         self.smart_practice_signal_cache_payload = None
         self.smart_practice_pool_cache = {}
         self.smart_practice_prewarm = None
+        self._app_closing = False
+        self._smart_practice_async_generation = 0
         self.render_cache = QuestionRenderCache()
         self.last_render_snapshot = None
         self.followup_candidate_index = None
@@ -654,6 +689,7 @@ class TestingEngineApp(
         self.save_queue.flush("progress")
 
     def close_app(self):
+        self._app_closing = True
         try:
             if self.smart_practice_prewarm is not None:
                 self.smart_practice_prewarm.close()
@@ -1494,6 +1530,10 @@ class TestingEngineApp(
     def _issue_reports(self) -> list[IssueReport]:
         return self._progress_meta()["issue_reports"]
 
+    def _invalidate_issue_report_cache(self):
+        self._open_issue_reports_cache_source = None
+        self._open_issue_reports_cache_value = None
+
     def _open_issue_reports_for_question(self, qnum):
         try:
             target_qnum = int(qnum or 0)
@@ -1559,6 +1599,7 @@ class TestingEngineApp(
         )
         entry = issue_report_from_question(q, exclude_from_scoring=bool(exclude), reported_at=now_iso())
         self._issue_reports().append(entry)
+        self._invalidate_issue_report_cache()
         q["flagged"] = True
         self.update_progress_for_flag(q)
         if exclude:
@@ -1597,6 +1638,7 @@ class TestingEngineApp(
         qnum = report.get("question_number")
         if restore_scoring and report.get("exclude_from_scoring"):
             self.set_question_suspended_state(qnum, False)
+        self._invalidate_issue_report_cache()
         self.save_progress()
         self.last_question_list_signature = None
         self.refresh_issue_review_window()
@@ -2085,7 +2127,7 @@ class TestingEngineApp(
         return cast(ProgressRecord, record)
 
     def _show_bad_json_warning(self, label, path, backup, err):
-        backup_name = backup.name if backup is not None else 'not created'
+        backup_name = backup.name if backup is not None else "not created"
         messagebox.showwarning(
             f"{label} reset",
             f"{label} file could not be read and was moved aside.\n\n"
@@ -2180,17 +2222,27 @@ class TestingEngineApp(
             return
         if not isinstance(data, dict):
             return
-        data.setdefault("version", PROGRESS_VERSION)
-        data.setdefault("app_version", APP_VERSION)
-        data.setdefault("bank_file", self.bank_path.name if self.bank_path else "")
-        data.setdefault("created_at", now_iso())
-        data.setdefault("updated_at", data.get("created_at") or now_iso())
-        if not isinstance(data.get("questions"), dict):
-            data["questions"] = {}
-        if not isinstance(data.get("history"), list):
-            data["history"] = []
-        if not isinstance(data.get("meta"), dict):
-            data["meta"] = {}
+        try:
+            if "questions" in data and not isinstance(data.get("questions"), dict):
+                raise ValueError("Progress.questions must be a mapping.")
+            if "history" in data and not isinstance(data.get("history"), list):
+                raise ValueError("Progress.history must be a list.")
+            if "meta" in data and not isinstance(data.get("meta"), dict):
+                raise ValueError("Progress.meta must be a mapping.")
+            data.setdefault("version", PROGRESS_VERSION)
+            data.setdefault("app_version", APP_VERSION)
+            data.setdefault("bank_file", self.bank_path.name if self.bank_path else "")
+            data.setdefault("created_at", now_iso())
+            data.setdefault("updated_at", data.get("created_at") or now_iso())
+            data.setdefault("questions", {})
+            data.setdefault("history", [])
+            data.setdefault("meta", {})
+            data["meta"] = normalize_progress_meta(data.get("meta"))
+        except (TypeError, ValueError, KeyError, IndexError) as exc:
+            backup = self.persistence.quarantine_invalid_runtime_file(self.progress_path, label="progress")
+            logging.warning("Progress file quarantined after validation failure: %s", self.progress_path)
+            self._show_bad_json_warning("Progress", self.progress_path, backup, exc)
+            return
         self.progress_data = data
         self._progress_meta()
         self.normalize_progress_repair_state()
@@ -2316,7 +2368,9 @@ class TestingEngineApp(
             self._question_correct(q),
             confidence=feedback.get("confidence"),
             miss_reason=feedback.get("miss_reason"),
-            effective_response_seconds=feedback.get("effective_response_seconds", feedback.get("response_seconds", 0.0)),
+            effective_response_seconds=feedback.get(
+                "effective_response_seconds", feedback.get("response_seconds", 0.0)
+            ),
             session_tag=q.get("session_tag", ""),
             recall_failure=feedback.get("recall_failure", ""),
         )

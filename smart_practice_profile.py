@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 
-
 SMART_PRACTICE_POLICY_VERSION = "smart-practice-9"
 SMART_PRACTICE_PRIMARY_ROLES = (
     "due_retention",

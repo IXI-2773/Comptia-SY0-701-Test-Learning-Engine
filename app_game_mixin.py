@@ -1,8 +1,7 @@
-from collections import Counter
-
 import random
 import time
 import tkinter as tk
+from collections import Counter
 from tkinter import ttk
 from typing import cast
 
@@ -827,11 +826,12 @@ class GameRewardsMixin:
         }
 
     def maybe_finish_session(self, force=False):
-        if not self._all_session_questions_resolved_for_finish():
-            return
+        allow_forced_exam_finish = bool(force and self.active_session_mode == MODE_EXAM)
+        if not self._all_session_questions_resolved_for_finish() and not allow_forced_exam_finish:
+            return False
         signature = f"{self.current_session_signature()}:{len(self.session_answer_history)}"
         if signature == self.session_completion_signature:
-            return
+            return False
         self.session_completion_signature = signature
         summary = self._build_session_summary()
         self.last_session_summary = summary
@@ -866,9 +866,10 @@ class GameRewardsMixin:
             meta["level"] = self._level_for_xp(meta["xp"])
         self._check_global_milestones()
         self.schedule_progress_save()
-        self.save_session(show_notice=False)
+        self.save_session(show_notice=False, force_complete=allow_forced_exam_finish)
         self.session_label.configure(text="Session complete: progress saved")
         self.show_session_celebration(summary)
+        return True
 
     def show_session_celebration(self, summary=None):
         if not self.gamification_enabled() or not self.celebration_popups_var.get():
