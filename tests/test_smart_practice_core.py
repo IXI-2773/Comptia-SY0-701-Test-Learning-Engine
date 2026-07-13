@@ -61,6 +61,16 @@ class SmartPracticeCoreTests(unittest.TestCase):
                 primary_topic="T1",
                 normalized_domain="d1",
                 raw_domain="D1",
+                attempts=1,
+                is_unseen=False,
+                is_active_weak=True,
+                is_due=False,
+                is_mastered=False,
+                is_super_confident=False,
+                last_seen="2026-07-01",
+                recent_selection_pressure=0.0,
+                eligibility_tier=1,
+                duplicate_group_key="qnum::1",
             ),
             SmartPracticeCandidate(
                 question={"question_number": 2, "smart_primary_role": "due_retention"},
@@ -73,6 +83,16 @@ class SmartPracticeCoreTests(unittest.TestCase):
                 primary_topic="T2",
                 normalized_domain="d1",
                 raw_domain="D1",
+                attempts=1,
+                is_unseen=False,
+                is_active_weak=False,
+                is_due=True,
+                is_mastered=False,
+                is_super_confident=False,
+                last_seen="2026-07-01",
+                recent_selection_pressure=0.0,
+                eligibility_tier=1,
+                duplicate_group_key="qnum::2",
             ),
             SmartPracticeCandidate(
                 question={"question_number": 3, "smart_primary_role": "blueprint_coverage"},
@@ -85,6 +105,16 @@ class SmartPracticeCoreTests(unittest.TestCase):
                 primary_topic="T3",
                 normalized_domain="d2",
                 raw_domain="D2",
+                attempts=0,
+                is_unseen=True,
+                is_active_weak=False,
+                is_due=False,
+                is_mastered=False,
+                is_super_confident=False,
+                last_seen="",
+                recent_selection_pressure=0.0,
+                eligibility_tier=1,
+                duplicate_group_key="qnum::3",
             ),
             SmartPracticeCandidate(
                 question={"question_number": 4, "smart_primary_role": "transfer"},
@@ -97,6 +127,16 @@ class SmartPracticeCoreTests(unittest.TestCase):
                 primary_topic="T4",
                 normalized_domain="d2",
                 raw_domain="D2",
+                attempts=1,
+                is_unseen=False,
+                is_active_weak=False,
+                is_due=False,
+                is_mastered=False,
+                is_super_confident=False,
+                last_seen="2026-06-20",
+                recent_selection_pressure=0.0,
+                eligibility_tier=2,
+                duplicate_group_key="qnum::4",
             ),
             SmartPracticeCandidate(
                 question={"question_number": 5, "smart_primary_role": "controlled_stretch"},
@@ -109,6 +149,16 @@ class SmartPracticeCoreTests(unittest.TestCase):
                 primary_topic="T5",
                 normalized_domain="d3",
                 raw_domain="D3",
+                attempts=3,
+                is_unseen=False,
+                is_active_weak=False,
+                is_due=False,
+                is_mastered=True,
+                is_super_confident=False,
+                last_seen="2026-06-10",
+                recent_selection_pressure=0.0,
+                eligibility_tier=3,
+                duplicate_group_key="qnum::5",
             ),
         ]
 
@@ -121,6 +171,8 @@ class SmartPracticeCoreTests(unittest.TestCase):
             profile=SMART_PRACTICE_SCORING,
             high_signal_qnums={1, 2},
             freshness_map={1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0},
+            explicit_history_filter="All",
+            session_intent={"label": "Build coverage"},
         )
 
         ordered_qnums = [question["question_number"] for question in result.ordered_questions]
@@ -130,6 +182,7 @@ class SmartPracticeCoreTests(unittest.TestCase):
         self.assertEqual(seed_qnums, ordered_qnums)
         self.assertFalse(result.retry_used)
         self.assertGreater(result.quality_score, 0.0)
+        self.assertEqual(1, result.audit["selected_unseen"])
 
 
 if __name__ == "__main__":

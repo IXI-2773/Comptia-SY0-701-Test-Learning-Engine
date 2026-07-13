@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import re
+import unicodedata
 from collections.abc import Mapping
 from dataclasses import dataclass
+from math import ceil
 from typing import Any
 
 from progress_store import is_active_weak, is_review_due, is_super_confident_active
@@ -38,6 +41,16 @@ class SmartPracticeCandidate:
     primary_topic: str
     normalized_domain: str
     raw_domain: str
+    attempts: int
+    is_unseen: bool
+    is_active_weak: bool
+    is_due: bool
+    is_mastered: bool
+    is_super_confident: bool
+    last_seen: str
+    recent_selection_pressure: float
+    eligibility_tier: int
+    duplicate_group_key: str
 
 
 @dataclass(frozen=True)
@@ -46,6 +59,81 @@ class SmartPracticeSelectionResult:
     role_seed_questions: list[dict[str, Any]]
     quality_score: float
     retry_used: bool
+    audit: dict[str, Any]
+
+
+def _normalize_duplicate_text(value: Any) -> str:
+    text = unicodedata.normalize("NFKC", str(value or ""))
+    text = re.sub(r"^\s*(?:q(?:uestion)?\s*)?\d+[\s\)\]\.\-:]+", "", text, flags=re.IGNORECASE)
+    text = text.casefold().strip()
+    text = re.sub(r"[^\w\s]", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def duplicate_group_key_for_question(question: Mapping[str, Any]) -> str:
+    source_record_id = str(question.get("source_record_id") or question.get("record_id") or "").strip()
+    if source_record_id:
+        return f"source::{source_record_id.casefold()}"
+    duplicate_group_id = str(question.get("duplicate_group_id") or question.get("duplicate_group_key") or "").strip()
+    if duplicate_group_id:
+        return f"group::{duplicate_group_id.casefold()}"
+    prompt_key = _normalize_duplicate_text(question.get("prompt") or "")
+    choice_signature = tuple(
+        _normalize_duplicate_text(text)
+        for _letter, text in sorted((question.get("choices") or {}).items(), key=lambda item: str(item[0]))
+        if _normalize_duplicate_text(text)
+    )
+    if prompt_key and choice_signature:
+        return f"stem_choice::{prompt_key}||{'|'.join(choice_signature)}"
+    if prompt_key and len(prompt_key.split()) >= 8:
+        return f"stem::{prompt_key}"
+    return f"qnum::{int(question.get('question_number') or 0)}"
+
+
+def validate_smart_practice_selection(
+    selected: list[SmartPracticeCandidate],
+    candidates: list[SmartPracticeCandidate],
+    *,
+    target: int,
+    explicit_history_filter: str,
+    unseen_target: int,
+) -> dict[str, Any]:
+    eligible_candidates = [candidate for candidate in candidates if candidate.eligibility_tier < 90]
+    eligible_qnums = {candidate.qnum for candidate in eligible_candidates}
+    selected_qnums = [candidate.qnum for candidate in selected]
+    duplicate_qnums = len(selected_qnums) != len(set(selected_qnums))
+    duplicate_groups = [
+        candidate.duplicate_group_key
+        for candidate in selected
+        if candidate.duplicate_group_key and not candidate.duplicate_group_key.startswith("qnum::")
+    ]
+    selected_mastered = [candidate for candidate in selected if candidate.is_mastered]
+    available_higher_tier = [
+        candidate
+        for candidate in eligible_candidates
+        if candidate.qnum not in set(selected_qnums) and candidate.eligibility_tier < 3
+    ]
+    reasons: list[str] = []
+    if any(qnum not in eligible_qnums for qnum in selected_qnums):
+        reasons.append("selection_outside_eligible_pool")
+    if duplicate_qnums:
+        reasons.append("duplicate_question_numbers")
+    if len(duplicate_groups) != len(set(duplicate_groups)):
+        reasons.append("duplicate_groups_present")
+    if any(candidate.is_super_confident for candidate in selected):
+        reasons.append("active_super_confident_selected")
+    if explicit_history_filter == "Unseen" and any(not candidate.is_unseen for candidate in selected):
+        reasons.append("explicit_unseen_filter_violated")
+    if unseen_target > 0 and sum(1 for candidate in selected if candidate.is_unseen) < unseen_target:
+        reasons.append("unseen_target_not_met")
+    if len(selected) > target:
+        reasons.append("selection_exceeds_requested_count")
+    if selected_mastered and available_higher_tier:
+        reasons.append("mastered_displaced_higher_tier_candidate")
+    return {
+        "valid": not reasons,
+        "reasons": reasons,
+    }
 
 
 def _is_screenshot_import(question: Mapping[str, Any]) -> bool:
@@ -76,9 +164,10 @@ def build_smart_practice_score(
     active_smart_policy = context["active_smart_policy"]
     graph_enabled = bool(context.get("graph_enabled", True))
     if graph_enabled:
+        concept_graph = context.get("concept_graph") or {}
         diagnosis = diagnose_root_cause(
             dict(question),
-            context.get("concept_graph"),
+            concept_graph,
             context.get("concept_states") or {},
             context.get("progress_history") or [],
             source_trust=source_trust,
@@ -466,9 +555,11 @@ def build_smart_practice_selection(
     profile: SmartPracticeScoringProfile,
     high_signal_qnums: set[int],
     freshness_map: Mapping[int, float],
+    explicit_history_filter: str,
+    session_intent: Mapping[str, Any] | None,
 ) -> SmartPracticeSelectionResult:
-    def candidate_score(candidate: SmartPracticeCandidate) -> tuple[float, int]:
-        return (-(candidate.priority + candidate.selection_bonus), candidate.qnum)
+    allocations = smart_practice_role_allocation(target, role_shares=dict(role_shares))
+    intent_label = str((session_intent or {}).get("label") or "Build coverage")
 
     def unique_candidates(*groups: list[SmartPracticeCandidate]) -> list[SmartPracticeCandidate]:
         unique: list[SmartPracticeCandidate] = []
@@ -479,170 +570,173 @@ def build_smart_practice_selection(
                     continue
                 used_qnums.add(candidate.qnum)
                 unique.append(candidate)
-        unique.sort(key=candidate_score)
         return unique
 
-    allocations = smart_practice_role_allocation(target, role_shares=dict(role_shares))
-    buckets: dict[str, list[SmartPracticeCandidate]] = {role: [] for role in allocations}
-    ranked_unique: list[SmartPracticeCandidate] = []
-    used_qnums: set[int] = set()
-    for candidate in working_candidates:
-        if candidate.qnum in used_qnums:
-            continue
-        used_qnums.add(candidate.qnum)
-        role = candidate.primary_role if candidate.primary_role in buckets else "blueprint_coverage"
-        buckets[role].append(candidate)
-        ranked_unique.append(candidate)
-    for bucket in buckets.values():
-        bucket.sort(key=candidate_score)
+    def candidate_value(candidate: SmartPracticeCandidate) -> float:
+        return candidate.priority + candidate.selection_bonus - candidate.recent_selection_pressure
+
+    def candidate_rank(candidate: SmartPracticeCandidate) -> tuple[float, int]:
+        return (-candidate_value(candidate), candidate.qnum)
+
+    def is_non_mastered_attempt(candidate: SmartPracticeCandidate) -> bool:
+        return candidate.attempts > 0 and not candidate.is_mastered
+
+    excluded_super_confident = sum(1 for candidate in working_candidates if candidate.is_super_confident)
+    eligible_working = sorted(
+        [candidate for candidate in unique_candidates(working_candidates) if candidate.eligibility_tier < 90],
+        key=candidate_rank,
+    )
     selected: list[SmartPracticeCandidate] = []
     selected_qnums: set[int] = set()
+    selected_duplicate_groups: set[str] = set()
+    objective_counts: dict[str, int] = {}
+    source_counts: dict[str, int] = {}
+    max_source = max(1, int(target * profile.variety_source_label_cap_ratio + 0.999))
 
-    def add(candidate: SmartPracticeCandidate) -> bool:
+    def can_add(candidate: SmartPracticeCandidate, *, strict_source: bool, strict_objective: bool) -> bool:
         if candidate.qnum in selected_qnums or len(selected) >= target:
             return False
-        selected_qnums.add(candidate.qnum)
-        selected.append(candidate)
+        if (
+            strict_objective
+            and candidate.objective_code
+            and objective_counts.get(candidate.objective_code, 0) >= objective_cap
+        ):
+            return False
+        if candidate.duplicate_group_key and candidate.duplicate_group_key in selected_duplicate_groups:
+            return False
+        if strict_source and source_counts.get(candidate.source_label, 0) >= max_source:
+            return False
         return True
 
-    for role in ("weak_repair", "due_retention", "blueprint_coverage", "transfer", "controlled_stretch"):
-        for candidate in buckets.get(role, [])[: allocations.get(role, 0)]:
-            add(candidate)
-    remaining = sorted(
-        [candidate for candidate in ranked_unique if candidate.qnum not in selected_qnums],
-        key=candidate_score,
+    def add_candidate(candidate: SmartPracticeCandidate, *, strict_source: bool, strict_objective: bool) -> bool:
+        if not can_add(candidate, strict_source=strict_source, strict_objective=strict_objective):
+            return False
+        selected.append(candidate)
+        selected_qnums.add(candidate.qnum)
+        if candidate.duplicate_group_key:
+            selected_duplicate_groups.add(candidate.duplicate_group_key)
+        if candidate.objective_code:
+            objective_counts[candidate.objective_code] = objective_counts.get(candidate.objective_code, 0) + 1
+        source_counts[candidate.source_label] = source_counts.get(candidate.source_label, 0) + 1
+        return True
+
+    def fill_from_pool(pool: list[SmartPracticeCandidate], *, limit: int | None = None) -> None:
+        for strict_source, strict_objective in ((True, True), (False, True), (False, False)):
+            for candidate in pool:
+                if limit is not None and len(selected) >= limit:
+                    return
+                add_candidate(candidate, strict_source=strict_source, strict_objective=strict_objective)
+
+    available_unseen = sum(1 for candidate in eligible_working if candidate.is_unseen)
+    if explicit_history_filter == "Unseen":
+        unseen_target = min(target, available_unseen)
+    elif explicit_history_filter != "All":
+        unseen_target = 0
+    else:
+        unseen_ratio = profile.minimum_unseen_ratio
+        if intent_label == "Build coverage":
+            unseen_ratio = max(unseen_ratio, profile.build_coverage_unseen_ratio)
+        unseen_target = min(target, available_unseen, int(ceil(target * unseen_ratio)))
+
+    unseen_candidates = sorted(
+        [candidate for candidate in eligible_working if candidate.is_unseen],
+        key=candidate_rank,
     )
-    for candidate in remaining:
-        if len(selected) >= target:
-            break
-        add(candidate)
-    role_seed = selected[:target]
-    all_candidates = unique_candidates(role_seed, fallback_candidates, working_candidates)
+    fill_from_pool(unseen_candidates, limit=unseen_target)
 
-    def source_label_cap() -> int:
-        return max(1, int(target * profile.variety_source_label_cap_ratio + 0.999))
+    def fill_priority(candidate: SmartPracticeCandidate) -> tuple[int, int, float, int]:
+        if explicit_history_filter == "Unseen":
+            bucket = 0 if candidate.is_unseen else 9
+        elif intent_label == "Retain old material":
+            if candidate.is_due:
+                bucket = 0
+            elif candidate.is_active_weak:
+                bucket = 1
+            elif is_non_mastered_attempt(candidate):
+                bucket = 2
+            elif candidate.primary_role == "transfer":
+                bucket = 3
+            elif candidate.is_unseen:
+                bucket = 4
+            else:
+                bucket = 5
+        elif intent_label == "Repair weak spots":
+            if candidate.is_active_weak:
+                bucket = 0
+            elif candidate.is_due:
+                bucket = 1
+            elif is_non_mastered_attempt(candidate):
+                bucket = 2
+            elif candidate.primary_role == "transfer":
+                bucket = 3
+            elif candidate.is_unseen:
+                bucket = 4
+            else:
+                bucket = 5
+        else:
+            if candidate.is_active_weak:
+                bucket = 0
+            elif candidate.is_due:
+                bucket = 1
+            elif is_non_mastered_attempt(candidate):
+                bucket = 2
+            elif candidate.primary_role == "transfer":
+                bucket = 3
+            elif candidate.is_unseen:
+                bucket = 4
+            else:
+                bucket = 5
+        return (candidate.eligibility_tier, bucket, -candidate_value(candidate), candidate.qnum)
 
-    def shape_for_variety(seed: list[SmartPracticeCandidate]) -> list[SmartPracticeCandidate]:
-        if target < profile.variety_min_target_size:
-            return seed[:target]
-        available_topics = {candidate.primary_topic for candidate in all_candidates if candidate.primary_topic}
-        available_domains = {candidate.normalized_domain for candidate in all_candidates if candidate.normalized_domain}
-        desired_topics = min(profile.variety_min_topics, target, len(available_topics))
-        desired_domains = min(profile.variety_min_domains, target, len(available_domains))
-        max_source = source_label_cap()
-        shaped: list[SmartPracticeCandidate] = []
-        shaped_qnums: set[int] = set()
-        shaped_objectives: dict[str, int] = {}
-        shaped_source_labels: dict[str, int] = {}
-        pinned_count = min(target, max(profile.variety_pinned_min, round(target * profile.variety_pinned_ratio)))
+    remaining_candidates = sorted(
+        [candidate for candidate in eligible_working if candidate.qnum not in selected_qnums],
+        key=fill_priority,
+    )
+    fill_from_pool(remaining_candidates, limit=target)
 
-        def can_add(candidate: SmartPracticeCandidate, strict_source: bool, strict_objective: bool = True) -> bool:
-            if candidate.qnum in shaped_qnums or len(shaped) >= target:
-                return False
-            if (
-                strict_objective
-                and candidate.objective_code
-                and shaped_objectives.get(candidate.objective_code, 0) >= objective_cap
-            ):
-                return False
-            if strict_source and shaped_source_labels.get(candidate.source_label, 0) >= max_source:
-                return False
-            return True
+    def final_order_key(candidate: SmartPracticeCandidate) -> tuple[float, float, int]:
+        return (
+            -float(candidate.question.get("smart_utility", 0.0) or 0.0),
+            -candidate_value(candidate),
+            candidate.qnum,
+        )
 
-        def add_candidate(
-            candidate: SmartPracticeCandidate,
-            strict_source: bool = True,
-            strict_objective: bool = True,
-        ) -> bool:
-            if not can_add(candidate, strict_source, strict_objective):
-                return False
-            shaped_qnums.add(candidate.qnum)
-            shaped.append(candidate)
-            if candidate.objective_code:
-                shaped_objectives[candidate.objective_code] = shaped_objectives.get(candidate.objective_code, 0) + 1
-            shaped_source_labels[candidate.source_label] = shaped_source_labels.get(candidate.source_label, 0) + 1
-            return True
-
-        def best_values(value_fn, desired_count: int) -> list[str]:
-            best_by_value: dict[str, float] = {}
-            for candidate in all_candidates:
-                value = value_fn(candidate)
-                if not value:
-                    continue
-                best_by_value[value] = max(best_by_value.get(value, 0.0), candidate.priority)
-            ranked = [(score, value) for value, score in best_by_value.items()]
-            ranked.sort(reverse=True)
-            return [value for _score, value in ranked[:desired_count]]
-
-        for candidate in seed[:pinned_count]:
-            add_candidate(candidate, strict_source=True)
-            if len(shaped) >= pinned_count:
-                break
-        for topic in best_values(lambda candidate: candidate.primary_topic, desired_topics):
-            for candidate in all_candidates:
-                if candidate.primary_topic == topic and add_candidate(candidate, strict_source=True):
-                    break
-        for domain in best_values(lambda candidate: candidate.normalized_domain, desired_domains):
-            if domain in {candidate.normalized_domain for candidate in shaped}:
-                continue
-            for candidate in all_candidates:
-                if candidate.normalized_domain == domain and add_candidate(candidate, strict_source=True):
-                    break
-        for candidate in seed + all_candidates:
-            add_candidate(candidate, strict_source=True)
-            if len(shaped) >= target:
-                break
-        for candidate in seed + all_candidates:
-            add_candidate(candidate, strict_source=False)
-            if len(shaped) >= target:
-                break
-        for candidate in seed + all_candidates:
-            add_candidate(candidate, strict_source=False, strict_objective=False)
-            if len(shaped) >= target:
-                break
-        return shaped[:target]
-
-    def protected_role_counts(selection: list[SmartPracticeCandidate]) -> dict[str, int]:
-        counts = {"weak_repair": 0, "due_retention": 0, "blueprint_coverage": 0}
-        for candidate in selection:
-            if candidate.primary_role in counts:
-                counts[candidate.primary_role] += 1
-        return counts
-
-    def preserves_protected_roles(
-        candidate: list[SmartPracticeCandidate], baseline: list[SmartPracticeCandidate]
-    ) -> bool:
-        candidate_counts = protected_role_counts(candidate)
-        baseline_counts = protected_role_counts(baseline)
-        return all(candidate_counts[role] >= baseline_counts[role] for role in baseline_counts)
+    ordered = sorted(selected[:target], key=final_order_key)
+    validation = validate_smart_practice_selection(
+        ordered,
+        eligible_working,
+        target=target,
+        explicit_history_filter=explicit_history_filter,
+        unseen_target=unseen_target,
+    )
+    all_candidates = unique_candidates(ordered, fallback_candidates, working_candidates)
 
     def set_quality(selection: list[SmartPracticeCandidate]) -> float:
         if not selection:
             return 0.0
-        selected_qnums = {candidate.qnum for candidate in selection}
+        selected_qnums_local = {candidate.qnum for candidate in selection}
         topics = {candidate.primary_topic for candidate in selection if candidate.primary_topic}
         domains = {candidate.raw_domain for candidate in selection if candidate.raw_domain}
-        source_counts: dict[str, int] = {}
+        source_counts_local: dict[str, int] = {}
         for candidate in selection:
-            source_counts[candidate.source_label] = source_counts.get(candidate.source_label, 0) + 1
-        max_source_count = max(source_counts.values()) if source_counts else 0
-        max_source = source_label_cap()
+            source_counts_local[candidate.source_label] = source_counts_local.get(candidate.source_label, 0) + 1
+        max_source_count = max(source_counts_local.values()) if source_counts_local else 0
         available_sources = {candidate.source_label for candidate in all_candidates}
         desired_high_signal = min(len(high_signal_qnums), max(1, round(target * 0.25))) if high_signal_qnums else 0
-        high_signal_hits = len(selected_qnums & high_signal_qnums)
-        freshness_average = sum(float(freshness_map.get(qnum, 0.0)) for qnum in selected_qnums) / max(
-            1, len(selected_qnums)
+        high_signal_hits = len(selected_qnums_local & high_signal_qnums)
+        freshness_average = sum(float(freshness_map.get(qnum, 0.0)) for qnum in selected_qnums_local) / max(
+            1, len(selected_qnums_local)
         )
         fresh_question_target = round(target * profile.fresh_question_target_ratio)
         fresh_question_hits = sum(
             1
-            for qnum in selected_qnums
+            for qnum in selected_qnums_local
             if float(freshness_map.get(qnum, 0.0)) < profile.freshness_suppression_min or qnum in high_signal_qnums
         )
         desired_topics = min(profile.variety_min_topics, target)
         desired_domains = min(profile.variety_min_domains, target)
         score = 100.0
-        score -= max(0, target - len(selected_qnums)) * 8.0
+        score -= max(0, target - len(selected_qnums_local)) * 8.0
         if desired_high_signal:
             score -= max(0, desired_high_signal - high_signal_hits) * 10.0
         score -= max(0, fresh_question_target - fresh_question_hits) * profile.fresh_question_quality_penalty
@@ -653,43 +747,56 @@ def build_smart_practice_selection(
         score -= min(18.0, freshness_average * 0.15)
         return round(max(0.0, min(100.0, score)), 2)
 
-    def source_balanced_seed() -> list[SmartPracticeCandidate]:
-        remaining = list(all_candidates)
-        seeded: list[SmartPracticeCandidate] = []
-        used_seed_qnums: set[int] = set()
-        source_counts: dict[str, int] = {}
-        while remaining and len(seeded) < target:
-            remaining.sort(
-                key=lambda candidate: (
-                    source_counts.get(candidate.source_label, 0),
-                    -(candidate.priority + candidate.selection_bonus),
-                )
-            )
-            candidate = remaining.pop(0)
-            if candidate.qnum in used_seed_qnums:
-                continue
-            used_seed_qnums.add(candidate.qnum)
-            seeded.append(candidate)
-            source_counts[candidate.source_label] = source_counts.get(candidate.source_label, 0) + 1
-        return seeded
-
-    ordered = shape_for_variety(role_seed)
-    if not preserves_protected_roles(ordered, role_seed):
-        ordered = role_seed[:target]
     primary_quality = set_quality(ordered)
-    retry_used = False
-    if primary_quality < profile.set_quality_retry_threshold:
-        alternate = shape_for_variety(source_balanced_seed())
-        alternate_quality = set_quality(alternate)
-        if alternate_quality >= primary_quality + profile.set_quality_retry_margin and preserves_protected_roles(
-            alternate, ordered
-        ):
-            ordered = alternate
-            primary_quality = alternate_quality
-            retry_used = True
+    selected_unseen = sum(1 for candidate in ordered if candidate.is_unseen)
+    selected_active_weak = sum(1 for candidate in ordered if candidate.is_active_weak)
+    selected_due = sum(1 for candidate in ordered if candidate.is_due)
+    selected_attempted_non_mastered = sum(1 for candidate in ordered if is_non_mastered_attempt(candidate))
+    selected_mastered = sum(1 for candidate in ordered if candidate.is_mastered)
+    duplicate_groups_excluded = sum(
+        1
+        for candidate in eligible_working
+        if candidate.qnum not in selected_qnums
+        and candidate.duplicate_group_key in selected_duplicate_groups
+        and not candidate.duplicate_group_key.startswith("qnum::")
+    )
+    undersized_reason = ""
+    if len(ordered) < target:
+        if explicit_history_filter == "Unseen":
+            undersized_reason = "unseen_filter_exhausted"
+        elif excluded_super_confident and not ordered:
+            undersized_reason = "only_super_confident_candidates_excluded"
+        else:
+            undersized_reason = "insufficient_eligible_candidates"
+    audit = {
+        "requested_count": int(target),
+        "final_count": len(ordered),
+        "candidate_count": len(eligible_working),
+        "explicit_history_filter": str(explicit_history_filter or "All"),
+        "session_intent": intent_label,
+        "available_unseen": available_unseen,
+        "selected_unseen": selected_unseen,
+        "selected_active_weak": selected_active_weak,
+        "selected_due": selected_due,
+        "selected_attempted_non_mastered": selected_attempted_non_mastered,
+        "selected_mastered": selected_mastered,
+        "selected_super_confident": 0,
+        "unseen_target": unseen_target,
+        "unseen_target_met": selected_unseen >= unseen_target,
+        "excluded_super_confident": excluded_super_confident,
+        "excluded_recent_repetition": 0,
+        "duplicate_groups_excluded": duplicate_groups_excluded,
+        "cache_hit": False,
+        "resumed_saved_set": False,
+        "undersized_reason": undersized_reason,
+        "post_selection_validation_passed": validation["valid"],
+        "post_selection_validation_reasons": list(validation["reasons"]),
+        "role_allocations": allocations,
+    }
     return SmartPracticeSelectionResult(
         ordered_questions=[candidate.question for candidate in ordered[:target]],
-        role_seed_questions=[candidate.question for candidate in role_seed[:target]],
+        role_seed_questions=[candidate.question for candidate in ordered[:target]],
         quality_score=primary_quality,
-        retry_used=retry_used,
+        retry_used=False,
+        audit=audit,
     )

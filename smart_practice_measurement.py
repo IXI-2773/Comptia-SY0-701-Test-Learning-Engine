@@ -1,18 +1,21 @@
 import hashlib
 import math
 from collections import Counter
+from collections.abc import Mapping
 from datetime import datetime
-from typing import Any, Mapping
+from typing import Any
 
 from progress_store import now_iso
 from smart_practice_concept_graph import (
     audit_graph,
-    concept_key_for_question as graph_concept_key_for_question,
     diagnosis_measurement,
     normalize_graph,
 )
-from smart_practice_question_value import normalize_calibration_store, quality_measurement
+from smart_practice_concept_graph import (
+    concept_key_for_question as graph_concept_key_for_question,
+)
 from smart_practice_profile import SMART_PRACTICE_POLICY_VERSION, smart_practice_role_allocation
+from smart_practice_question_value import quality_measurement
 
 MEASUREMENT_SCHEMA_VERSION = 1
 REPORT_LIMIT = 50
@@ -103,7 +106,9 @@ def normalize_measurement_store(store: Mapping[str, Any] | None) -> dict[str, An
     return clean
 
 
-def prediction_from_question(question: Mapping[str, Any], record: Mapping[str, Any] | None, created_at: str | None = None) -> dict[str, Any]:
+def prediction_from_question(
+    question: Mapping[str, Any], record: Mapping[str, Any] | None, created_at: str | None = None
+) -> dict[str, Any]:
     created_at = created_at or now_iso()
     memory = dict((record or {}).get("learner_memory") or {})
     retrievability = clamp(memory.get("retrievability", 0.35), 0.0, 1.0)
@@ -121,7 +126,10 @@ def prediction_from_question(question: Mapping[str, Any], record: Mapping[str, A
     policy_version = str(question.get("smart_policy_version") or SMART_PRACTICE_POLICY_VERSION)
     policy_id = str(question.get("smart_policy_id") or "")
     qnum = int(question.get("question_number") or 0)
-    prediction_id = str(question.get("prediction_id") or stable_id(policy_version, created_at, qnum, question.get("smart_primary_role", "")))
+    prediction_id = str(
+        question.get("prediction_id")
+        or stable_id(policy_version, created_at, qnum, question.get("smart_primary_role", ""))
+    )
     concept_key = str(question.get("repair_concept_key") or concept_key_for_question(question))
     if any(marker in concept_key for marker in ("(", ")", "[", "]", "{", "}", "<", ">", ",")):
         raise ValueError(f"Malformed Smart Practice concept identity: {concept_key}")
@@ -149,11 +157,23 @@ def prediction_from_question(question: Mapping[str, Any], record: Mapping[str, A
     }
 
 
-def attach_prediction_to_question(question: dict[str, Any], store: dict[str, Any], record: Mapping[str, Any] | None, created_at: str | None = None) -> dict[str, Any]:
+def attach_prediction_to_question(
+    question: dict[str, Any], store: dict[str, Any], record: Mapping[str, Any] | None, created_at: str | None = None
+) -> dict[str, Any]:
     if question.get("prediction_id") and question.get("prediction_id") in store.get("predictions", {}):
         return dict(store["predictions"][question["prediction_id"]])
     prediction = prediction_from_question(question, record, created_at=created_at)
-    store.setdefault("predictions", {})[prediction["prediction_id"]] = prediction
+    predictions = store.setdefault("predictions", {})
+    if prediction["prediction_id"] in predictions:
+        base_prediction_id = str(prediction["prediction_id"] or "")
+        collision_index = 1
+        next_prediction_id = base_prediction_id
+        while next_prediction_id in predictions:
+            next_prediction_id = stable_id(base_prediction_id, collision_index)
+            collision_index += 1
+        prediction = dict(prediction)
+        prediction["prediction_id"] = next_prediction_id
+    predictions[prediction["prediction_id"]] = prediction
     question["prediction_id"] = prediction["prediction_id"]
     question["prediction_snapshot"] = prediction
     return prediction
@@ -161,11 +181,13 @@ def attach_prediction_to_question(question: dict[str, Any], store: dict[str, Any
 
 def event_prediction_fields(question: Mapping[str, Any]) -> dict[str, Any]:
     snapshot = dict(question.get("prediction_snapshot") or {})
-    fields = {
+    fields: dict[str, Any] = {
         "prediction_id": str(question.get("prediction_id") or snapshot.get("prediction_id") or ""),
         "smart_policy_id": str(question.get("smart_policy_id") or snapshot.get("smart_policy_id") or ""),
         "smart_policy_version": str(
-            question.get("smart_policy_version") or snapshot.get("smart_policy_version") or SMART_PRACTICE_POLICY_VERSION
+            question.get("smart_policy_version")
+            or snapshot.get("smart_policy_version")
+            or SMART_PRACTICE_POLICY_VERSION
         ),
     }
     for key in (
@@ -181,7 +203,15 @@ def event_prediction_fields(question: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def event_id(event: Mapping[str, Any]) -> str:
-    return str(event.get("event_id") or stable_id(event.get("at", ""), event.get("question_number", ""), event.get("prediction_id", ""), event.get("selected", "")))
+    return str(
+        event.get("event_id")
+        or stable_id(
+            event.get("at", ""),
+            event.get("question_number", ""),
+            event.get("prediction_id", ""),
+            event.get("selected", ""),
+        )
+    )
 
 
 def _normalize_key_fragment(value: Any) -> str:
@@ -245,7 +275,9 @@ def same_concept(prediction: Mapping[str, Any], event: Mapping[str, Any]) -> tup
     prediction_concept_key = str(prediction.get("concept_key") or "")
     if prediction_concept_key and prediction_concept_key == event_concept_key:
         return True, "repair_concept"
-    if str(prediction.get("objective_code") or "") and str(prediction.get("objective_code") or "") == str(event.get("objective_code") or ""):
+    if str(prediction.get("objective_code") or "") and str(prediction.get("objective_code") or "") == str(
+        event.get("objective_code") or ""
+    ):
         pred_topic = str(prediction.get("concept_key") or "").casefold()
         event_topics = " ".join(str(topic) for topic in event.get("topics", [])).casefold()
         if event_topics and any(part and part in event_topics for part in pred_topic.split("::")[-1:]):
@@ -259,7 +291,9 @@ def outcome_detail(prediction, event, delay_seconds, match_basis):
         "correct": bool(event.get("correct")),
         "review_grade": str(event.get("review_grade") or event.get("confidence") or ""),
         "confidence": str(event.get("confidence") or ""),
-        "effective_response_seconds": float(event.get("effective_response_seconds", event.get("response_seconds", 0.0)) or 0.0),
+        "effective_response_seconds": float(
+            event.get("effective_response_seconds", event.get("response_seconds", 0.0)) or 0.0
+        ),
         "response_time_contaminated": bool(event.get("response_time_contaminated")),
         "miss_reason": str(event.get("miss_reason") or ""),
         "question_number": int(event.get("question_number") or 0),
@@ -307,7 +341,9 @@ def link_prediction_outcomes(prediction, history):
     immediate = next(
         (
             outcome_detail(prediction, event, 0, "same_question")
-            for event in sorted(future_history, key=lambda e: (str(e.get("at") or ""), int(e.get("question_number") or 0), event_id(e)))
+            for event in sorted(
+                future_history, key=lambda e: (str(e.get("at") or ""), int(e.get("question_number") or 0), event_id(e))
+            )
             if str(event.get("prediction_id") or "") == str(prediction.get("prediction_id") or "")
         ),
         {"status": "not_observed"},
@@ -327,7 +363,9 @@ def observed_pairs(predictions, links, outcome_key):
     for prediction in predictions:
         outcome = (links.get(prediction.get("prediction_id")) or {}).get(outcome_key) or {}
         if outcome.get("status") == "observed":
-            rows.append((float(prediction.get("predicted_recall_probability", 0.5)), 1.0 if outcome.get("correct") else 0.0))
+            rows.append(
+                (float(prediction.get("predicted_recall_probability", 0.5)), 1.0 if outcome.get("correct") else 0.0)
+            )
     return rows
 
 
@@ -358,7 +396,10 @@ def brier_score(pairs):
 def log_loss(pairs):
     if not pairs:
         return metric_result(None, 0, 0)
-    value = -sum(actual * math.log(clamp_probability(p)) + (1 - actual) * math.log(1 - clamp_probability(p)) for p, actual in pairs) / len(pairs)
+    value = -sum(
+        actual * math.log(clamp_probability(p)) + (1 - actual) * math.log(1 - clamp_probability(p))
+        for p, actual in pairs
+    ) / len(pairs)
     return metric_result(round(value, 6), len(pairs))
 
 
@@ -377,13 +418,15 @@ def calibration_bins(pairs, bins=5):
             mean_pred = observed = gap = None
         if gap is not None:
             ece_total += gap * len(bucket)
-        out.append({
-            "range": [round(low, 2), round(high, 2)],
-            "mean_predicted_probability": None if mean_pred is None else round(mean_pred, 4),
-            "observed_success_rate": None if observed is None else round(observed, 4),
-            "sample_count": len(bucket),
-            "calibration_gap": None if gap is None else round(gap, 4),
-        })
+        out.append(
+            {
+                "range": [round(low, 2), round(high, 2)],
+                "mean_predicted_probability": None if mean_pred is None else round(mean_pred, 4),
+                "observed_success_rate": None if observed is None else round(observed, 4),
+                "sample_count": len(bucket),
+                "calibration_gap": None if gap is None else round(gap, 4),
+            }
+        )
     ece = round(ece_total / max(1, len(pairs)), 6) if pairs else None
     return out, metric_result(ece, len(pairs))
 
@@ -391,7 +434,7 @@ def calibration_bins(pairs, bins=5):
 def pairwise_discrimination(pairs):
     comparable = []
     for i, left in enumerate(pairs):
-        for right in pairs[i + 1:]:
+        for right in pairs[i + 1 :]:
             if left[1] == right[1]:
                 continue
             comparable.append((left, right))
@@ -412,14 +455,21 @@ def safe_accuracy(outcomes):
     observed = [outcome for outcome in outcomes if outcome.get("status") == "observed"]
     if not observed:
         return {"value": None, "sample_count": 0, "unobserved_count": len(outcomes), "status": "no_eligible_samples"}
-    return {"value": round(sum(1 for row in observed if row.get("correct")) / len(observed), 4), "sample_count": len(observed), "unobserved_count": len(outcomes) - len(observed), "status": "ok"}
+    return {
+        "value": round(sum(1 for row in observed if row.get("correct")) / len(observed), 4),
+        "sample_count": len(observed),
+        "unobserved_count": len(outcomes) - len(observed),
+        "status": "ok",
+    }
 
 
 def repair_performance(repair_state, history):
     rows = list((repair_state or {}).values())
     triggered = len(rows)
     contrast = sum(1 for row in rows if row.get("stage") in {"contrast", "transfer", "spaced_retrieval"})
-    transfer = sum(1 for row in rows if row.get("scheduled_transfer_qnums") or row.get("stage") in {"transfer", "spaced_retrieval"})
+    transfer = sum(
+        1 for row in rows if row.get("scheduled_transfer_qnums") or row.get("stage") in {"transfer", "spaced_retrieval"}
+    )
     spaced = sum(1 for row in rows if row.get("spaced_retrieval_due") or row.get("stage") == "spaced_retrieval")
     resolved = [row for row in rows if row.get("status") == "resolved"]
     blocked = [row for row in rows if row.get("status") == "blocked"]
@@ -438,12 +488,18 @@ def repair_performance(repair_state, history):
     return {
         "repairs_triggered": triggered,
         "contrast_scheduled": contrast,
-        "contrast_success": sum(1 for event in history if event.get("repair_stage") == "contrast" and event.get("correct")),
+        "contrast_success": sum(
+            1 for event in history if event.get("repair_stage") == "contrast" and event.get("correct")
+        ),
         "transfer_scheduled": transfer,
-        "transfer_success": sum(1 for event in history if event.get("repair_stage") == "transfer" and event.get("correct")),
+        "transfer_success": sum(
+            1 for event in history if event.get("repair_stage") == "transfer" and event.get("correct")
+        ),
         "spaced_retrieval_due": spaced,
         "spaced_retrieval_observed": sum(1 for event in history if event.get("repair_stage") == "spaced_retrieval"),
-        "spaced_retrieval_success": sum(1 for event in history if event.get("repair_stage") == "spaced_retrieval" and event.get("correct")),
+        "spaced_retrieval_success": sum(
+            1 for event in history if event.get("repair_stage") == "spaced_retrieval" and event.get("correct")
+        ),
         "provisional_rate": round(sum(1 for row in rows if row.get("status") == "provisional") / max(1, triggered), 4),
         "resolved_rate": round(len(resolved) / max(1, triggered), 4),
         "blocked_rate": round(len(blocked) / max(1, triggered), 4),
@@ -455,15 +511,45 @@ def weakness_precision(predictions, links, history):
     weak = [p for p in predictions if p.get("smart_primary_role") == "weak_repair"]
     immediate = [(links.get(p["prediction_id"]) or {}).get("immediate_item_outcome", {}) for p in weak]
     delayed = [(links.get(p["prediction_id"]) or {}).get("delayed_24h_concept_outcome", {}) for p in weak]
-    stable_success = Counter()
+    stable_success: Counter[int] = Counter()
     for event in history:
         if event.get("correct") and str(event.get("confidence") or "") == "Sure":
             stable_success[int(event.get("question_number") or 0)] += 1
     return {
-        "weak_role_immediate_error_rate": None if not immediate else round(sum(1 for row in immediate if row.get("status") == "observed" and not row.get("correct")) / max(1, sum(1 for row in immediate if row.get("status") == "observed")), 4),
-        "weak_role_delayed_error_rate": None if not delayed else round(sum(1 for row in delayed if row.get("status") == "observed" and not row.get("correct")) / max(1, sum(1 for row in delayed if row.get("status") == "observed")), 4),
-        "weak_role_high_confidence_error_rate": round(sum(1 for event in history if event.get("smart_primary_role") == "weak_repair" and not event.get("correct") and event.get("confidence") == "Sure") / max(1, sum(1 for event in history if event.get("smart_primary_role") == "weak_repair")), 4),
-        "weak_role_recovery_rate": round(sum(1 for row in delayed if row.get("status") == "observed" and row.get("correct")) / max(1, sum(1 for row in delayed if row.get("status") == "observed")), 4),
+        "weak_role_immediate_error_rate": (
+            None
+            if not immediate
+            else round(
+                sum(1 for row in immediate if row.get("status") == "observed" and not row.get("correct"))
+                / max(1, sum(1 for row in immediate if row.get("status") == "observed")),
+                4,
+            )
+        ),
+        "weak_role_delayed_error_rate": (
+            None
+            if not delayed
+            else round(
+                sum(1 for row in delayed if row.get("status") == "observed" and not row.get("correct"))
+                / max(1, sum(1 for row in delayed if row.get("status") == "observed")),
+                4,
+            )
+        ),
+        "weak_role_high_confidence_error_rate": round(
+            sum(
+                1
+                for event in history
+                if event.get("smart_primary_role") == "weak_repair"
+                and not event.get("correct")
+                and event.get("confidence") == "Sure"
+            )
+            / max(1, sum(1 for event in history if event.get("smart_primary_role") == "weak_repair")),
+            4,
+        ),
+        "weak_role_recovery_rate": round(
+            sum(1 for row in delayed if row.get("status") == "observed" and row.get("correct"))
+            / max(1, sum(1 for row in delayed if row.get("status") == "observed")),
+            4,
+        ),
         "false_weakness_candidates": sorted(qnum for qnum, count in stable_success.items() if count >= 2),
     }
 
@@ -475,17 +561,40 @@ def role_performance(predictions, links, history):
         immediate = [(links.get(p["prediction_id"]) or {}).get("immediate_item_outcome", {}) for p in role_predictions]
         h24 = [(links.get(p["prediction_id"]) or {}).get("delayed_24h_concept_outcome", {}) for p in role_predictions]
         d7 = [(links.get(p["prediction_id"]) or {}).get("delayed_7d_concept_outcome", {}) for p in role_predictions]
-        times = [float(e.get("effective_response_seconds", e.get("response_seconds", 0.0)) or 0.0) for e in history if e.get("smart_primary_role") == role]
+        times = [
+            float(e.get("effective_response_seconds", e.get("response_seconds", 0.0)) or 0.0)
+            for e in history
+            if e.get("smart_primary_role") == role
+        ]
         result[role] = {
             "selection_count": len(role_predictions),
             "immediate_accuracy": safe_accuracy(immediate),
             "24h_accuracy": safe_accuracy(h24),
             "7d_accuracy": safe_accuracy(d7),
             "mean_effective_response_seconds": round(sum(times) / len(times), 2) if times else None,
-            "mean_predicted_recall": round(sum(float(p.get("predicted_recall_probability", 0.0)) for p in role_predictions) / len(role_predictions), 4) if role_predictions else None,
+            "mean_predicted_recall": (
+                round(
+                    sum(float(p.get("predicted_recall_probability", 0.0)) for p in role_predictions)
+                    / len(role_predictions),
+                    4,
+                )
+                if role_predictions
+                else None
+            ),
             "calibration_gap": None,
-            "mean_learning_gain": round(sum(float(p.get("predicted_learning_gain", 0.0)) for p in role_predictions) / len(role_predictions), 4) if role_predictions else None,
-            "repeat_rate": round((len(role_predictions) - len({p.get("question_number") for p in role_predictions})) / max(1, len(role_predictions)), 4),
+            "mean_learning_gain": (
+                round(
+                    sum(float(p.get("predicted_learning_gain", 0.0)) for p in role_predictions) / len(role_predictions),
+                    4,
+                )
+                if role_predictions
+                else None
+            ),
+            "repeat_rate": round(
+                (len(role_predictions) - len({p.get("question_number") for p in role_predictions}))
+                / max(1, len(role_predictions)),
+                4,
+            ),
         }
     return result
 
@@ -501,13 +610,20 @@ def session_composition(predictions, requested_count=None):
         "requested_role_counts": requested,
         "actual_role_counts": dict(actual),
         "role_deviation": {role: int(actual.get(role, 0)) - int(requested.get(role, 0)) for role in requested},
-        "weak_due_floor_preserved": actual.get("weak_repair", 0) + actual.get("due_retention", 0) >= min(len(predictions), requested.get("weak_repair", 0) + requested.get("due_retention", 0)),
+        "weak_due_floor_preserved": actual.get("weak_repair", 0) + actual.get("due_retention", 0)
+        >= min(len(predictions), requested.get("weak_repair", 0) + requested.get("due_retention", 0)),
         "duplicate_question_rate": round((len(qnums) - len(set(qnums))) / max(1, len(qnums)), 4),
         "same_concept_clustering_rate": round(max(Counter(concepts).values() or [0]) / max(1, len(concepts)), 4),
         "same_source_concentration": round(max(Counter(sources).values() or [0]) / max(1, len(sources)), 4),
         "same_domain_concentration": round(max(Counter(domains).values() or [0]) / max(1, len(domains)), 4),
-        "unseen_share": round(sum(1 for p in predictions if p.get("smart_primary_role") == "blueprint_coverage") / max(1, len(predictions)), 4),
-        "repair_share": round(sum(1 for p in predictions if p.get("smart_primary_role") == "weak_repair") / max(1, len(predictions)), 4),
+        "unseen_share": round(
+            sum(1 for p in predictions if p.get("smart_primary_role") == "blueprint_coverage")
+            / max(1, len(predictions)),
+            4,
+        ),
+        "repair_share": round(
+            sum(1 for p in predictions if p.get("smart_primary_role") == "weak_repair") / max(1, len(predictions)), 4
+        ),
     }
 
 
@@ -527,7 +643,9 @@ def source_band(event):
 
 
 def source_performance(history):
-    buckets = {band: [] for band in ("high_trust", "medium_trust", "low_trust", "missing_trust", "decayed_or_conflicted")}
+    buckets: dict[str, list[Mapping[str, Any]]] = {
+        band: [] for band in ("high_trust", "medium_trust", "low_trust", "missing_trust", "decayed_or_conflicted")
+    }
     for event in history:
         buckets[source_band(event)].append(event)
     return {
@@ -547,7 +665,10 @@ def timing_quality(history):
     median = sorted_effective[len(sorted_effective) // 2] if sorted_effective else None
     return {
         "raw_time_contamination_rate": round(contaminated / max(1, len(history)), 4),
-        "effective_time_cap_rate": round(sum(1 for r, e in zip(raw, effective) if r > e) / max(1, len(history)), 4),
+        "effective_time_cap_rate": round(
+            sum(1 for r, e in zip(raw, effective, strict=False) if r > e) / max(1, len(history)),
+            4,
+        ),
         "median_effective_response_seconds": median,
         "role_adjusted_response_time": {},
         "confidence_adjusted_response_time": {},
@@ -555,11 +676,21 @@ def timing_quality(history):
 
 
 def baseline_comparison(predictions, links):
-    observed = sum(1 for p in predictions if (links.get(p.get("prediction_id")) or {}).get("immediate_item_outcome", {}).get("status") == "observed")
+    observed = sum(
+        1
+        for p in predictions
+        if (links.get(p.get("prediction_id")) or {}).get("immediate_item_outcome", {}).get("status") == "observed"
+    )
     coverage = round(observed / max(1, len(predictions)), 4)
     base = {
         "eligible_decisions": len(predictions),
-        "estimated_immediate_accuracy": "not_available" if not observed else safe_accuracy([(links.get(p.get("prediction_id")) or {}).get("immediate_item_outcome", {}) for p in predictions])["value"],
+        "estimated_immediate_accuracy": (
+            "not_available"
+            if not observed
+            else safe_accuracy(
+                [(links.get(p.get("prediction_id")) or {}).get("immediate_item_outcome", {}) for p in predictions]
+            )["value"]
+        ),
         "estimated_24h_recall": "not_available",
         "estimated_7d_recall": "not_available",
         "estimated_learning_gain": "not_available",
@@ -570,42 +701,59 @@ def baseline_comparison(predictions, links):
         "counterfactual_coverage_rate": coverage,
         "comparison_type": "retrospective_shadow_comparison",
     }
-    return {name: dict(base) for name in ("smart_practice", "random_blueprint", "due_only", "weakest_only", "coverage_only")}
+    return {
+        name: dict(base) for name in ("smart_practice", "random_blueprint", "due_only", "weakest_only", "coverage_only")
+    }
 
 
 def calibration_recommendations(calibration):
     sample_count = int(calibration.get("brier", {}).get("sample_count") or 0)
     ece = calibration.get("expected_calibration_error", {}).get("value")
     if sample_count < 50:
-        return [{
+        return [
+            {
+                "target": "recall_probability_bias",
+                "current_value": 0.0,
+                "recommended_value": None,
+                "maximum_allowed_change": 0.05,
+                "sample_count": sample_count,
+                "evidence": {"expected_calibration_error": ece},
+                "confidence": "low",
+                "reason": "Not enough delayed outcomes for a numeric policy change.",
+                "status": "insufficient_data",
+            }
+        ]
+    offset = -0.05 if ece and ece > 0.08 else 0.0
+    return [
+        {
             "target": "recall_probability_bias",
             "current_value": 0.0,
-            "recommended_value": None,
+            "recommended_value": offset,
             "maximum_allowed_change": 0.05,
             "sample_count": sample_count,
             "evidence": {"expected_calibration_error": ece},
-            "confidence": "low",
-            "reason": "Not enough delayed outcomes for a numeric policy change.",
-            "status": "insufficient_data",
-        }]
-    offset = -0.05 if ece and ece > 0.08 else 0.0
-    return [{
-        "target": "recall_probability_bias",
-        "current_value": 0.0,
-        "recommended_value": offset,
-        "maximum_allowed_change": 0.05,
-        "sample_count": sample_count,
-        "evidence": {"expected_calibration_error": ece},
-        "confidence": "medium" if offset else "high",
-        "reason": "Predicted recall is overconfident." if offset else "Predictions are within the monitored calibration band.",
-        "status": "recommended" if offset else "no_change",
-    }]
+            "confidence": "medium" if offset else "high",
+            "reason": (
+                "Predicted recall is overconfident."
+                if offset
+                else "Predictions are within the monitored calibration band."
+            ),
+            "status": "recommended" if offset else "no_change",
+        }
+    ]
 
 
 def build_measurement_report(store, history, evaluation_at=None, requested_count=None):
     store = normalize_measurement_store(store)
     evaluation_at = evaluation_at or now_iso()
-    predictions = sorted(store["predictions"].values(), key=lambda p: (str(p.get("prediction_created_at") or ""), int(p.get("question_number") or 0), str(p.get("prediction_id") or "")))
+    predictions = sorted(
+        store["predictions"].values(),
+        key=lambda p: (
+            str(p.get("prediction_created_at") or ""),
+            int(p.get("question_number") or 0),
+            str(p.get("prediction_id") or ""),
+        ),
+    )
     links = {}
     invalid = 0
     for prediction in predictions:
@@ -634,8 +782,13 @@ def build_measurement_report(store, history, evaluation_at=None, requested_count
         "eligible_outcome_count": len(pairs),
         "data_quality": {
             "missing_prediction_count": sum(1 for event in history if not event.get("prediction_id")),
-            "unmatched_answer_count": sum(1 for event in history if event.get("prediction_id") and event.get("prediction_id") not in store["predictions"]),
-            "invalid_timestamp_count": invalid + sum(1 for event in history if parse_timestamp(event.get("at")) is None),
+            "unmatched_answer_count": sum(
+                1
+                for event in history
+                if event.get("prediction_id") and event.get("prediction_id") not in store["predictions"]
+            ),
+            "invalid_timestamp_count": invalid
+            + sum(1 for event in history if parse_timestamp(event.get("at")) is None),
             "contaminated_response_count": sum(1 for event in history if event.get("response_time_contaminated")),
             "insufficient_window_count": unobserved,
             "duplicate_event_count": len(history) - len({event_id(event) for event in history}),
@@ -650,7 +803,12 @@ def build_measurement_report(store, history, evaluation_at=None, requested_count
         },
         "learning_gain": {
             "immediate_excluded": True,
-            "transfer_evidence_count": sum(1 for link in links.values() if link["delayed_24h_concept_outcome"].get("status") == "observed" and not link["delayed_24h_concept_outcome"].get("same_question")),
+            "transfer_evidence_count": sum(
+                1
+                for link in links.values()
+                if link["delayed_24h_concept_outcome"].get("status") == "observed"
+                and not link["delayed_24h_concept_outcome"].get("same_question")
+            ),
         },
         "repair_performance": repair_performance((store.get("repair_state") or {}), history),
         "diagnosis_performance": diagnosis_measurement(normalize_graph(store.get("concept_graph") or {}), history),
@@ -659,12 +817,19 @@ def build_measurement_report(store, history, evaluation_at=None, requested_count
         "question_information_value": {
             "history_count": len((store.get("question_calibration") or {}).get("information_value_history") or {}),
             "mean_value": round(
-                sum(float(row.get("information_value", 0.0) or 0.0) for row in ((store.get("question_calibration") or {}).get("information_value_history") or {}).values())
+                sum(
+                    float(row.get("information_value", 0.0) or 0.0)
+                    for row in (
+                        (store.get("question_calibration") or {}).get("information_value_history") or {}
+                    ).values()
+                )
                 / max(1, len((store.get("question_calibration") or {}).get("information_value_history") or {})),
                 4,
             ),
         },
-        "question_quality": quality_measurement((store.get("question_calibration") or {}).get("question_quality") or {}),
+        "question_quality": quality_measurement(
+            (store.get("question_calibration") or {}).get("question_quality") or {}
+        ),
         "weakness_precision": weakness_precision(predictions, links, history),
         "role_performance": role_performance(predictions, links, history),
         "session_composition": session_composition(predictions, requested_count=requested_count),

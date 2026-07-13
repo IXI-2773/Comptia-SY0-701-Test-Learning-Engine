@@ -59,6 +59,7 @@ class ProgressMeta(TypedDict):
     smart_practice_policy_governance: dict[str, Any]
     smart_practice_concept_graph: dict[str, Any]
     smart_practice_question_calibration: dict[str, Any]
+    smart_practice_rotation: dict[str, Any]
 
 
 class ProgressSummary(TypedDict):
@@ -116,6 +117,22 @@ def _coerce_str_list(value: Any, *, field: str) -> list[str]:
     return [str(item) for item in value if str(item).strip()]
 
 
+def _normalize_positive_int_list(value: Any, *, field: str, limit: int = 64) -> list[int]:
+    if value in (None, ""):
+        return []
+    if not isinstance(value, list):
+        return []
+    clean: list[int] = []
+    for item in value:
+        try:
+            number = int(item)
+        except (TypeError, ValueError):
+            continue
+        if number > 0:
+            clean.append(number)
+    return clean[-limit:]
+
+
 def normalize_progress_meta(meta: MutableMapping[str, Any] | Mapping[str, Any] | None) -> ProgressMeta:
     payload: MutableMapping[str, Any]
     if isinstance(meta, MutableMapping):
@@ -137,6 +154,19 @@ def normalize_progress_meta(meta: MutableMapping[str, Any] | Mapping[str, Any] |
     payload["smart_practice_concept_graph"] = dict(graph) if isinstance(graph, Mapping) else {}
     calibration = payload.get("smart_practice_question_calibration", {})
     payload["smart_practice_question_calibration"] = dict(calibration) if isinstance(calibration, Mapping) else {}
+    rotation = payload.get("smart_practice_rotation", {})
+    rotation_payload = dict(rotation) if isinstance(rotation, Mapping) else {}
+    payload["smart_practice_rotation"] = {
+        "epoch": _coerce_int(rotation_payload.get("epoch", 0), field="meta.smart_practice_rotation.epoch", minimum=0),
+        "last_membership_qnums": _normalize_positive_int_list(
+            rotation_payload.get("last_membership_qnums", []),
+            field="meta.smart_practice_rotation.last_membership_qnums",
+        ),
+        "pending_reference_qnums": _normalize_positive_int_list(
+            rotation_payload.get("pending_reference_qnums", []),
+            field="meta.smart_practice_rotation.pending_reference_qnums",
+        ),
+    }
 
     raw_session_history = payload.get("session_history", [])
     if raw_session_history not in (None, "") and not isinstance(raw_session_history, list):
@@ -158,7 +188,9 @@ def normalize_progress_meta(meta: MutableMapping[str, Any] | Mapping[str, Any] |
                 "medal": str(row.get("medal") or ""),
                 "xp_gained": _coerce_int(row.get("xp_gained", 0), field="meta.session_history.xp_gained", minimum=0),
                 "quest_key": str(row.get("quest_key") or ""),
-                "quests_completed": _coerce_int(row.get("quests_completed", 0), field="meta.session_history.quests_completed", minimum=0),
+                "quests_completed": _coerce_int(
+                    row.get("quests_completed", 0), field="meta.session_history.quests_completed", minimum=0
+                ),
                 "boss_hits": _coerce_int(row.get("boss_hits", 0), field="meta.session_history.boss_hits", minimum=0),
                 "speed_risk": _coerce_int(row.get("speed_risk", 0), field="meta.session_history.speed_risk", minimum=0),
             }
@@ -176,7 +208,9 @@ def normalize_progress_meta(meta: MutableMapping[str, Any] | Mapping[str, Any] |
             stat = dict(value or {})
             quest_stats[str(key)] = {
                 "offered": _coerce_int(stat.get("offered", 0), field=f"meta.quest_stats.{key}.offered", minimum=0),
-                "completed": _coerce_int(stat.get("completed", 0), field=f"meta.quest_stats.{key}.completed", minimum=0),
+                "completed": _coerce_int(
+                    stat.get("completed", 0), field=f"meta.quest_stats.{key}.completed", minimum=0
+                ),
             }
     payload["quest_stats"] = quest_stats
 
@@ -193,7 +227,9 @@ def normalize_progress_meta(meta: MutableMapping[str, Any] | Mapping[str, Any] |
             raise ValueError("Invalid list for meta.issue_reports.source_notes")
         issue_reports.append(
             {
-                "question_number": _coerce_int(row.get("question_number", 0), field="meta.issue_reports.question_number", minimum=0),
+                "question_number": _coerce_int(
+                    row.get("question_number", 0), field="meta.issue_reports.question_number", minimum=0
+                ),
                 "source_page": str(row.get("source_page") or ""),
                 "domain": str(row.get("domain") or ""),
                 "prompt": str(row.get("prompt") or ""),
@@ -210,11 +246,21 @@ def normalize_progress_meta(meta: MutableMapping[str, Any] | Mapping[str, Any] |
     raw_stats = payload.get("stats", {})
     stats_source = dict(raw_stats or {}) if isinstance(raw_stats, Mapping) else {}
     stats = blank_progress_stats()
-    stats["total_answered"] = _coerce_int(stats_source.get("total_answered", 0), field="meta.stats.total_answered", minimum=0)
-    stats["total_correct"] = _coerce_int(stats_source.get("total_correct", 0), field="meta.stats.total_correct", minimum=0)
-    stats["total_recovered"] = _coerce_int(stats_source.get("total_recovered", 0), field="meta.stats.total_recovered", minimum=0)
-    stats["sessions_completed"] = _coerce_int(stats_source.get("sessions_completed", 0), field="meta.stats.sessions_completed", minimum=0)
-    stats["perfect_sessions"] = _coerce_int(stats_source.get("perfect_sessions", 0), field="meta.stats.perfect_sessions", minimum=0)
+    stats["total_answered"] = _coerce_int(
+        stats_source.get("total_answered", 0), field="meta.stats.total_answered", minimum=0
+    )
+    stats["total_correct"] = _coerce_int(
+        stats_source.get("total_correct", 0), field="meta.stats.total_correct", minimum=0
+    )
+    stats["total_recovered"] = _coerce_int(
+        stats_source.get("total_recovered", 0), field="meta.stats.total_recovered", minimum=0
+    )
+    stats["sessions_completed"] = _coerce_int(
+        stats_source.get("sessions_completed", 0), field="meta.stats.sessions_completed", minimum=0
+    )
+    stats["perfect_sessions"] = _coerce_int(
+        stats_source.get("perfect_sessions", 0), field="meta.stats.perfect_sessions", minimum=0
+    )
     stats["domains_seen"] = _coerce_str_list(stats_source.get("domains_seen", []), field="meta.stats.domains_seen")
     payload["stats"] = stats
 

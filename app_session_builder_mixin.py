@@ -1,6 +1,7 @@
 import copy
 import random
 import threading
+from datetime import date
 from tkinter import messagebox
 
 from app_constants import MODE_PRACTICE, MODE_SMART_PRACTICE
@@ -12,6 +13,7 @@ from progress_store import (
     is_suspended,
     select_due_review_questions,
     select_questions_by_history,
+    study_status_name,
 )
 from session_models import QuestionRuntimeState, reset_runtime_question_state
 from smart_practice_concept_graph import (
@@ -24,6 +26,8 @@ from smart_practice_core import (
     SmartPracticeCandidate,
     build_smart_practice_score,
     build_smart_practice_selection,
+    duplicate_group_key_for_question,
+    validate_smart_practice_selection,
 )
 from smart_practice_measurement import attach_prediction_to_question, normalize_measurement_store
 from smart_practice_policy import active_policy, normalize_governance
@@ -50,6 +54,17 @@ from study_question_utils import (
 
 
 class SessionBuilderMixin:
+    def _advance_smart_practice_rotation_epoch(self):
+        meta = self.progress_data.setdefault("meta", {})
+        rotation = dict(meta.get("smart_practice_rotation") or {})
+        last_membership = list(rotation.get("last_membership_qnums") or [])
+        rotation["epoch"] = int(rotation.get("epoch", 0) or 0) + 1
+        rotation["pending_reference_qnums"] = last_membership
+        meta["smart_practice_rotation"] = rotation
+        self.smart_practice_signal_cache_key = None
+        self.smart_practice_signal_cache_payload = None
+        self.smart_practice_pool_cache = {}
+
     def _smart_practice_worker_revision(self):
         return self._freeze_signal_value(
             {
@@ -93,6 +108,7 @@ class SessionBuilderMixin:
         return value
 
     def _smart_practice_signal_key(self):
+        meta = self.progress_data.get("meta", {}) or {}
         records_key = tuple(
             (
                 key,
@@ -111,26 +127,22 @@ class SessionBuilderMixin:
                     str(key),
                     self._freeze_signal_value(value),
                 )
-                for key, value in (self.progress_data.get("meta", {}).get("repair_state", {}) or {}).items()
+                for key, value in (meta.get("repair_state", {}) or {}).items()
             )
         )
         measurement_policy = self._freeze_signal_value(
-            self.progress_data.get("meta", {}).get("smart_practice_measurement", {}).get("active_policy", {}) or {}
+            meta.get("smart_practice_measurement", {}).get("active_policy", {}) or {}
         )
-        governance = normalize_governance(self.progress_data.get("meta", {}).get("smart_practice_policy_governance"))
+        governance = normalize_governance(meta.get("smart_practice_policy_governance"))
         active_smart_policy = active_policy(governance)
         governance_policy = (
             str(active_smart_policy.get("policy_id") or ""),
             str(active_smart_policy.get("checksum") or ""),
             int(active_smart_policy.get("policy_schema_version") or 0),
         )
-        graph_key = str(
-            (self.progress_data.get("meta", {}).get("smart_practice_concept_graph") or {}).get("graph_signature") or ""
-        )
-        calibration_key = str(
-            (self.progress_data.get("meta", {}).get("smart_practice_question_calibration") or {}).get("last_updated_at")
-            or ""
-        )
+        graph_key = str((meta.get("smart_practice_concept_graph") or {}).get("graph_signature") or "")
+        calibration_key = str((meta.get("smart_practice_question_calibration") or {}).get("last_updated_at") or "")
+        rotation_key = self._freeze_signal_value(meta.get("smart_practice_rotation") or {})
         session_answer_key = tuple(
             (
                 int(event.get("question_number") or 0),
@@ -146,6 +158,8 @@ class SessionBuilderMixin:
             governance_policy,
             graph_key,
             calibration_key,
+            date.today().isoformat(),
+            rotation_key,
             self._analytics_signature(),
             records_key,
             repair_key,
@@ -715,7 +729,7 @@ class SessionBuilderMixin:
 
     def on_session_mode_change(self, event=None):
         mode = self.session_mode_var.get()
-        if mode in ("Weak retest", "Due review", MODE_SMART_PRACTICE):
+        if mode in ("Weak retest", "Due review"):
             self.session_source_var.set("All")
         self.save_app_config()
 
@@ -730,7 +744,7 @@ class SessionBuilderMixin:
         if mode == "Due review":
             return "Due review" if source == "All" else f"Due review + {source}"
         if mode == MODE_SMART_PRACTICE:
-            return "Smart practice"
+            return "Smart practice" if source == "All" else f"Smart practice · {source}"
         return source
 
     def current_builder_context(self, mode=None, count=None, randomize=None, source_label=None):
@@ -830,11 +844,36 @@ class SessionBuilderMixin:
                     source_label=self.current_builder_source_label(MODE_SMART_PRACTICE),
                     builder_context=builder_context,
                 )
+                self.active_source_label = "Resumed saved Smart Practice set"
+                self.render_question()
+                self.last_smart_practice_selection_audit = {
+                    "requested_count": int(builder_context.get("count") or 0),
+                    "final_count": len(self.questions),
+                    "candidate_count": len(self.questions),
+                    "explicit_history_filter": self.normalize_session_source(self.session_source_var.get()),
+                    "session_intent": "Resumed saved Smart Practice set",
+                    "available_unseen": 0,
+                    "selected_unseen": 0,
+                    "selected_active_weak": 0,
+                    "selected_due": 0,
+                    "selected_attempted_non_mastered": 0,
+                    "selected_mastered": 0,
+                    "selected_super_confident": 0,
+                    "unseen_target": 0,
+                    "unseen_target_met": True,
+                    "excluded_super_confident": 0,
+                    "excluded_recent_repetition": 0,
+                    "cache_hit": False,
+                    "resumed_saved_set": True,
+                    "undersized_reason": "",
+                }
                 return
+            if resume_choice is False:
+                self._advance_smart_practice_rotation_epoch()
             self._start_smart_practice_async(
                 self.session_count_var.get(),
                 self.session_random_var.get(),
-                self.get_filtered_master_pool(),
+                self.get_session_builder_pool(),
                 preserve_if_saved=(resume_choice is None),
                 builder_context=builder_context,
             )
@@ -935,11 +974,48 @@ class SessionBuilderMixin:
             ]
         return pool
 
+    def filter_pool_by_status(self, pool):
+        status = self.normalize_status_filter(self.status_filter_var.get())
+        if status == "All questions":
+            return list(pool)
+        records = self._progress_questions()
+        filtered = []
+        for question in pool:
+            record = records.get(self._question_key(question), {}) or {}
+            if status == "Unanswered":
+                if not question.get("answered"):
+                    filtered.append(question)
+            elif status == "Answered in session":
+                if question.get("answered"):
+                    filtered.append(question)
+            elif status == "Correct in session":
+                if question.get("answered") and self._question_correct(question):
+                    filtered.append(question)
+            elif status == "Wrong in session":
+                if question.get("answered") and not self._question_correct(question):
+                    filtered.append(question)
+            elif status == "Previously wrong":
+                if is_active_weak(record):
+                    filtered.append(question)
+            elif status == "Flagged":
+                if bool(question.get("flagged")) or bool(record.get("flagged")):
+                    filtered.append(question)
+            elif status == "Due review":
+                if is_review_due(record):
+                    filtered.append(question)
+            elif status == "Suspended":
+                if bool(question.get("suspended")) or is_suspended(record):
+                    filtered.append(question)
+            elif status == "With issues":
+                if bool(question.get("flagged")) or bool(record.get("flagged")) or is_active_weak(record):
+                    filtered.append(question)
+        return filtered
+
     def filter_pool_by_session_source(self, pool):
         return select_questions_by_history(pool, self._progress_questions(), self.session_source_var.get())
 
     def get_session_builder_pool(self):
-        return self.filter_pool_by_session_source(self.get_filtered_master_pool())
+        return self.filter_pool_by_session_source(self.filter_pool_by_status(self.get_filtered_master_pool()))
 
     def build_weak_retest_pool(self) -> list[QuestionRuntimeState]:
         if not self.master_questions:
@@ -993,6 +1069,7 @@ class SessionBuilderMixin:
 
     def build_smart_practice_pool(self, count, randomize=True, base_pool=None) -> list[QuestionRuntimeState]:
         profile = SMART_PRACTICE_SCORING
+        explicit_history_filter = self.normalize_session_source(self.session_source_var.get())
         governance = normalize_governance(
             self.progress_data.setdefault("meta", {}).get("smart_practice_policy_governance")
         )
@@ -1019,22 +1096,32 @@ class SessionBuilderMixin:
         bad_key_min_samples = int(active_policy_values.get("possible_bad_key_minimum_samples", 20) or 20)
         quality_risk_max = float(active_policy_values.get("quality_risk_maximum", 4.0) or 4.0)
         role_shares = dict(active_policy_values.get("role_shares") or {})
-        pool = list(base_pool) if base_pool is not None else self.get_filtered_master_pool()
+        source_pool = list(base_pool) if base_pool is not None else self.get_session_builder_pool()
+        pool = copy.deepcopy(source_pool)
         if not pool:
+            self.last_smart_practice_selection_audit = {
+                "requested_count": int(count) if str(count).isdigit() else 0,
+                "final_count": 0,
+                "candidate_count": 0,
+                "explicit_history_filter": explicit_history_filter,
+                "session_intent": "Unavailable",
+                "available_unseen": 0,
+                "selected_unseen": 0,
+                "selected_active_weak": 0,
+                "selected_due": 0,
+                "selected_attempted_non_mastered": 0,
+                "selected_mastered": 0,
+                "selected_super_confident": 0,
+                "unseen_target": 0,
+                "unseen_target_met": True,
+                "excluded_super_confident": 0,
+                "excluded_recent_repetition": 0,
+                "cache_hit": False,
+                "resumed_saved_set": False,
+                "undersized_reason": "empty_filtered_pool",
+            }
             return []
-        existing_signal_key = getattr(self, "smart_practice_signal_cache_key", None)
-        existing_signal_payload = getattr(self, "smart_practice_signal_cache_payload", None)
-        existing_pool_cache = getattr(self, "smart_practice_pool_cache", {})
         pool_qnums = tuple(int(question.get("question_number") or 0) for question in pool)
-        if existing_signal_key is not None and existing_signal_payload is not None:
-            quick_cache_key = (existing_signal_key, str(count), pool_qnums, bool(randomize))
-            cached_qnums = existing_pool_cache.get(quick_cache_key)
-            if cached_qnums is not None:
-                question_map = {int(question.get("question_number") or 0): question for question in pool}
-                cached_order = [qnum for qnum in cached_qnums if qnum in question_map]
-                if randomize:
-                    random.shuffle(cached_order)
-                return [question_map[qnum] for qnum in cached_order]
         records = self._progress_questions()
         progress_history = self._progress_history()
         meta = self.progress_data.setdefault("meta", {})
@@ -1046,16 +1133,11 @@ class SessionBuilderMixin:
         pool_cache_key = (
             signal_cache_key,
             str(count),
+            explicit_history_filter,
             pool_qnums,
             bool(randomize),
         )
-        cached_qnums = getattr(self, "smart_practice_pool_cache", {}).get(pool_cache_key)
-        if cached_qnums is not None:
-            question_map = {int(question.get("question_number") or 0): question for question in pool}
-            cached_order = [qnum for qnum in cached_qnums if qnum in question_map]
-            if randomize:
-                random.shuffle(cached_order)
-            return [question_map[qnum] for qnum in cached_order]
+        cached_entry = getattr(self, "smart_practice_pool_cache", {}).get(pool_cache_key)
         signal_payload = getattr(self, "smart_practice_signal_cache_payload", None)
         if signal_cache_key != getattr(self, "smart_practice_signal_cache_key", None) or signal_payload is None:
             prewarm = getattr(self, "smart_practice_prewarm", None)
@@ -1104,6 +1186,7 @@ class SessionBuilderMixin:
         recent_concept_cooldown_map = signal_payload["recent_concept_cooldown_map"]
         burnout_risk = signal_payload["burnout_risk"]
         momentum_profile = signal_payload["momentum_profile"]
+        session_intent = signal_payload.get("session_intent") or {"label": "Build coverage"}
 
         def interference_priority(question: QuestionRuntimeState) -> float:
             score = 0.0
@@ -1677,19 +1760,6 @@ class SessionBuilderMixin:
             if float(wrong_answer_recycling_map.get(int(q.get("question_number") or 0), 0.0))
             >= profile.wrong_answer_recycle_focus_min
         ]
-        near_miss_focus = [
-            q
-            for q in pool
-            if max(
-                float(
-                    near_miss_unit_map.get(
-                        str(question_meta.get(int(q.get("question_number") or 0), {}).get("unit_key") or ""), 0.0
-                    )
-                ),
-                float(near_miss_question_map.get(int(q.get("question_number") or 0), 0.0)),
-            )
-            >= profile.near_miss_focus_min
-        ]
         target = len(pool)
         if count != "All visible":
             try:
@@ -1698,114 +1768,7 @@ class SessionBuilderMixin:
                 target = len(pool)
         if target <= 0:
             return []
-
-        super_confident_qnums = {
-            q.get("question_number")
-            for q in pool
-            if is_super_confident_active(question_meta.get(int(q.get("question_number") or 0), {}).get("record", {}))
-            and not is_active_weak(question_meta.get(int(q.get("question_number") or 0), {}).get("record", {}))
-            and not is_review_due(question_meta.get(int(q.get("question_number") or 0), {}).get("record", {}))
-        }
-        freshness_suppressed_qnums = {
-            q.get("question_number")
-            for q in pool
-            if float(freshness_map.get(int(q.get("question_number") or 0), 0.0)) >= profile.freshness_suppression_min
-            and not is_active_weak(question_meta.get(int(q.get("question_number") or 0), {}).get("record", {}))
-            and not is_review_due(question_meta.get(int(q.get("question_number") or 0), {}).get("record", {}))
-        }
-        suppressed_qnums = super_confident_qnums | freshness_suppressed_qnums
-        non_super_count = len(pool) - len(super_confident_qnums)
-        available_count = len(pool) - len(suppressed_qnums)
-        if super_confident_qnums and non_super_count >= max(1, target):
-            working_pool = [q for q in pool if q.get("question_number") not in super_confident_qnums]
-        elif available_count >= max(1, target):
-            working_pool = [q for q in pool if q.get("question_number") not in suppressed_qnums]
-        else:
-            working_pool = list(pool)
-
-        working_qnums = {int(question.get("question_number") or 0) for question in working_pool}
-
-        def in_working_set(question: QuestionRuntimeState) -> bool:
-            return int(question.get("question_number") or 0) in working_qnums
-
-        groups = [
-            [q for q in group if in_working_set(q)]
-            for group in [
-                unseen,
-                active_weak,
-                due,
-                recovered,
-                screenshot_focus,
-                coverage_focus,
-                objective_focus,
-                interference_focus,
-                compression_focus,
-                ladder_focus,
-                boundary_focus,
-                counterfactual_focus,
-                prerequisite_focus,
-                blind_spot_focus,
-                robustness_focus,
-                reinforcement_focus,
-                synthesis_focus,
-                knowledge_trace_focus,
-                learning_gain_focus,
-                delayed_probe_focus,
-                cue_dependence_focus,
-                recognition_focus,
-                retention_stress_focus,
-                failure_mode_focus,
-                generalization_focus,
-                decision_latency_focus,
-                contrast_rule_focus,
-                concept_state_focus,
-                wrong_recycle_focus,
-                near_miss_focus,
-            ]
-        ]
-        (
-            unseen,
-            active_weak,
-            due,
-            recovered,
-            screenshot_focus,
-            coverage_focus,
-            objective_focus,
-            interference_focus,
-            compression_focus,
-            ladder_focus,
-            boundary_focus,
-            counterfactual_focus,
-            prerequisite_focus,
-            blind_spot_focus,
-            robustness_focus,
-            reinforcement_focus,
-            synthesis_focus,
-            knowledge_trace_focus,
-            learning_gain_focus,
-            delayed_probe_focus,
-            cue_dependence_focus,
-            recognition_focus,
-            retention_stress_focus,
-            failure_mode_focus,
-            generalization_focus,
-            decision_latency_focus,
-            contrast_rule_focus,
-            concept_state_focus,
-            wrong_recycle_focus,
-            near_miss_focus,
-        ) = groups
-        for group in groups:
-            if randomize:
-                random.shuffle(group)
-            initial_order = {int(item.get("question_number") or 0): idx for idx, item in enumerate(group)}
-            group.sort(
-                key=lambda item: (
-                    smart_priority(item),
-                    -initial_order.get(int(item.get("question_number") or 0), 0),
-                ),
-                reverse=True,
-            )
+        working_pool = list(pool)
 
         objective_cap = smart_practice_objective_cap(target, profile)
 
@@ -1868,6 +1831,33 @@ class SessionBuilderMixin:
                 return cached
             smart_priority(question)
             meta = question_meta.get(qnum, {})
+            record = meta.get("record", {}) or {}
+            status_name = study_status_name(record)
+            rotation = self.progress_data.setdefault("meta", {}).get("smart_practice_rotation", {}) or {}
+            pending_reference_qnums = {
+                int(value) for value in (rotation.get("pending_reference_qnums") or []) if str(value).strip()
+            }
+            attempts = int(record.get("attempts", 0) or 0)
+            due_now = is_review_due(record)
+            active_weak_now = is_active_weak(record)
+            super_confident_now = is_super_confident_active(record)
+            mastered_now = status_name == "Mastered" and not due_now
+            recent_pressure = float(freshness_map.get(qnum, 0.0) or 0.0) / max(profile.freshness_suppression_min, 1.0)
+            if qnum in pending_reference_qnums:
+                recent_pressure += profile.recent_selection_rotation_penalty
+            if super_confident_now:
+                eligibility_tier = 99
+            elif (
+                attempts <= 0
+                or active_weak_now
+                or due_now
+                or str(question.get("smart_primary_role") or "") == "weak_repair"
+            ):
+                eligibility_tier = 1
+            elif attempts > 0 and not mastered_now:
+                eligibility_tier = 2
+            else:
+                eligibility_tier = 3
             candidate = SmartPracticeCandidate(
                 question=question,
                 qnum=qnum,
@@ -1881,9 +1871,71 @@ class SessionBuilderMixin:
                 primary_topic=primary_topic_label(question),
                 normalized_domain=normalized_study_label(str(question.get("domain") or "")),
                 raw_domain=str(question.get("domain") or "").strip(),
+                attempts=attempts,
+                is_unseen=attempts <= 0,
+                is_active_weak=active_weak_now,
+                is_due=due_now,
+                is_mastered=mastered_now,
+                is_super_confident=super_confident_now,
+                last_seen=str(record.get("last_seen") or ""),
+                recent_selection_pressure=recent_pressure,
+                eligibility_tier=eligibility_tier,
+                duplicate_group_key=duplicate_group_key_for_question(question),
             )
             candidate_cache[qnum] = candidate
             return candidate
+
+        working_candidates = [build_candidate(question) for question in working_pool]
+        candidate_by_qnum = {candidate.qnum: candidate for candidate in working_candidates}
+
+        def validate_candidate_membership(qnums) -> dict[str, object]:
+            missing_qnums = [qnum for qnum in qnums if qnum not in candidate_by_qnum]
+            selected_candidates = [candidate_by_qnum[qnum] for qnum in qnums if qnum in candidate_by_qnum]
+            cached_audit = {}
+            if isinstance(cached_entry, dict) and isinstance(cached_entry.get("audit"), dict):
+                cached_audit = dict(cached_entry.get("audit") or {})
+            selection_validation = validate_smart_practice_selection(
+                selected_candidates,
+                working_candidates,
+                target=target,
+                explicit_history_filter=explicit_history_filter,
+                unseen_target=int(cached_audit.get("unseen_target", 0) or 0),
+            )
+            if missing_qnums:
+                selection_validation = {
+                    "valid": False,
+                    "reasons": list(selection_validation["reasons"]) + ["cached_question_missing_from_current_pool"],
+                }
+            return {
+                "selected_candidates": selected_candidates,
+                "validation": selection_validation,
+            }
+
+        if cached_entry is not None:
+            cached_qnums = cached_entry.get("qnums") if isinstance(cached_entry, dict) else cached_entry
+            question_map = {int(question.get("question_number") or 0): question for question in pool}
+            cached_order = [int(qnum) for qnum in cached_qnums if int(qnum) in question_map]
+            cached_state = validate_candidate_membership(cached_order)
+            if cached_state["validation"]["valid"]:
+                cached_audit = {}
+                if isinstance(cached_entry, dict) and isinstance(cached_entry.get("audit"), dict):
+                    cached_audit = dict(cached_entry.get("audit") or {})
+                cached_audit["cache_hit"] = True
+                cached_audit["post_selection_validation_passed"] = True
+                cached_audit["post_selection_validation_reasons"] = []
+                self.last_smart_practice_selection_audit = cached_audit
+                if randomize:
+                    random.shuffle(cached_order)
+                measurement = normalize_measurement_store(
+                    self.progress_data.setdefault("meta", {}).get("smart_practice_measurement")
+                )
+                result = [question_map[qnum] for qnum in cached_order]
+                for question in result:
+                    record = records.get(self._question_key(question), {})
+                    attach_prediction_to_question(question, measurement, record)
+                self.progress_data.setdefault("meta", {})["smart_practice_measurement"] = measurement
+                return result
+            self.smart_practice_pool_cache.pop(pool_cache_key, None)
 
         high_signal_qnums = {
             int(question.get("question_number") or 0)
@@ -1891,7 +1943,7 @@ class SessionBuilderMixin:
             if int(question.get("question_number") or 0)
         }
         selection_result = build_smart_practice_selection(
-            [build_candidate(question) for question in working_pool],
+            working_candidates,
             [build_candidate(question) for question in fallback],
             target=target,
             role_shares=role_shares,
@@ -1899,6 +1951,8 @@ class SessionBuilderMixin:
             profile=profile,
             high_signal_qnums=high_signal_qnums,
             freshness_map=freshness_map,
+            explicit_history_filter=explicit_history_filter,
+            session_intent=session_intent,
         )
         ordered = list(selection_result.ordered_questions)
         role_seed = list(selection_result.role_seed_questions)
@@ -1906,6 +1960,7 @@ class SessionBuilderMixin:
             "score": selection_result.quality_score,
             "retry_used": selection_result.retry_used,
         }
+        self.last_smart_practice_selection_audit = dict(selection_result.audit)
 
         def protected_role_counts(selection: list[QuestionRuntimeState]) -> dict[str, int]:
             counts = {"weak_repair": 0, "due_retention": 0, "blueprint_coverage": 0}
@@ -1926,6 +1981,18 @@ class SessionBuilderMixin:
             result = self._interleave_questions(selection[:target])
             if not preserves_protected_roles(result, role_seed):
                 result = self._interleave_questions(role_seed[:target])
+            selected_candidates = [
+                candidate_by_qnum[int(question.get("question_number") or 0)]
+                for question in result
+                if int(question.get("question_number") or 0) in candidate_by_qnum
+            ]
+            final_validation = validate_smart_practice_selection(
+                selected_candidates,
+                working_candidates,
+                target=target,
+                explicit_history_filter=explicit_history_filter,
+                unseen_target=int(selection_result.audit.get("unseen_target", 0) or 0),
+            )
             measurement = normalize_measurement_store(
                 self.progress_data.setdefault("meta", {}).get("smart_practice_measurement")
             )
@@ -1935,11 +2002,24 @@ class SessionBuilderMixin:
                 record = records.get(self._question_key(question), {})
                 attach_prediction_to_question(question, measurement, record)
             self.progress_data.setdefault("meta", {})["smart_practice_measurement"] = measurement
+            final_qnums = [int(question.get("question_number") or 0) for question in result]
+            rotation = dict(self.progress_data.setdefault("meta", {}).get("smart_practice_rotation") or {})
+            rotation["last_membership_qnums"] = final_qnums
+            rotation["pending_reference_qnums"] = []
+            self.progress_data.setdefault("meta", {})["smart_practice_rotation"] = rotation
             final_signal_key = self._smart_practice_signal_key()
             self.smart_practice_signal_cache_key = final_signal_key
-            self.smart_practice_pool_cache[(final_signal_key, str(count), pool_qnums, bool(randomize))] = tuple(
-                int(question.get("question_number") or 0) for question in result
-            )
+            audit = dict(self.last_smart_practice_selection_audit or {})
+            audit["final_count"] = len(final_qnums)
+            audit["post_selection_validation_passed"] = bool(final_validation["valid"])
+            audit["post_selection_validation_reasons"] = list(final_validation["reasons"])
+            self.last_smart_practice_selection_audit = audit
+            self.smart_practice_pool_cache[
+                (final_signal_key, str(count), explicit_history_filter, pool_qnums, bool(randomize))
+            ] = {
+                "qnums": tuple(final_qnums),
+                "audit": audit,
+            }
             return result[:target]
 
         if not randomize:

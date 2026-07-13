@@ -442,7 +442,7 @@ def is_super_confident_active(record: Mapping[str, Any] | None, on_date=None) ->
     except ValueError:
         return False
     on_date = date.fromisoformat(on_date) if isinstance(on_date, str) else (on_date or date.today())
-    return until_day >= on_date
+    return until_day > on_date
 
 
 def set_progress_super_confident(
@@ -480,7 +480,11 @@ def is_review_due(record: Mapping[str, Any] | None, on_date=None) -> bool:
     record = record or {}
     memory = normalize_learner_memory(record.get("learner_memory"))
     next_review = memory.get("next_review_at") or record.get("next_review")
-    if int(record.get("attempts", 0) or 0) > 0 and not next_review and float(memory.get("retrievability", 0.0) or 0.0) <= 0.05:
+    if (
+        int(record.get("attempts", 0) or 0) > 0
+        and not next_review
+        and float(memory.get("retrievability", 0.0) or 0.0) <= 0.05
+    ):
         return True
     if not next_review:
         return False

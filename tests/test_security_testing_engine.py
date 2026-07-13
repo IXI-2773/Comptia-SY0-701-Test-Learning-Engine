@@ -154,7 +154,12 @@ class SecurityTestingEngineTests(unittest.TestCase):
             self.assertIn("Recovered 10 question records", notice)
             self.assertEqual(2000, restored["meta"]["xp"])
             self.assertTrue((target / "public_sy0701_bank_v4_practice_session_25_test.json").exists())
-            self.assertTrue(any(path.name.startswith("SecurityTestingEngine_before_auto_migration_") for path in target.parent.iterdir()))
+            self.assertTrue(
+                any(
+                    path.name.startswith("SecurityTestingEngine_before_auto_migration_")
+                    for path in target.parent.iterdir()
+                )
+            )
 
     def test_release_packager_outputs_single_exe_folder(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -194,7 +199,6 @@ class SecurityTestingEngineTests(unittest.TestCase):
                 "Project Files\\release\\SecurityTestingEngine",
                 checkout_readme.read_text(encoding="utf-8"),
             )
-
 
     def test_chapter_screenshot_filename_parses_source_question_number(self):
         path = Path(
@@ -846,7 +850,9 @@ class SecurityTestingEngineTests(unittest.TestCase):
     def test_progress_file_strength_rejects_malformed_numeric_xp(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "bad_progress.json"
-            path.write_text(json.dumps({"questions": {"1": {}}, "history": [], "meta": {"xp": "not-a-number"}}), encoding="utf-8")
+            path.write_text(
+                json.dumps({"questions": {"1": {}}, "history": [], "meta": {"xp": "not-a-number"}}), encoding="utf-8"
+            )
 
             self.assertEqual((0, 0, 0, 0), app_module.progress_file_strength(path))
 
@@ -1534,7 +1540,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
             self.assertEqual(1, len(scheduled))
             scheduled[0]()
 
-        self.assertEqual("Smart Practice build discarded because learner state changed.", app.session_label.cget("text"))
+        self.assertEqual(
+            "Smart Practice build discarded because learner state changed.", app.session_label.cget("text")
+        )
         self.assertFalse(app.questions)
 
     def test_async_smart_practice_worker_skips_commit_when_closing(self):
@@ -1865,9 +1873,7 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertFalse(session_path.exists())
         self.assertFalse(checkpoint_path.exists())
         self.assertTrue(progress_path.exists())
-        self.assertFalse(
-            any(q.get("answered") or q.get("selected") or q.get("flagged") for q in app.master_questions)
-        )
+        self.assertFalse(any(q.get("answered") or q.get("selected") or q.get("flagged") for q in app.master_questions))
         self.assertEqual("Ready to start a set", app.question_meta_label.cget("text"))
         self.assertIn("START SET", app.question_label.cget("text"))
 
@@ -2304,6 +2310,61 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
                 self.assertEqual(expected_answered, [bool(q.get("answered")) for q in app.questions])
                 self.assertEqual(expected_selected, [list(q.get("selected", [])) for q in app.questions])
 
+    def test_smart_practice_explicit_resume_marks_resumed_saved_set(self):
+        app = self.make_app(start_session=False)
+        app.session_mode_var.set("Smart Practice")
+        app.session_count_var.set("2")
+        app.session_source_var.set("All")
+        app.session_random_var.set(False)
+
+        app.start_custom_session()
+        saved_qnums = [q.get("question_number") for q in app.questions]
+        app.toggle_choice("A")
+        expected_answered = [bool(q.get("answered")) for q in app.questions]
+
+        regenerated_pool = [
+            dict(next(q for q in app.master_questions if q["question_number"] == qnum))
+            for qnum in reversed(saved_qnums)
+        ]
+        app.build_smart_practice_pool = (
+            lambda count, randomize=True, regenerated_pool=regenerated_pool: regenerated_pool
+        )
+
+        with mock.patch.object(app, "_resume_existing_session_choice", return_value=True):
+            app.start_custom_session()
+
+        self.assertEqual(saved_qnums, [q.get("question_number") for q in app.questions])
+        self.assertEqual(expected_answered, [bool(q.get("answered")) for q in app.questions])
+        self.assertEqual("Resumed saved Smart Practice set", app.active_source_label)
+        self.assertTrue(app.last_smart_practice_selection_audit["resumed_saved_set"])
+        self.assertEqual(
+            "Resumed saved Smart Practice set",
+            app.last_smart_practice_selection_audit["session_intent"],
+        )
+
+    def test_smart_practice_explicit_fresh_start_does_not_restore_saved_membership(self):
+        app = self.make_app(start_session=False)
+        app.session_mode_var.set("Smart Practice")
+        app.session_count_var.set("2")
+        app.session_source_var.set("All")
+        app.session_random_var.set(False)
+
+        app.start_custom_session()
+        saved_qnums = [q.get("question_number") for q in app.questions]
+        alternate_qnums = [3, 2]
+        alternate_pool = [
+            dict(next(q for q in app.master_questions if q["question_number"] == qnum)) for qnum in alternate_qnums
+        ]
+        app.build_smart_practice_pool = lambda count, randomize=True, alternate_pool=alternate_pool: alternate_pool
+
+        with mock.patch.object(app, "_resume_existing_session_choice", return_value=False):
+            app.start_custom_session()
+
+        self.assertNotEqual(saved_qnums, [q.get("question_number") for q in app.questions])
+        self.assertEqual(alternate_qnums, [q.get("question_number") for q in app.questions])
+        self.assertEqual("Smart practice", app.active_source_label)
+        self.assertFalse(app.last_smart_practice_selection_audit["resumed_saved_set"])
+
     def test_redo_question_clears_answer_state(self):
         app = self.make_app()
 
@@ -2463,6 +2524,38 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         app.session_mode_var.set("Exam")
         app.on_session_mode_change()
         self.assertEqual("Previously answered", app.session_source_var.get())
+
+    def test_smart_practice_preserves_unseen_source_and_does_not_backfill_attempted_questions(self):
+        app = self.make_app(start_session=False)
+        app.master_questions = [
+            {
+                "question_number": qnum,
+                "prompt": f"Question {qnum}",
+                "choices": {"A": "Right", "B": "Wrong"},
+                "correct": ["A"],
+                "domain": "Domain A",
+                "topics": ["Topic A"],
+                "source_name": "Source",
+            }
+            for qnum in range(1, 31)
+        ]
+        app._reset_runtime_question_state(app.master_questions)
+        for qnum in range(1, 11):
+            app._progress_questions()[str(qnum)] = update_progress_record({}, ["A"], True, seen_on="2026-07-01")
+
+        app.session_mode_var.set(app_module.MODE_SMART_PRACTICE)
+        app.session_source_var.set("Unseen")
+        app.on_session_mode_change()
+
+        filtered_pool = app.get_session_builder_pool()
+        smart_pool = app.build_smart_practice_pool("25", randomize=False)
+
+        self.assertEqual("Unseen", app.session_source_var.get())
+        self.assertEqual("Smart practice · Unseen", app.current_builder_source_label(app_module.MODE_SMART_PRACTICE))
+        self.assertEqual(list(range(11, 31)), [q["question_number"] for q in filtered_pool])
+        self.assertEqual(list(range(11, 31)), [q["question_number"] for q in smart_pool])
+        self.assertEqual(20, app.last_smart_practice_selection_audit["candidate_count"])
+        self.assertEqual("Unseen", app.last_smart_practice_selection_audit["explicit_history_filter"])
 
     def test_all_source_is_preserved_when_bank_loads(self):
         app = self.make_app(start_session=False)
@@ -3892,6 +3985,90 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertTrue(is_super_confident_active(app._progress_questions()["1"], on_date="2026-05-17"))
         self.assertNotIn(1, [q["question_number"] for q in pool])
 
+    def test_smart_practice_default_composition_keeps_strong_unseen_floor(self):
+        app = self.make_app(start_session=False)
+        questions = []
+        for qnum in range(1, 31):
+            questions.append(self._sp9_question(qnum, topic=f"Unseen {qnum}", source="Clean"))
+        for qnum in range(31, 41):
+            questions.append(self._sp9_question(qnum, topic=f"Weak {qnum}", source="Trusted"))
+        for qnum in range(41, 61):
+            questions.append(self._sp9_question(qnum, topic=f"Mastered {qnum}", source="Trusted"))
+        for qnum in range(61, 71):
+            questions.append(self._sp9_question(qnum, topic=f"Super {qnum}", source="Trusted"))
+        app.master_questions = questions
+        app.questions = list(questions)
+        app._reset_runtime_question_state(app.master_questions)
+        for qnum in range(31, 36):
+            app._progress_questions()[str(qnum)] = update_progress_record({}, ["B"], False, seen_on="2026-07-01")
+        for qnum in range(36, 41):
+            rec = update_progress_record({}, ["A"], True, seen_on="2026-07-01", confidence="Sure")
+            rec["learner_memory"]["next_review_at"] = "2026-07-01"
+            rec["next_review"] = "2026-07-01"
+            app._progress_questions()[str(qnum)] = rec
+        for qnum in range(41, 61):
+            rec = update_progress_record({}, ["A"], True, seen_on="2026-06-01", confidence="Sure")
+            rec["correct_streak"] = 5
+            app._progress_questions()[str(qnum)] = rec
+        for qnum in range(61, 71):
+            rec = update_progress_record({}, ["A"], True, seen_on="2026-07-01", confidence="Sure")
+            rec = set_progress_super_confident(rec, seen_on="2026-07-01", cooldown_days=120)
+            app._progress_questions()[str(qnum)] = rec
+
+        pool = app.build_smart_practice_pool("25", randomize=False)
+        qnums = {q["question_number"] for q in pool}
+        unseen = sum(1 for q in pool if int(q["question_number"]) <= 30)
+        mastered = sum(1 for q in pool if 41 <= int(q["question_number"]) <= 60)
+
+        self.assertGreaterEqual(unseen, 18)
+        self.assertEqual(0, mastered)
+        self.assertFalse(any(61 <= qnum <= 70 for qnum in qnums))
+        self.assertEqual(unseen, app.last_smart_practice_selection_audit["selected_unseen"])
+        self.assertEqual(0, app.last_smart_practice_selection_audit["selected_super_confident"])
+
+    def test_smart_practice_limited_unseen_supply_uses_all_unseen_before_mastered(self):
+        app = self.make_app(start_session=False)
+        questions = []
+        for qnum in range(1, 9):
+            questions.append(self._sp9_question(qnum, topic=f"Unseen {qnum}", source="Clean"))
+        for qnum in range(9, 21):
+            questions.append(self._sp9_question(qnum, topic=f"Attempted {qnum}", source="Trusted"))
+        for qnum in range(21, 41):
+            questions.append(self._sp9_question(qnum, topic=f"Mastered {qnum}", source="Trusted"))
+        for qnum in range(41, 51):
+            questions.append(self._sp9_question(qnum, topic=f"Super {qnum}", source="Trusted"))
+        app.master_questions = questions
+        app.questions = list(questions)
+        app._reset_runtime_question_state(app.master_questions)
+        for qnum in range(9, 21):
+            app._progress_questions()[str(qnum)] = update_progress_record({}, ["A"], True, seen_on="2026-07-01")
+        for qnum in range(21, 41):
+            rec = update_progress_record({}, ["A"], True, seen_on="2026-06-01", confidence="Sure")
+            rec["correct_streak"] = 5
+            app._progress_questions()[str(qnum)] = rec
+        for qnum in range(41, 51):
+            rec = update_progress_record({}, ["A"], True, seen_on="2026-07-01", confidence="Sure")
+            rec = set_progress_super_confident(rec, seen_on="2026-07-01", cooldown_days=120)
+            app._progress_questions()[str(qnum)] = rec
+
+        pool = app.build_smart_practice_pool("25", randomize=False)
+        qnums = {q["question_number"] for q in pool}
+        mastered = {qnum for qnum in qnums if 21 <= qnum <= 40}
+
+        self.assertTrue(set(range(1, 9)).issubset(qnums))
+        self.assertTrue(set(range(9, 21)).issubset(qnums))
+        self.assertFalse(any(41 <= qnum <= 50 for qnum in qnums))
+        self.assertLessEqual(len(mastered), 5)
+        self.assertEqual(8, app.last_smart_practice_selection_audit["selected_unseen"])
+
+    def test_super_confident_boundary_becomes_due_on_transition_day(self):
+        rec = update_progress_record({}, ["A"], True, seen_on="2026-05-17", confidence="Sure")
+        rec = set_progress_super_confident(rec, seen_on="2026-05-17", cooldown_days=5)
+
+        self.assertTrue(is_super_confident_active(rec, on_date="2026-05-21"))
+        self.assertFalse(is_super_confident_active(rec, on_date="2026-05-22"))
+        self.assertTrue(is_review_due(rec, on_date="2026-05-22"))
+
     def test_wrong_answer_queues_confusion_pair_drill_before_generic_twins(self):
         app = self.make_app(start_session=False)
         app.master_questions = [
@@ -4263,6 +4440,21 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
         self.assertEqual("Repair weak spots", payload["session_intent"]["label"])
         self.assertGreater(payload["near_miss_unit_map"]["Objective::2.2"], 0.0)
+
+    def test_build_coverage_intent_enforces_higher_unseen_target(self):
+        app = self.make_app(start_session=False)
+        questions = [self._sp9_question(qnum, topic=f"Coverage {qnum}", source="Clean") for qnum in range(1, 41)]
+        app.master_questions = questions
+        app.questions = list(questions)
+        app._reset_runtime_question_state(app.master_questions)
+
+        payload = app._build_smart_practice_signal_payload()
+        pool = app.build_smart_practice_pool("25", randomize=False)
+
+        self.assertEqual("Build coverage", payload["session_intent"]["label"])
+        self.assertEqual(25, len(pool))
+        self.assertGreaterEqual(app.last_smart_practice_selection_audit["unseen_target"], 20)
+        self.assertEqual(25, app.last_smart_practice_selection_audit["selected_unseen"])
 
     def test_smart_practice_recycles_tempting_wrong_answer_contrasts(self):
         app = self.make_app(start_session=False)
@@ -5054,6 +5246,22 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         second_qnums = [q["question_number"] for q in second]
         self.assertEqual(set(first_qnums), set(second_qnums))
         self.assertEqual(3, len(second_qnums))
+        self.assertTrue(app.last_smart_practice_selection_audit["cache_hit"])
+
+    def test_smart_practice_rotation_changes_membership_only_after_explicit_fresh_epoch(self):
+        app = self.make_app(start_session=False)
+        questions = [self._sp9_question(qnum, topic=f"Coverage {qnum}", source="Clean") for qnum in range(1, 21)]
+        app.master_questions = questions
+        app.questions = list(questions)
+        app._reset_runtime_question_state(app.master_questions)
+
+        first = [q["question_number"] for q in app.build_smart_practice_pool("5", randomize=False)]
+        app._advance_smart_practice_rotation_epoch()
+        second = [q["question_number"] for q in app.build_smart_practice_pool("5", randomize=False)]
+        third = [q["question_number"] for q in app.build_smart_practice_pool("5", randomize=False)]
+
+        self.assertNotEqual(first, second)
+        self.assertEqual(second, third)
 
     def test_boss_round_inserts_challenge_after_ten_answers(self):
         app = self.make_app()
@@ -5250,7 +5458,10 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertEqual(6, allocation["weak_repair"])
         self.assertEqual(6, allocation["due_retention"])
         self.assertEqual(6, allocation["blueprint_coverage"])
-        self.assertEqual({"weak_repair": 1, "due_retention": 1, "blueprint_coverage": 1, "transfer": 0, "controlled_stretch": 0}, smart_practice_role_allocation(3))
+        self.assertEqual(
+            {"weak_repair": 1, "due_retention": 1, "blueprint_coverage": 1, "transfer": 0, "controlled_stretch": 0},
+            smart_practice_role_allocation(3),
+        )
 
     def test_smart_practice9_low_source_trust_is_penalty_not_reward(self):
         app = self.make_app(start_session=False)
@@ -5292,8 +5503,12 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_smart_practice9_adaptive_memory_and_response_sanitizer(self):
         guessed = update_progress_record({}, ["A"], True, seen_on="2026-04-23", confidence="Guessed")
-        strong = update_progress_record({}, ["A"], True, seen_on="2026-04-23", confidence="Sure", session_tag="Transfer check")
-        lapse = update_progress_record(strong, ["B"], False, seen_on="2026-04-24", confidence="Sure", recall_failure="Blank recall")
+        strong = update_progress_record(
+            {}, ["A"], True, seen_on="2026-04-23", confidence="Sure", session_tag="Transfer check"
+        )
+        lapse = update_progress_record(
+            strong, ["B"], False, seen_on="2026-04-24", confidence="Sure", recall_failure="Blank recall"
+        )
         timing = sanitize_response_time(1200.0, recent_effective_seconds=[10.0, 12.0, 14.0])
 
         self.assertEqual("recognition", guessed["learner_memory"]["last_grade"])
@@ -5457,7 +5672,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertEqual(1.0, rec["learner_memory"]["stability"])
 
     def test_sp9_11_adaptive_due_uses_next_review_at(self):
-        rec = normalize_progress_record({"attempts": 1, "learner_memory": {"retrievability": 0.5, "next_review_at": "2026-04-20"}})
+        rec = normalize_progress_record(
+            {"attempts": 1, "learner_memory": {"retrievability": 0.5, "next_review_at": "2026-04-20"}}
+        )
         self.assertTrue(is_review_due(rec, on_date="2026-04-21"))
 
     def test_sp9_12_easy_schedules_later_than_good(self):
@@ -5520,7 +5737,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         q = dict(app.master_questions[0], selected=["B"])
         app.questions = [q]
         app.plan_misconception_repair(q, is_correct=False)
-        self.assertEqual("contrast", app.progress_data["meta"]["repair_state"][app.repair_concept_key_for_question(q)]["stage"])
+        self.assertEqual(
+            "contrast", app.progress_data["meta"]["repair_state"][app.repair_concept_key_for_question(q)]["stage"]
+        )
 
     def test_sp9_22b_progress_repair_state_normalizes_legacy_key_on_load(self):
         app = self._sp9_app_with_role_pool()
@@ -5735,9 +5954,13 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
         self.assertEqual(before_prediction_id, resumed["prediction_id"])
         self.assertEqual(before_concept_key, resumed["prediction_snapshot"]["concept_key"])
-        self.assertEqual(before_prediction_count, len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"]))
+        self.assertEqual(
+            before_prediction_count, len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"])
+        )
 
-        app._record_answer(resumed, list(resumed["correct"]), feedback_override={"confidence": "Sure", "miss_reason": ""})
+        app._record_answer(
+            resumed, list(resumed["correct"]), feedback_override={"confidence": "Sure", "miss_reason": ""}
+        )
         new_history = app._progress_history()[before_history_count:]
 
         self.assertEqual(1, len(app.session_answer_history))
@@ -5745,7 +5968,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertEqual(before_prediction_id, app.session_answer_history[0]["prediction_id"])
         self.assertEqual(before_prediction_id, new_history[0]["prediction_id"])
         self.assertEqual(int(resumed["question_number"]), new_history[0]["question_number"])
-        self.assertEqual(before_prediction_count, len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"]))
+        self.assertEqual(
+            before_prediction_count, len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"])
+        )
 
     def test_sp9_measurement_02f_repair_prediction_preserves_canonical_repair_identity(self):
         question = self._sp9_question(1)
@@ -5844,7 +6069,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         q["smart_primary_role"] = "weak_repair"
         q["smart_utility"] = 9.0
         q["smart_utility_breakdown"] = {"misconception_repair_value": 9.0}
-        attach_prediction_to_question(q, app.progress_data["meta"]["smart_practice_measurement"], {}, created_at="2026-01-01T00:00:00")
+        attach_prediction_to_question(
+            q, app.progress_data["meta"]["smart_practice_measurement"], {}, created_at="2026-01-01T00:00:00"
+        )
         prediction_id = q["prediction_id"]
         prediction_count = len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"])
         app.save_session(show_notice=False)
@@ -5885,7 +6112,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         q["smart_primary_role"] = "weak_repair"
         q["smart_utility"] = 8.0
         q["smart_utility_breakdown"] = {"misconception_repair_value": 8.0}
-        attach_prediction_to_question(q, app.progress_data["meta"]["smart_practice_measurement"], {}, created_at="2026-01-01T00:00:00")
+        attach_prediction_to_question(
+            q, app.progress_data["meta"]["smart_practice_measurement"], {}, created_at="2026-01-01T00:00:00"
+        )
         prediction_id = q["prediction_id"]
         prediction_count = len(app.progress_data["meta"]["smart_practice_measurement"]["predictions"])
         app.save_session(show_notice=False)
@@ -5915,7 +6144,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
     def test_sp9_measurement_03_prediction_keeps_original_learner_state(self):
         prediction = self._measurement_prediction()
         changed = update_progress_record({"learner_memory": {"retrievability": 0.1}}, ["B"], False)
-        self.assertNotEqual(prediction["learner_retrievability_at_selection"], changed["learner_memory"]["retrievability"])
+        self.assertNotEqual(
+            prediction["learner_retrievability_at_selection"], changed["learner_memory"]["retrievability"]
+        )
 
     def test_sp9_measurement_04_session_resume_preserves_prediction_id(self):
         app = self._sp9_app_with_role_pool()
@@ -5938,7 +6169,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
     def test_sp9_measurement_06_same_answer_cannot_evaluate_own_prediction(self):
         prediction = self._measurement_prediction()
         event = self._measurement_event("2026-01-01T00:00:00", prediction_id=prediction["prediction_id"])
-        self.assertEqual("not_observed", link_prediction_outcomes(prediction, [event])["delayed_24h_item_outcome"]["status"])
+        self.assertEqual(
+            "not_observed", link_prediction_outcomes(prediction, [event])["delayed_24h_item_outcome"]["status"]
+        )
 
     def test_sp9_measurement_07_before_18h_not_24h(self):
         prediction = self._measurement_prediction()
@@ -5947,7 +6180,10 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp9_measurement_08_first_eligible_24h_selected(self):
         prediction = self._measurement_prediction()
-        events = [self._measurement_event("2026-01-02T20:00:00", correct=False), self._measurement_event("2026-01-01T19:00:00", correct=True)]
+        events = [
+            self._measurement_event("2026-01-02T20:00:00", correct=False),
+            self._measurement_event("2026-01-01T19:00:00", correct=True),
+        ]
         self.assertTrue(find_future_outcome(prediction, events, "24h")["correct"])
 
     def test_sp9_measurement_09_after_36h_not_24h(self):
@@ -5957,7 +6193,10 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp9_measurement_10_first_eligible_7d_selected(self):
         prediction = self._measurement_prediction()
-        events = [self._measurement_event("2026-01-08T00:00:00", correct=False), self._measurement_event("2026-01-06T01:00:00", correct=True)]
+        events = [
+            self._measurement_event("2026-01-08T00:00:00", correct=False),
+            self._measurement_event("2026-01-06T01:00:00", correct=True),
+        ]
         self.assertTrue(find_future_outcome(prediction, events, "7d")["correct"])
 
     def test_sp9_measurement_11_missing_future_attempt_not_observed(self):
@@ -5985,7 +6224,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp9_measurement_13c_malformed_legacy_repair_key_does_not_match(self):
         prediction = self._measurement_prediction()
-        event = self._measurement_event("2026-01-02T00:00:00", qnum=2, correct=False, repair_concept_key="Topic::Not This Topic")
+        event = self._measurement_event(
+            "2026-01-02T00:00:00", qnum=2, correct=False, repair_concept_key="Topic::Not This Topic"
+        )
 
         observed = find_future_outcome(prediction, [event], "24h", concept=True)
 
@@ -6028,18 +6269,36 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
     def test_sp9_measurement_21_immediate_correct_not_delayed_gain(self):
         prediction = self._measurement_prediction()
         event = self._measurement_event("2026-01-01T00:01:00", prediction_id=prediction["prediction_id"])
-        report, _store = build_measurement_report({"predictions": {prediction["prediction_id"]: prediction}}, [event], evaluation_at="2026-01-03T00:00:00")
+        report, _store = build_measurement_report(
+            {"predictions": {prediction["prediction_id"]: prediction}}, [event], evaluation_at="2026-01-03T00:00:00"
+        )
         self.assertEqual(0, report["learning_gain"]["transfer_evidence_count"])
 
     def test_sp9_measurement_22_different_question_delayed_success_transfer(self):
         prediction = self._measurement_prediction()
         event = self._measurement_event("2026-01-02T00:00:00", qnum=2, correct=True)
-        report, _store = build_measurement_report({"predictions": {prediction["prediction_id"]: prediction}}, [event], evaluation_at="2026-01-03T00:00:00")
+        report, _store = build_measurement_report(
+            {"predictions": {prediction["prediction_id"]: prediction}}, [event], evaluation_at="2026-01-03T00:00:00"
+        )
         self.assertEqual(1, report["learning_gain"]["transfer_evidence_count"])
 
     def test_sp9_measurement_23_repair_report_stages(self):
-        repair = {"x": {"stage": "spaced_retrieval", "status": "resolved", "concept_key": "x", "scheduled_transfer_qnums": [2]}}
-        perf = repair_performance(repair, [self._measurement_event("2026-01-02T00:00:00", repair_stage="contrast"), self._measurement_event("2026-01-03T00:00:00", repair_stage="transfer"), self._measurement_event("2026-01-04T00:00:00", repair_stage="spaced_retrieval")])
+        repair = {
+            "x": {
+                "stage": "spaced_retrieval",
+                "status": "resolved",
+                "concept_key": "x",
+                "scheduled_transfer_qnums": [2],
+            }
+        }
+        perf = repair_performance(
+            repair,
+            [
+                self._measurement_event("2026-01-02T00:00:00", repair_stage="contrast"),
+                self._measurement_event("2026-01-03T00:00:00", repair_stage="transfer"),
+                self._measurement_event("2026-01-04T00:00:00", repair_stage="spaced_retrieval"),
+            ],
+        )
         self.assertEqual(1, perf["contrast_scheduled"])
         self.assertEqual(1, perf["transfer_scheduled"])
         self.assertEqual(1, perf["spaced_retrieval_due"])
@@ -6050,26 +6309,46 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertEqual(0, perf["spaced_retrieval_success"])
 
     def test_sp9_measurement_25_resolved_repair_later_failure_relapse(self):
-        perf = repair_performance({"x": {"status": "resolved", "concept_key": "c"}}, [self._measurement_event("2026-01-05T00:00:00", correct=False, repair_concept_key="c")])
+        perf = repair_performance(
+            {"x": {"status": "resolved", "concept_key": "c"}},
+            [self._measurement_event("2026-01-05T00:00:00", correct=False, repair_concept_key="c")],
+        )
         self.assertEqual(1.0, perf["relapse_rate"])
 
     def test_sp9_measurement_25b_resolved_repair_relapse_matches_question_number_when_key_family_changes(self):
         perf = repair_performance(
             {"x": {"status": "resolved", "concept_key": "coverage::general_review", "last_question_number": 1}},
-            [self._measurement_event("2026-01-05T00:00:00", qnum=1, correct=False, repair_concept_key="objective_topic::1_2::general_review")],
+            [
+                self._measurement_event(
+                    "2026-01-05T00:00:00",
+                    qnum=1,
+                    correct=False,
+                    repair_concept_key="objective_topic::1_2::general_review",
+                )
+            ],
         )
         self.assertEqual(1.0, perf["relapse_rate"])
 
     def test_sp9_measurement_26_weak_precision_uses_observed(self):
         prediction = self._measurement_prediction()
-        links = {prediction["prediction_id"]: {"immediate_item_outcome": {"status": "observed", "correct": False}, "delayed_24h_concept_outcome": {"status": "observed", "correct": True}}}
+        links = {
+            prediction["prediction_id"]: {
+                "immediate_item_outcome": {"status": "observed", "correct": False},
+                "delayed_24h_concept_outcome": {"status": "observed", "correct": True},
+            }
+        }
         from smart_practice_measurement import weakness_precision
+
         self.assertEqual(1.0, weakness_precision([prediction], links, [])["weak_role_immediate_error_rate"])
 
     def test_sp9_measurement_27_stable_success_false_weakness_signal(self):
         prediction = self._measurement_prediction()
         from smart_practice_measurement import weakness_precision
-        history = [self._measurement_event("2026-01-02T00:00:00", qnum=1), self._measurement_event("2026-01-03T00:00:00", qnum=1)]
+
+        history = [
+            self._measurement_event("2026-01-02T00:00:00", qnum=1),
+            self._measurement_event("2026-01-03T00:00:00", qnum=1),
+        ]
         self.assertIn(1, weakness_precision([prediction], {}, history)["false_weakness_candidates"])
 
     def test_sp9_measurement_28_role_metrics_separated(self):
@@ -6078,7 +6357,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp9_measurement_29_unobserved_delayed_does_not_lower_role_accuracy(self):
         prediction = self._measurement_prediction()
-        metrics = role_performance([prediction], {prediction["prediction_id"]: {"delayed_24h_concept_outcome": {"status": "not_observed"}}}, [])
+        metrics = role_performance(
+            [prediction], {prediction["prediction_id"]: {"delayed_24h_concept_outcome": {"status": "not_observed"}}}, []
+        )
         self.assertEqual("no_eligible_samples", metrics["weak_repair"]["24h_accuracy"]["status"])
 
     def test_sp9_measurement_30_final_session_composition_actual_roles(self):
@@ -6086,26 +6367,50 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertEqual({"weak_repair": 1}, session_composition([prediction], requested_count=1)["actual_role_counts"])
 
     def test_sp9_measurement_31_missing_source_trust_band(self):
-        self.assertEqual(1, source_performance([self._measurement_event("2026-01-02T00:00:00")])["missing_trust"]["sample_count"])
+        self.assertEqual(
+            1, source_performance([self._measurement_event("2026-01-02T00:00:00")])["missing_trust"]["sample_count"]
+        )
 
     def test_sp9_measurement_32_raw_effective_timing_separate(self):
-        metric = timing_quality([self._measurement_event("2026-01-02T00:00:00", raw_response_seconds=999.0, effective_response_seconds=12.0)])
+        metric = timing_quality(
+            [
+                self._measurement_event(
+                    "2026-01-02T00:00:00", raw_response_seconds=999.0, effective_response_seconds=12.0
+                )
+            ]
+        )
         self.assertEqual(1.0, metric["effective_time_cap_rate"])
 
     def test_sp9_measurement_33_contaminated_raw_not_dominate(self):
-        metric = timing_quality([self._measurement_event("2026-01-02T00:00:00", raw_response_seconds=999.0, effective_response_seconds=12.0, response_time_contaminated=True)])
+        metric = timing_quality(
+            [
+                self._measurement_event(
+                    "2026-01-02T00:00:00",
+                    raw_response_seconds=999.0,
+                    effective_response_seconds=12.0,
+                    response_time_contaminated=True,
+                )
+            ]
+        )
         self.assertEqual(12.0, metric["median_effective_response_seconds"])
 
     def test_sp9_measurement_34_baseline_labeled_retrospective(self):
-        self.assertEqual("retrospective_shadow_comparison", baseline_comparison([], {})["random_blueprint"]["comparison_type"])
+        self.assertEqual(
+            "retrospective_shadow_comparison", baseline_comparison([], {})["random_blueprint"]["comparison_type"]
+        )
 
     def test_sp9_measurement_35_baseline_does_not_invent_outcomes(self):
-        self.assertEqual("not_available", baseline_comparison([self._measurement_prediction()], {})["due_only"]["estimated_immediate_accuracy"])
+        self.assertEqual(
+            "not_available",
+            baseline_comparison([self._measurement_prediction()], {})["due_only"]["estimated_immediate_accuracy"],
+        )
 
     def test_sp9_measurement_36_counterfactual_coverage_rate(self):
         prediction = self._measurement_prediction()
         links = {prediction["prediction_id"]: {"immediate_item_outcome": {"status": "observed", "correct": True}}}
-        self.assertEqual(1.0, baseline_comparison([prediction], links)["smart_practice"]["counterfactual_coverage_rate"])
+        self.assertEqual(
+            1.0, baseline_comparison([prediction], links)["smart_practice"]["counterfactual_coverage_rate"]
+        )
 
     def test_sp9_measurement_37_baseline_deterministic(self):
         prediction = self._measurement_prediction()
@@ -6117,7 +6422,10 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp9_measurement_39_recommendation_bounds(self):
         from smart_practice_measurement import calibration_recommendations
-        rec = calibration_recommendations({"brier": {"sample_count": 50}, "expected_calibration_error": {"value": 0.2}})[0]
+
+        rec = calibration_recommendations(
+            {"brier": {"sample_count": 50}, "expected_calibration_error": {"value": 0.2}}
+        )[0]
         self.assertLessEqual(abs(rec["recommended_value"]), rec["maximum_allowed_change"])
 
     def test_sp9_measurement_40_recommendations_do_not_mutate_policy(self):
@@ -6128,12 +6436,21 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp9_measurement_41_overconfident_bounded_downward_correction(self):
         from smart_practice_measurement import calibration_recommendations
-        rec = calibration_recommendations({"brier": {"sample_count": 60}, "expected_calibration_error": {"value": 0.2}})[0]
+
+        rec = calibration_recommendations(
+            {"brier": {"sample_count": 60}, "expected_calibration_error": {"value": 0.2}}
+        )[0]
         self.assertEqual(-0.05, rec["recommended_value"])
 
     def test_sp9_measurement_42_well_calibrated_no_change(self):
         from smart_practice_measurement import calibration_recommendations
-        self.assertEqual("no_change", calibration_recommendations({"brier": {"sample_count": 60}, "expected_calibration_error": {"value": 0.01}})[0]["status"])
+
+        self.assertEqual(
+            "no_change",
+            calibration_recommendations({"brier": {"sample_count": 60}, "expected_calibration_error": {"value": 0.01}})[
+                0
+            ]["status"],
+        )
 
     def test_sp9_measurement_43_schema_loads_missing_safely(self):
         self.assertEqual(1, normalize_measurement_store(None)["schema_version"])
@@ -6158,7 +6475,10 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp9_measurement_47_report_deterministic(self):
         store = empty_measurement_store()
-        self.assertEqual(build_measurement_report(store, [], evaluation_at="2026-01-01T00:00:00")[0], build_measurement_report(store, [], evaluation_at="2026-01-01T00:00:00")[0])
+        self.assertEqual(
+            build_measurement_report(store, [], evaluation_at="2026-01-01T00:00:00")[0],
+            build_measurement_report(store, [], evaluation_at="2026-01-01T00:00:00")[0],
+        )
 
     def test_sp9_measurement_48_limitations_reflect_missing_data(self):
         report, _store = build_measurement_report(empty_measurement_store(), [], evaluation_at="2026-01-01T00:00:00")
@@ -6273,14 +6593,18 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
     def test_sp10_05_candidate_does_not_mutate_active_policy(self):
         gov = self._sp10_governance()
         before = active_policy(gov)
-        candidate, gov, rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00")
+        candidate, gov, rejected = create_candidate_policy(
+            gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00"
+        )
         self.assertEqual([], rejected)
         self.assertNotEqual(before["policy_id"], candidate["policy_id"])
         self.assertEqual(before, active_policy(gov))
 
     def test_sp10_06_candidate_records_bounded_change(self):
         gov = self._sp10_governance()
-        candidate, _gov, _rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00")
+        candidate, _gov, _rejected = create_candidate_policy(
+            gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00"
+        )
         self.assertEqual("recall_probability_bias", candidate["change_summary"][0]["field"])
         self.assertEqual(-0.02, candidate["change_summary"][0]["new_value"])
 
@@ -6302,7 +6626,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp10_09_shadow_decision_persists_separately(self):
         gov = self._sp10_governance()
-        candidate, gov, _rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00")
+        candidate, gov, _rejected = create_candidate_policy(
+            gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00"
+        )
         decision, gov = create_shadow_decision(
             gov,
             [{"question_number": 1, "smart_primary_role": "due_retention", "smart_utility": 1}],
@@ -6317,7 +6643,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp10_10_shadow_decision_is_deterministic(self):
         gov = self._sp10_governance()
-        candidate, gov, _rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00")
+        candidate, gov, _rejected = create_candidate_policy(
+            gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00"
+        )
         args = dict(
             challenger_policy_id=candidate["policy_id"],
             created_at="2026-01-03T00:00:00",
@@ -6330,8 +6658,12 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp10_11_low_evidence_blocks_promotion(self):
         gov = self._sp10_governance()
-        candidate, gov, _rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00")
-        evaluation, _gov = evaluate_challenger(gov, candidate["policy_id"], {"supported_challenger_outcomes": 1}, evaluated_at="2026-01-04T00:00:00")
+        candidate, gov, _rejected = create_candidate_policy(
+            gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00"
+        )
+        evaluation, _gov = evaluate_challenger(
+            gov, candidate["policy_id"], {"supported_challenger_outcomes": 1}, evaluated_at="2026-01-04T00:00:00"
+        )
         self.assertEqual("insufficient_data", evaluation["status"])
         self.assertIn("insufficient_delayed_evidence", evaluation["rejection_reasons"])
 
@@ -6343,7 +6675,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp10_14_promotion_recommended_when_gates_pass(self):
         gov, candidate = self._sp10_promote_candidate()
-        latest = [ev for ev in gov["challenger_evaluations"].values() if ev["challenger_policy_id"] == candidate["policy_id"]][0]
+        latest = [
+            ev for ev in gov["challenger_evaluations"].values() if ev["challenger_policy_id"] == candidate["policy_id"]
+        ][0]
         self.assertEqual("promotion_recommended", latest["status"])
 
     def test_sp10_15_activation_requires_expected_active_policy(self):
@@ -6418,7 +6752,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertTrue(all(report["status"] == "insufficient_data" for report in reports))
 
     def test_sp10_21_question_bank_drift_handles_string_signature(self):
-        reports = detect_drift({"bank_signature": "a"}, {"bank_signature": "b"}, sample_count=80, detected_at="2026-01-02T00:00:00")
+        reports = detect_drift(
+            {"bank_signature": "a"}, {"bank_signature": "b"}, sample_count=80, detected_at="2026-01-02T00:00:00"
+        )
         bank = next(report for report in reports if report["drift_type"] == "question_bank_drift")
         self.assertTrue(bank["detected"])
 
@@ -6431,7 +6767,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp10_23_candidate_expiration_records_audit(self):
         gov = self._sp10_governance()
-        candidate, gov, _rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00")
+        candidate, gov, _rejected = create_candidate_policy(
+            gov, [self._sp10_recommendation(gov)], created_at="2026-01-02T00:00:00"
+        )
         gov = expire_candidate(gov, candidate["policy_id"], expired_at="2026-01-20T00:00:00", reason="stale")
         self.assertEqual("expired", gov["policies"][candidate["policy_id"]]["status"])
         self.assertTrue(any(event["event_type"] == "candidate_expired" for event in gov["audit_log"]))
@@ -6697,21 +7035,45 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         app = self._sp9_app_with_role_pool()
         before = copy.deepcopy(app.progress_data)
         gov, candidate = self._sp10_candidate()
-        create_shadow_decision(gov, [{"question_number": 1}], [{"question_number": 2}], challenger_policy_id=candidate["policy_id"], created_at="2026-03-03T00:00:00", learner_state_signature="x", candidate_snapshot_signature="y")
+        create_shadow_decision(
+            gov,
+            [{"question_number": 1}],
+            [{"question_number": 2}],
+            challenger_policy_id=candidate["policy_id"],
+            created_at="2026-03-03T00:00:00",
+            learner_state_signature="x",
+            candidate_snapshot_signature="y",
+        )
         self.assertEqual(before, app.progress_data)
 
     def test_sp10_completion_05_shadow_selection_cannot_schedule_repair(self):
         app = self._sp9_app_with_role_pool()
         before = copy.deepcopy(app.progress_data.get("meta", {}).get("repair_state", {}))
         gov, candidate = self._sp10_candidate()
-        create_shadow_decision(gov, [{"question_number": 1}], [{"question_number": 2}], challenger_policy_id=candidate["policy_id"], created_at="2026-03-03T00:00:00", learner_state_signature="x", candidate_snapshot_signature="y")
+        create_shadow_decision(
+            gov,
+            [{"question_number": 1}],
+            [{"question_number": 2}],
+            challenger_policy_id=candidate["policy_id"],
+            created_at="2026-03-03T00:00:00",
+            learner_state_signature="x",
+            candidate_snapshot_signature="y",
+        )
         self.assertEqual(before, app.progress_data.get("meta", {}).get("repair_state", {}))
 
     def test_sp10_completion_06_shadow_selection_cannot_change_live_session(self):
         app = self._sp9_app_with_role_pool()
         before = [q["question_number"] for q in app.questions]
         gov, candidate = self._sp10_candidate()
-        create_shadow_decision(gov, [{"question_number": 1}], [{"question_number": 2}], challenger_policy_id=candidate["policy_id"], created_at="2026-03-03T00:00:00", learner_state_signature="x", candidate_snapshot_signature="y")
+        create_shadow_decision(
+            gov,
+            [{"question_number": 1}],
+            [{"question_number": 2}],
+            challenger_policy_id=candidate["policy_id"],
+            created_at="2026-03-03T00:00:00",
+            learner_state_signature="x",
+            candidate_snapshot_signature="y",
+        )
         self.assertEqual(before, [q["question_number"] for q in app.questions])
 
     def test_sp10_completion_07_unsupported_challenger_has_no_fabricated_result(self):
@@ -6795,20 +7157,38 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
     def test_sp10_completion_18_parent_mismatch_blocks_activation(self):
         gov, candidate = self._sp10_promote_candidate()
         gov["policies"][candidate["policy_id"]]["parent_policy_id"] = "wrong-parent"
-        ok, _gov, reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        ok, _gov, reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=active_policy(gov)["policy_id"],
+            approval_reference="approval",
+            activated_at="2026-03-11T00:00:00",
+        )
         self.assertFalse(ok)
         self.assertEqual("candidate_parent_mismatch", reason)
 
     def test_sp10_completion_19_expired_candidate_blocks_activation(self):
         gov, candidate = self._sp10_promote_candidate()
         gov = expire_candidate(gov, candidate["policy_id"], expired_at="2026-03-10T00:00:00", reason="stale")
-        ok, _gov, reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        ok, _gov, reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=active_policy(gov)["policy_id"],
+            approval_reference="approval",
+            activated_at="2026-03-11T00:00:00",
+        )
         self.assertFalse(ok)
         self.assertEqual("invalid_candidate_status", reason)
 
     def test_sp10_completion_20_activation_leaves_exactly_one_active(self):
         gov, candidate = self._sp10_promote_candidate()
-        ok, gov, reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        ok, gov, reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=active_policy(gov)["policy_id"],
+            approval_reference="approval",
+            activated_at="2026-03-11T00:00:00",
+        )
         self.assertTrue(ok, reason)
         self.assertTrue(exactly_one_active(gov))
 
@@ -6816,7 +7196,13 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         gov, candidate = self._sp10_promote_candidate()
         previous = active_policy(gov)["policy_id"]
         with mock.patch("smart_practice_policy.exactly_one_active", side_effect=ValueError("boom")):
-            ok, recovered, reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=previous, approval_reference="approval", activated_at="2026-03-11T00:00:00")
+            ok, recovered, reason = activate_candidate_policy(
+                gov,
+                candidate["policy_id"],
+                expected_active_policy_id=previous,
+                approval_reference="approval",
+                activated_at="2026-03-11T00:00:00",
+            )
         self.assertFalse(ok)
         self.assertEqual("activation_failed", reason)
         self.assertEqual(previous, recovered["active_policy_id"])
@@ -6827,7 +7213,13 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         app.start_session_from_pool(pool, mode=app_module.MODE_SMART_PRACTICE, count="1", randomize=False)
         original = app.questions[0]["smart_policy_id"]
         gov, candidate = self._sp10_promote_candidate()
-        ok, gov, _reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        ok, gov, _reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=active_policy(gov)["policy_id"],
+            approval_reference="approval",
+            activated_at="2026-03-11T00:00:00",
+        )
         self.assertTrue(ok)
         app.progress_data["meta"]["smart_practice_policy_governance"] = gov
         self.assertEqual(original, app.questions[0]["smart_policy_id"])
@@ -6835,7 +7227,13 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
     def test_sp10_completion_23_new_session_uses_newly_activated_policy(self):
         app = self._sp9_app_with_role_pool()
         gov, candidate = self._sp10_promote_candidate()
-        ok, gov, _reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        ok, gov, _reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=active_policy(gov)["policy_id"],
+            approval_reference="approval",
+            activated_at="2026-03-11T00:00:00",
+        )
         self.assertTrue(ok)
         app.progress_data["meta"]["smart_practice_policy_governance"] = gov
         pool = app.build_smart_practice_pool("1", randomize=False)
@@ -6844,17 +7242,41 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
     def test_sp10_completion_24_rollback_restores_exact_prior_checksum(self):
         gov, candidate = self._sp10_promote_candidate()
         prior = active_policy(gov)
-        ok, gov, _reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=prior["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        ok, gov, _reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=prior["policy_id"],
+            approval_reference="approval",
+            activated_at="2026-03-11T00:00:00",
+        )
         self.assertTrue(ok)
-        ok, gov, reason = rollback_policy(gov, prior["policy_id"], expected_active_policy_id=candidate["policy_id"], reason="test", rolled_back_at="2026-03-12T00:00:00")
+        ok, gov, reason = rollback_policy(
+            gov,
+            prior["policy_id"],
+            expected_active_policy_id=candidate["policy_id"],
+            reason="test",
+            rolled_back_at="2026-03-12T00:00:00",
+        )
         self.assertTrue(ok, reason)
         self.assertEqual(prior["checksum"], active_policy(gov)["checksum"])
 
     def test_sp10_completion_25_invalid_rollback_target_fails_safely(self):
         gov, candidate = self._sp10_promote_candidate()
-        ok, gov, _reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        ok, gov, _reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=active_policy(gov)["policy_id"],
+            approval_reference="approval",
+            activated_at="2026-03-11T00:00:00",
+        )
         self.assertTrue(ok)
-        ok, after, reason = rollback_policy(gov, "missing", expected_active_policy_id=candidate["policy_id"], reason="test", rolled_back_at="2026-03-12T00:00:00")
+        ok, after, reason = rollback_policy(
+            gov,
+            "missing",
+            expected_active_policy_id=candidate["policy_id"],
+            reason="test",
+            rolled_back_at="2026-03-12T00:00:00",
+        )
         self.assertFalse(ok)
         self.assertEqual("target_policy_not_found", reason)
         self.assertEqual(gov["active_policy_id"], after["active_policy_id"])
@@ -6865,9 +7287,21 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         prediction = prediction_from_question(question, {}, created_at="2026-03-01T00:00:00")
         gov, candidate = self._sp10_promote_candidate()
         prior = active_policy(gov)["policy_id"]
-        ok, gov, _reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=prior, approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        ok, gov, _reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=prior,
+            approval_reference="approval",
+            activated_at="2026-03-11T00:00:00",
+        )
         self.assertTrue(ok)
-        rollback_policy(gov, prior, expected_active_policy_id=candidate["policy_id"], reason="test", rolled_back_at="2026-03-12T00:00:00")
+        rollback_policy(
+            gov,
+            prior,
+            expected_active_policy_id=candidate["policy_id"],
+            reason="test",
+            rolled_back_at="2026-03-12T00:00:00",
+        )
         self.assertEqual("old-policy", prediction["smart_policy_id"])
 
     def test_sp10_completion_27_malformed_active_policy_triggers_startup_recovery(self):
@@ -6884,8 +7318,26 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertTrue(exactly_one_active(recovered))
 
     def test_sp10_completion_29_every_drift_type_detected_with_evidence(self):
-        baseline = {"calibration_error": 0.1, "delayed_recall": 0.9, "accuracy": 0.9, "domain_weakness": 0.1, "bank_signature": "a", "source_risk": 0.1, "role_deviation": 0.1, "repair_success": 0.9}
-        recent = {"calibration_error": 0.3, "delayed_recall": 0.7, "accuracy": 0.7, "domain_weakness": 0.3, "bank_signature": "b", "source_risk": 0.3, "role_deviation": 0.3, "repair_success": 0.7}
+        baseline = {
+            "calibration_error": 0.1,
+            "delayed_recall": 0.9,
+            "accuracy": 0.9,
+            "domain_weakness": 0.1,
+            "bank_signature": "a",
+            "source_risk": 0.1,
+            "role_deviation": 0.1,
+            "repair_success": 0.9,
+        }
+        recent = {
+            "calibration_error": 0.3,
+            "delayed_recall": 0.7,
+            "accuracy": 0.7,
+            "domain_weakness": 0.3,
+            "bank_signature": "b",
+            "source_risk": 0.3,
+            "role_deviation": 0.3,
+            "repair_success": 0.7,
+        }
         reports = detect_drift(baseline, recent, sample_count=80, detected_at="2026-03-03T00:00:00")
         self.assertEqual(8, sum(1 for report in reports if report["detected"]))
 
@@ -6902,7 +7354,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
     def test_sp10_completion_32_audit_log_is_append_only(self):
         gov = self._sp10_governance()
         before = list(gov["audit_log"])
-        candidate, gov, _rejected = create_candidate_policy(gov, [self._sp10_recommendation(gov)], created_at="2026-03-02T00:00:00")
+        candidate, gov, _rejected = create_candidate_policy(
+            gov, [self._sp10_recommendation(gov)], created_at="2026-03-02T00:00:00"
+        )
         self.assertEqual(before, gov["audit_log"][: len(before)])
         self.assertTrue(candidate)
 
@@ -6921,21 +7375,41 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
     def test_sp10_completion_34_activation_survives_real_save_load(self):
         app = self._sp9_app_with_role_pool()
         gov, candidate = self._sp10_promote_candidate()
-        ok, gov, reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=active_policy(gov)["policy_id"], approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        ok, gov, reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=active_policy(gov)["policy_id"],
+            approval_reference="approval",
+            activated_at="2026-03-11T00:00:00",
+        )
         self.assertTrue(ok, reason)
         app.progress_data["meta"]["smart_practice_policy_governance"] = gov
         app.save_progress()
         app.progress_data = {}
         app.load_progress_if_present()
-        self.assertEqual(candidate["policy_id"], app.progress_data["meta"]["smart_practice_policy_governance"]["active_policy_id"])
+        self.assertEqual(
+            candidate["policy_id"], app.progress_data["meta"]["smart_practice_policy_governance"]["active_policy_id"]
+        )
 
     def test_sp10_completion_35_rollback_survives_real_save_load(self):
         app = self._sp9_app_with_role_pool()
         gov, candidate = self._sp10_promote_candidate()
         prior = active_policy(gov)["policy_id"]
-        ok, gov, _reason = activate_candidate_policy(gov, candidate["policy_id"], expected_active_policy_id=prior, approval_reference="approval", activated_at="2026-03-11T00:00:00")
+        ok, gov, _reason = activate_candidate_policy(
+            gov,
+            candidate["policy_id"],
+            expected_active_policy_id=prior,
+            approval_reference="approval",
+            activated_at="2026-03-11T00:00:00",
+        )
         self.assertTrue(ok)
-        ok, gov, reason = rollback_policy(gov, prior, expected_active_policy_id=candidate["policy_id"], reason="test", rolled_back_at="2026-03-12T00:00:00")
+        ok, gov, reason = rollback_policy(
+            gov,
+            prior,
+            expected_active_policy_id=candidate["policy_id"],
+            reason="test",
+            rolled_back_at="2026-03-12T00:00:00",
+        )
         self.assertTrue(ok, reason)
         app.progress_data["meta"]["smart_practice_policy_governance"] = gov
         app.save_progress()
@@ -6952,7 +7426,15 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertNotEqual(bad_id, recovered["active_policy_id"])
         self.assertIn(bad_id, recovered["policies"])
 
-    def _sp11_question(self, qnum=1, objective="1.1", topic="Identity", domain="General Security Concepts", source="Clean", stem="Scenario"):
+    def _sp11_question(
+        self,
+        qnum=1,
+        objective="1.1",
+        topic="Identity",
+        domain="General Security Concepts",
+        source="Clean",
+        stem="Scenario",
+    ):
         q = self._sp9_question(qnum, domain=domain, topic=topic, source=source)
         q["objective_code"] = objective
         q["stem_style"] = stem
@@ -6964,7 +7446,15 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         graph = normalize_graph({}, [source, target], created_at="2026-04-01T00:00:00")
         source_key = concept_key_for_question(source)[0]
         target_key = concept_key_for_question(target)[0]
-        graph["edges"]["e1"] = make_edge(source_key, target_key, "prerequisite_of", weight=0.8, evidence_level="strong", evidence_sources=["manual"], created_at="2026-04-01T00:00:00")
+        graph["edges"]["e1"] = make_edge(
+            source_key,
+            target_key,
+            "prerequisite_of",
+            weight=0.8,
+            evidence_level="strong",
+            evidence_sources=["manual"],
+            created_at="2026-04-01T00:00:00",
+        )
         return normalize_graph(graph), source, target, source_key, target_key
 
     def _sp11_states(self, source_key, target_key, source_weak=True, target_weak=True):
@@ -6986,7 +7476,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         }
 
     def test_sp11_01_stable_metadata_produces_stable_concept_keys(self):
-        self.assertEqual(concept_key_for_question(self._sp11_question())[0], concept_key_for_question(self._sp11_question())[0])
+        self.assertEqual(
+            concept_key_for_question(self._sp11_question())[0], concept_key_for_question(self._sp11_question())[0]
+        )
 
     def test_sp11_02_unrelated_similar_labels_do_not_merge(self):
         left = self._sp11_question(1, objective="1.1", topic="Access control")
@@ -6994,13 +7486,21 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertNotEqual(concept_key_for_question(left)[0], concept_key_for_question(right)[0])
 
     def test_sp11_03_question_fallback_concepts_remain_isolated(self):
-        self.assertNotEqual(concept_key_for_question({"question_number": 1})[0], concept_key_for_question({"question_number": 2})[0])
+        self.assertNotEqual(
+            concept_key_for_question({"question_number": 1})[0], concept_key_for_question({"question_number": 2})[0]
+        )
 
     def test_sp11_04_duplicate_active_edges_are_rejected(self):
         graph, _source, _target, source_key, target_key = self._sp11_graph_with_prereq()
-        graph["edges"]["dupe"] = make_edge(source_key, target_key, "prerequisite_of", weight=0.7, evidence_level="strong")
+        graph["edges"]["dupe"] = make_edge(
+            source_key, target_key, "prerequisite_of", weight=0.7, evidence_level="strong"
+        )
         normalized = normalize_graph(graph)
-        statuses = [edge["status"] for edge in normalized["edges"].values() if edge["source_concept_key"] == source_key and edge["target_concept_key"] == target_key]
+        statuses = [
+            edge["status"]
+            for edge in normalized["edges"].values()
+            if edge["source_concept_key"] == source_key and edge["target_concept_key"] == target_key
+        ]
         self.assertIn("disabled", statuses)
 
     def test_sp11_05_self_edges_are_rejected(self):
@@ -7027,7 +7527,12 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
     def test_sp11_09_concept_aggregation_prevents_one_item_dominating(self):
         q = self._sp11_question(1)
         key = concept_key_for_question(q)[0]
-        rec = {"attempts": 10, "correct_count": 8, "wrong_count": 2, "learner_memory": {"retrievability": 0.9, "stability": 2, "uncertainty": 0.1}}
+        rec = {
+            "attempts": 10,
+            "correct_count": 8,
+            "wrong_count": 2,
+            "learner_memory": {"retrievability": 0.9, "stability": 2, "uncertainty": 0.1},
+        }
         state = aggregate_concept_state(key, [q], {"1": rec})
         self.assertEqual(1, state["attempt_count"])
 
@@ -7039,43 +7544,95 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp11_11_missing_prerequisite_requires_weak_prerequisite_evidence(self):
         graph, _source, target, source_key, target_key = self._sp11_graph_with_prereq()
-        diagnosis = diagnose_root_cause(target, graph, self._sp11_states(source_key, target_key), [{"correct": False}, {"correct": False}], policy={"policy_values": default_policy_values()})
+        diagnosis = diagnose_root_cause(
+            target,
+            graph,
+            self._sp11_states(source_key, target_key),
+            [{"correct": False}, {"correct": False}],
+            policy={"policy_values": default_policy_values()},
+        )
         self.assertEqual("missing_prerequisite", diagnosis["diagnosis"])
 
     def test_sp11_12_stable_prerequisites_produce_target_weakness(self):
         graph, _source, target, source_key, target_key = self._sp11_graph_with_prereq()
-        diagnosis = diagnose_root_cause(target, graph, self._sp11_states(source_key, target_key, source_weak=False), [{"correct": False}, {"correct": False}], policy={"policy_values": default_policy_values()})
+        diagnosis = diagnose_root_cause(
+            target,
+            graph,
+            self._sp11_states(source_key, target_key, source_weak=False),
+            [{"correct": False}, {"correct": False}],
+            policy={"policy_values": default_policy_values()},
+        )
         self.assertEqual("target_concept_weakness", diagnosis["diagnosis"])
 
     def test_sp11_13_repeated_distractor_substitution_produces_confusion(self):
         graph, source, target, source_key, target_key = self._sp11_graph_with_prereq()
-        graph["edges"]["conf"] = make_edge(target_key, source_key, "confusable_with", weight=0.8, evidence_level="strong")
-        diagnosis = diagnose_root_cause(target, normalize_graph(graph), {target_key: {"lowest_retrievability": 0.6, "wrong_count": 0, "correct_count": 1}}, [{"correct": False, "wrong_answer_family": "ports"}, {"correct": False, "wrong_answer_family": "ports"}], policy={"policy_values": default_policy_values()})
+        graph["edges"]["conf"] = make_edge(
+            target_key, source_key, "confusable_with", weight=0.8, evidence_level="strong"
+        )
+        diagnosis = diagnose_root_cause(
+            target,
+            normalize_graph(graph),
+            {target_key: {"lowest_retrievability": 0.6, "wrong_count": 0, "correct_count": 1}},
+            [{"correct": False, "wrong_answer_family": "ports"}, {"correct": False, "wrong_answer_family": "ports"}],
+            policy={"policy_values": default_policy_values()},
+        )
         self.assertEqual("concept_confusion", diagnosis["diagnosis"])
 
     def test_sp11_14_familiar_success_plus_scenario_failure_produces_transfer_failure(self):
         q = self._sp11_question(1, stem="Scenario")
         key = concept_key_for_question(q)[0]
-        diagnosis = diagnose_root_cause(q, normalize_graph({}, [q]), {key: {"lowest_retrievability": 0.7, "wrong_count": 0, "correct_count": 1}}, [{"correct": True, "stem_style": "Scenario"}, {"correct": False, "stem_style": "Troubleshooting"}], policy={"policy_values": default_policy_values()})
+        diagnosis = diagnose_root_cause(
+            q,
+            normalize_graph({}, [q]),
+            {key: {"lowest_retrievability": 0.7, "wrong_count": 0, "correct_count": 1}},
+            [{"correct": True, "stem_style": "Scenario"}, {"correct": False, "stem_style": "Troubleshooting"}],
+            policy={"policy_values": default_policy_values()},
+        )
         self.assertEqual("transfer_failure", diagnosis["diagnosis"])
 
     def test_sp11_15_isolated_bad_item_can_produce_item_specific(self):
         q = self._sp11_question(1)
         key = concept_key_for_question(q)[0]
-        history = [{"question_number": 1, "correct": False}, {"question_number": 1, "correct": False}, {"question_number": 2, "correct": True}, {"question_number": 3, "correct": True}]
-        diagnosis = diagnose_root_cause(q, normalize_graph({}, [q]), {key: {"lowest_retrievability": 0.7, "wrong_count": 0, "correct_count": 2}}, history, policy={"policy_values": default_policy_values()})
+        history = [
+            {"question_number": 1, "correct": False},
+            {"question_number": 1, "correct": False},
+            {"question_number": 2, "correct": True},
+            {"question_number": 3, "correct": True},
+        ]
+        diagnosis = diagnose_root_cause(
+            q,
+            normalize_graph({}, [q]),
+            {key: {"lowest_retrievability": 0.7, "wrong_count": 0, "correct_count": 2}},
+            history,
+            policy={"policy_values": default_policy_values()},
+        )
         self.assertEqual("item_specific_failure", diagnosis["diagnosis"])
 
     def test_sp11_16_source_problem_requires_healthier_source_comparison(self):
         q = self._sp11_question(1, source="Source conflict")
         key = concept_key_for_question(q)[0]
-        history = [{"question_number": 1, "correct": False}, {"question_number": 2, "correct": True, "source_label": "Clean"}]
-        diagnosis = diagnose_root_cause(q, normalize_graph({}, [q]), {key: {"lowest_retrievability": 0.7}}, history, source_trust={"label": "Source conflict"}, policy={"policy_values": default_policy_values()})
+        history = [
+            {"question_number": 1, "correct": False},
+            {"question_number": 2, "correct": True, "source_label": "Clean"},
+        ]
+        diagnosis = diagnose_root_cause(
+            q,
+            normalize_graph({}, [q]),
+            {key: {"lowest_retrievability": 0.7}},
+            history,
+            source_trust={"label": "Source conflict"},
+            policy={"policy_values": default_policy_values()},
+        )
         self.assertEqual("source_quality_problem", diagnosis["diagnosis"])
 
     def test_sp11_17_missing_evidence_produces_insufficient(self):
         q = self._sp11_question(1)
-        self.assertEqual("insufficient_evidence", diagnose_root_cause(q, normalize_graph({}, [q]), {}, [], policy={"policy_values": default_policy_values()})["diagnosis"])
+        self.assertEqual(
+            "insufficient_evidence",
+            diagnose_root_cause(q, normalize_graph({}, [q]), {}, [], policy={"policy_values": default_policy_values()})[
+                "diagnosis"
+            ],
+        )
 
     def test_sp11_18_diagnosis_cannot_bypass_protected_role_allocation(self):
         app = self._sp9_app_with_role_pool()
@@ -7118,7 +7675,18 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
     def test_sp11_23_item_specific_does_not_weaken_full_concept(self):
         q = self._sp11_question(1)
         key = concept_key_for_question(q)[0]
-        diagnosis = diagnose_root_cause(q, normalize_graph({}, [q]), {key: {"lowest_retrievability": 0.8, "wrong_count": 0, "correct_count": 2}}, [{"question_number": 1, "correct": False}, {"question_number": 1, "correct": False}, {"question_number": 2, "correct": True}, {"question_number": 3, "correct": True}], policy={"policy_values": default_policy_values()})
+        diagnosis = diagnose_root_cause(
+            q,
+            normalize_graph({}, [q]),
+            {key: {"lowest_retrievability": 0.8, "wrong_count": 0, "correct_count": 2}},
+            [
+                {"question_number": 1, "correct": False},
+                {"question_number": 1, "correct": False},
+                {"question_number": 2, "correct": True},
+                {"question_number": 3, "correct": True},
+            ],
+            policy={"policy_values": default_policy_values()},
+        )
         self.assertEqual("item_specific_failure", diagnosis["diagnosis"])
         self.assertNotIn("target_repeated_weakness", diagnosis["evidence"])
 
@@ -7135,7 +7703,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         app.save_progress()
         app.progress_data = {}
         app.load_progress_if_present()
-        self.assertEqual(graph["graph_signature"], app.progress_data["meta"]["smart_practice_concept_graph"]["graph_signature"])
+        self.assertEqual(
+            graph["graph_signature"], app.progress_data["meta"]["smart_practice_concept_graph"]["graph_signature"]
+        )
 
     def test_sp11_26_diagnosis_metadata_survives_real_session_save_load(self):
         app = self._sp9_app_with_role_pool()
@@ -7149,22 +7719,37 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp11_27_malformed_graph_records_cannot_control_live_selection(self):
         app = self._sp9_app_with_role_pool()
-        app.progress_data["meta"]["smart_practice_concept_graph"] = {"edges": {"bad": {"edge_id": "bad", "edge_type": "bad", "status": "active"}}}
+        app.progress_data["meta"]["smart_practice_concept_graph"] = {
+            "edges": {"bad": {"edge_id": "bad", "edge_type": "bad", "status": "active"}}
+        }
         pool = app.build_smart_practice_pool("1", randomize=False)
         self.assertNotEqual("bad", pool[0].get("smart_root_cause"))
 
     def test_sp11_28_same_event_cannot_evaluate_own_diagnosis(self):
-        graph = store_diagnosis(empty_graph("2026-04-01T00:00:00"), {"diagnosis": "missing_prerequisite", "target_concept_key": "c", "diagnosed_at": "2026-04-02T00:00:00"})
-        metrics = diagnosis_measurement(graph, [{"at": "2026-04-02T00:00:00", "correct": True, "repair_stage": "contrast"}])
+        graph = store_diagnosis(
+            empty_graph("2026-04-01T00:00:00"),
+            {"diagnosis": "missing_prerequisite", "target_concept_key": "c", "diagnosed_at": "2026-04-02T00:00:00"},
+        )
+        metrics = diagnosis_measurement(
+            graph, [{"at": "2026-04-02T00:00:00", "correct": True, "repair_stage": "contrast"}]
+        )
         self.assertEqual("unobserved", metrics["diagnosis_accuracy"])
 
     def test_sp11_29_later_prerequisite_repair_can_confirm_diagnosis(self):
-        graph = store_diagnosis(empty_graph("2026-04-01T00:00:00"), {"diagnosis": "missing_prerequisite", "target_concept_key": "c", "diagnosed_at": "2026-04-02T00:00:00"})
-        metrics = diagnosis_measurement(graph, [{"at": "2026-04-03T00:00:00", "correct": True, "repair_stage": "contrast"}])
+        graph = store_diagnosis(
+            empty_graph("2026-04-01T00:00:00"),
+            {"diagnosis": "missing_prerequisite", "target_concept_key": "c", "diagnosed_at": "2026-04-02T00:00:00"},
+        )
+        metrics = diagnosis_measurement(
+            graph, [{"at": "2026-04-03T00:00:00", "correct": True, "repair_stage": "contrast"}]
+        )
         self.assertEqual(1.0, metrics["diagnosis_accuracy"])
 
     def test_sp11_30_unobserved_diagnosis_outcome_remains_unobserved(self):
-        graph = store_diagnosis(empty_graph("2026-04-01T00:00:00"), {"diagnosis": "transfer_failure", "target_concept_key": "c", "diagnosed_at": "2026-04-02T00:00:00"})
+        graph = store_diagnosis(
+            empty_graph("2026-04-01T00:00:00"),
+            {"diagnosis": "transfer_failure", "target_concept_key": "c", "diagnosed_at": "2026-04-02T00:00:00"},
+        )
         self.assertEqual("unobserved", diagnosis_measurement(graph, [])["transfer_failure_recovery"])
 
     def test_sp11_31_active_policy_graph_control_reaches_runtime(self):
@@ -7178,7 +7763,10 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp11_32_disabling_graph_policy_removes_influence_without_deleting_history(self):
         app = self._sp9_app_with_role_pool()
-        app.progress_data["meta"]["smart_practice_concept_graph"] = store_diagnosis(empty_graph(), {"diagnosis": "target_concept_weakness", "target_concept_key": "c", "diagnosed_at": "2026-04-02T00:00:00"})
+        app.progress_data["meta"]["smart_practice_concept_graph"] = store_diagnosis(
+            empty_graph(),
+            {"diagnosis": "target_concept_weakness", "target_concept_key": "c", "diagnosed_at": "2026-04-02T00:00:00"},
+        )
         before = dict(app.progress_data["meta"]["smart_practice_concept_graph"]["diagnoses"])
         values = default_policy_values()
         values["graph_enabled"] = False
@@ -7200,8 +7788,20 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         states = self._sp11_states(source_key, target_key)
         self.assertEqual(normalize_graph(graph)["graph_signature"], normalize_graph(graph)["graph_signature"])
         self.assertEqual(
-            diagnose_root_cause(target, graph, states, [{"correct": False}, {"correct": False}], policy={"policy_values": default_policy_values()}),
-            diagnose_root_cause(target, graph, states, [{"correct": False}, {"correct": False}], policy={"policy_values": default_policy_values()}),
+            diagnose_root_cause(
+                target,
+                graph,
+                states,
+                [{"correct": False}, {"correct": False}],
+                policy={"policy_values": default_policy_values()},
+            ),
+            diagnose_root_cause(
+                target,
+                graph,
+                states,
+                [{"correct": False}, {"correct": False}],
+                policy={"policy_values": default_policy_values()},
+            ),
         )
 
     def test_sp11_35_existing_smart_practice_valid_when_graph_insufficient(self):
@@ -7212,7 +7812,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def _sp12_edge(self, status="provisional", weight=0.4):
         graph, _source, _target, source_key, target_key = self._sp11_graph_with_prereq()
-        edge = make_edge(source_key, target_key, "prerequisite_of", weight=weight, evidence_level="strong", status=status)
+        edge = make_edge(
+            source_key, target_key, "prerequisite_of", weight=weight, evidence_level="strong", status=status
+        )
         edge["support_count"] = 0
         edge["contradiction_count"] = 0
         graph["edges"] = {edge["edge_id"]: edge}
@@ -7269,7 +7871,14 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp12_08_cycle_producing_prerequisite_activation_blocked(self):
         graph, edge = self._sp12_edge()
-        reverse = make_edge(edge["target_concept_key"], edge["source_concept_key"], "prerequisite_of", weight=0.8, evidence_level="strong", status="active")
+        reverse = make_edge(
+            edge["target_concept_key"],
+            edge["source_concept_key"],
+            "prerequisite_of",
+            weight=0.8,
+            evidence_level="strong",
+            status="active",
+        )
         graph["edges"][reverse["edge_id"]] = reverse
         calibrated = calibrate_edge(edge, self._sp12_outcomes(edge, 3), graph)
         self.assertEqual("cycle_blocked", calibrated["calibration_status"])
@@ -7332,14 +7941,25 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp12_18_strongest_closest_weak_prerequisite_deterministic(self):
         graph, edge = self._sp12_edge(status="active", weight=0.6)
-        path1 = select_prerequisite_path(edge["target_concept_key"], graph, {edge["source_concept_key"]: {"lowest_retrievability": 0.2}})
-        path2 = select_prerequisite_path(edge["target_concept_key"], graph, {edge["source_concept_key"]: {"lowest_retrievability": 0.2}})
+        path1 = select_prerequisite_path(
+            edge["target_concept_key"], graph, {edge["source_concept_key"]: {"lowest_retrievability": 0.2}}
+        )
+        path2 = select_prerequisite_path(
+            edge["target_concept_key"], graph, {edge["source_concept_key"]: {"lowest_retrievability": 0.2}}
+        )
         self.assertEqual(path1, path2)
 
     def _sp12_info(self, **overrides):
         q = self._sp11_question(1)
         q.update(overrides)
-        return information_value(q, {"uncertainty": 1.0}, {"dependent_concepts": ["a", "b"]}, {}, {"source_risk": 0.0}, {"policy_values": default_policy_values()})
+        return information_value(
+            q,
+            {"uncertainty": 1.0},
+            {"dependent_concepts": ["a", "b"]},
+            {},
+            {"source_risk": 0.0},
+            {"policy_values": default_policy_values()},
+        )
 
     def test_sp12_19_every_information_component_inside_bounds(self):
         info = self._sp12_info()
@@ -7349,7 +7969,16 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp12_20_total_matches_component_equation(self):
         info = self._sp12_info()
-        expected = info["diagnostic_discrimination"] + info["graph_bottleneck_value"] + info["uncertainty_reduction"] + info["transfer_evidence_value"] + info["coverage_value"] - info["redundancy_cost"] - info["item_quality_risk"] - info["source_risk"]
+        expected = (
+            info["diagnostic_discrimination"]
+            + info["graph_bottleneck_value"]
+            + info["uncertainty_reduction"]
+            + info["transfer_evidence_value"]
+            + info["coverage_value"]
+            - info["redundancy_cost"]
+            - info["item_quality_risk"]
+            - info["source_risk"]
+        )
         self.assertEqual(info["total"], round(max(-6.0, min(6.0, expected)), 4))
 
     def test_sp12_21_diagnostic_question_scores_higher_than_non_discriminating(self):
@@ -7358,26 +7987,43 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertGreater(high["diagnostic_discrimination"], low["diagnostic_discrimination"])
 
     def test_sp12_22_bottleneck_value_is_bounded(self):
-        info = information_value(self._sp11_question(1), {}, {"dependent_concepts": list(range(99))}, {}, {}, {"policy_values": default_policy_values()})
+        info = information_value(
+            self._sp11_question(1),
+            {},
+            {"dependent_concepts": list(range(99))},
+            {},
+            {},
+            {"policy_values": default_policy_values()},
+        )
         self.assertLessEqual(info["graph_bottleneck_value"], 10.0)
 
     def test_sp12_23_high_uncertainty_increases_information_value(self):
-        high = information_value(self._sp11_question(1), {"uncertainty": 1.0}, {}, {}, {}, {"policy_values": default_policy_values()})
-        low = information_value(self._sp11_question(1), {"uncertainty": 0.0}, {}, {}, {}, {"policy_values": default_policy_values()})
+        high = information_value(
+            self._sp11_question(1), {"uncertainty": 1.0}, {}, {}, {}, {"policy_values": default_policy_values()}
+        )
+        low = information_value(
+            self._sp11_question(1), {"uncertainty": 0.0}, {}, {}, {}, {"policy_values": default_policy_values()}
+        )
         self.assertGreater(high["uncertainty_reduction"], low["uncertainty_reduction"])
 
     def test_sp12_24_exact_repetition_increases_redundancy_cost(self):
         q = self._sp11_question(1)
-        info = information_value(q, {}, {}, {"seen_question_numbers": [1]}, {}, {"policy_values": default_policy_values()})
+        info = information_value(
+            q, {}, {}, {"seen_question_numbers": [1]}, {}, {"policy_values": default_policy_values()}
+        )
         self.assertGreater(info["redundancy_cost"], 0)
 
     def test_sp12_25_distinct_transfer_item_increases_transfer_value(self):
         q = self._sp11_question(1, stem="Scenario")
-        info = information_value(q, {}, {}, {"seen_stem_styles": ["Definition"]}, {}, {"policy_values": default_policy_values()})
+        info = information_value(
+            q, {}, {}, {"seen_stem_styles": ["Definition"]}, {}, {"policy_values": default_policy_values()}
+        )
         self.assertGreater(info["transfer_evidence_value"], 1.0)
 
     def test_sp12_26_low_quality_item_receives_quality_risk(self):
-        info = information_value(self._sp11_question(1), {}, {}, {}, {"source_risk": 1.0}, {"policy_values": default_policy_values()})
+        info = information_value(
+            self._sp11_question(1), {}, {}, {}, {"source_risk": 1.0}, {"policy_values": default_policy_values()}
+        )
         self.assertGreater(info["item_quality_risk"], 0)
 
     def test_sp12_27_information_value_cannot_bypass_protected_roles(self):
@@ -7404,17 +8050,23 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         return [{"question_number": 1, "session_id": f"s{i}", "correct": correct, **extra} for i in range(n)]
 
     def test_sp12_30_low_sample_item_insufficient_data(self):
-        self.assertEqual("insufficient_data", question_quality_record(self._sp11_question(1), self._quality_outcomes(3))["status"])
+        self.assertEqual(
+            "insufficient_data", question_quality_record(self._sp11_question(1), self._quality_outcomes(3))["status"]
+        )
 
     def test_sp12_31_low_accuracy_alone_not_possible_bad_key(self):
-        self.assertNotEqual("possible_bad_key", question_quality_record(self._sp11_question(1), self._quality_outcomes(25))["status"])
+        self.assertNotEqual(
+            "possible_bad_key", question_quality_record(self._sp11_question(1), self._quality_outcomes(25))["status"]
+        )
 
     def test_sp12_32_stable_concept_isolated_failure_raises_ambiguity(self):
         outcomes = self._quality_outcomes(10, confidence="Sure", miss_reason="Misread")
         self.assertEqual("ambiguous", question_quality_record(self._sp11_question(1), outcomes)["status"])
 
     def test_sp12_33_stronger_outperforming_weaker_discrimination(self):
-        outcomes = self._quality_outcomes(8, correct=True, concept_retrievability=0.9) + self._quality_outcomes(8, correct=False, concept_retrievability=0.2)
+        outcomes = self._quality_outcomes(8, correct=True, concept_retrievability=0.9) + self._quality_outcomes(
+            8, correct=False, concept_retrievability=0.2
+        )
         self.assertGreater(question_quality_record(self._sp11_question(1), outcomes)["item_discrimination"], 0)
 
     def test_sp12_34_repeated_stable_failure_poor_discriminator(self):
@@ -7430,7 +8082,9 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
     def test_sp12_36_source_conflict_requires_cross_source_evidence(self):
         q = self._sp11_question(1, source="Source conflict")
         q["source_conflict"] = True
-        self.assertNotEqual("source_conflicted", question_quality_record(q, self._quality_outcomes(10, correct=False))["status"])
+        self.assertNotEqual(
+            "source_conflicted", question_quality_record(q, self._quality_outcomes(10, correct=False))["status"]
+        )
 
     def test_sp12_37_one_learner_repeated_session_cannot_dominate_quality(self):
         outcomes = [{"question_number": 1, "session_id": "same", "correct": False} for _ in range(20)]
@@ -7448,22 +8102,46 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertEqual(["A"], q["correct"])
 
     def test_sp12_40_healthier_alternative_preferred_when_available(self):
-        risky = information_value(self._sp11_question(1, source="Source conflict"), {}, {}, {}, {"source_risk": 1.0}, {"policy_values": default_policy_values()})
-        healthy = information_value(self._sp11_question(2, source="Clean"), {}, {}, {}, {"source_risk": 0.0}, {"policy_values": default_policy_values()})
+        risky = information_value(
+            self._sp11_question(1, source="Source conflict"),
+            {},
+            {},
+            {},
+            {"source_risk": 1.0},
+            {"policy_values": default_policy_values()},
+        )
+        healthy = information_value(
+            self._sp11_question(2, source="Clean"),
+            {},
+            {},
+            {},
+            {"source_risk": 0.0},
+            {"policy_values": default_policy_values()},
+        )
         self.assertGreater(healthy["total"], risky["total"])
 
     def test_sp12_41_same_event_cannot_calibrate_own_edge_or_quality(self):
         graph, edge = self._sp12_edge()
-        outcome = {"edge_id": edge["edge_id"], "supports_edge": True, "group_id": "g", "created_at": "2026-05-02", "observed_at": "2026-05-02"}
+        outcome = {
+            "edge_id": edge["edge_id"],
+            "supports_edge": True,
+            "group_id": "g",
+            "created_at": "2026-05-02",
+            "observed_at": "2026-05-02",
+        }
         self.assertNotEqual("active", calibrate_edge(edge, [outcome], graph)["status"])
 
     def test_sp12_42_later_prerequisite_improvement_strengthens_edge(self):
         graph, edge = self._sp12_edge()
-        self.assertEqual("strengthened", calibrate_edge(edge, self._sp12_outcomes(edge, 3), graph)["calibration_status"])
+        self.assertEqual(
+            "strengthened", calibrate_edge(edge, self._sp12_outcomes(edge, 3), graph)["calibration_status"]
+        )
 
     def test_sp12_43_later_contradiction_weakens_edge(self):
         graph, edge = self._sp12_edge(status="active")
-        self.assertEqual("weakened", calibrate_edge(edge, self._sp12_outcomes(edge, 2, supports=False), graph)["status"])
+        self.assertEqual(
+            "weakened", calibrate_edge(edge, self._sp12_outcomes(edge, 2, supports=False), graph)["status"]
+        )
 
     def test_sp12_44_unobserved_outcome_remains_unobserved(self):
         graph, edge = self._sp12_edge()
@@ -7504,9 +8182,14 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
 
     def test_sp12_49_malformed_calibration_records_cannot_control_selection(self):
         app = self._sp9_app_with_role_pool()
-        app.progress_data["meta"]["smart_practice_question_calibration"] = {"question_quality": {"1": {"status": "possible_bad_key", "source_risk": "bad"}}}
+        app.progress_data["meta"]["smart_practice_question_calibration"] = {
+            "question_quality": {"1": {"status": "possible_bad_key", "source_risk": "bad"}}
+        }
         q = app.build_smart_practice_pool("1", randomize=False)[0]
-        self.assertIn(q["smart_primary_role"], {"weak_repair", "due_retention", "blueprint_coverage", "transfer", "controlled_stretch"})
+        self.assertIn(
+            q["smart_primary_role"],
+            {"weak_repair", "due_retention", "blueprint_coverage", "transfer", "controlled_stretch"},
+        )
 
     def test_sp12_50_policy_change_invalidates_smart_cache(self):
         app = self._sp9_app_with_role_pool()
