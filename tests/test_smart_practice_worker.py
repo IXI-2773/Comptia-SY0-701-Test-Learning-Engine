@@ -31,6 +31,10 @@ class SmartPracticeWorkerTests(unittest.TestCase):
             progress_meta_cache_raw={},
             progress_meta_cache_value=None,
             base_pool=None,
+            session_source_value="All",
+            domain_filter_value="All domains",
+            topic_filter_value="All topics",
+            status_filter_value="All questions",
         )
 
         payload = build_detached_signal_payload(_FakeSmartPracticeOwner, snapshot)
@@ -50,6 +54,10 @@ class SmartPracticeWorkerTests(unittest.TestCase):
             progress_meta_cache_raw={},
             progress_meta_cache_value=None,
             base_pool=[{"question_number": 7}, {"question_number": 8}],
+            session_source_value="All",
+            domain_filter_value="All domains",
+            topic_filter_value="All topics",
+            status_filter_value="All questions",
         )
 
         pool = build_detached_pool(

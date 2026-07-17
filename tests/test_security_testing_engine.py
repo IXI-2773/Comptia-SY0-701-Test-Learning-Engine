@@ -116,6 +116,7 @@ from tools.benchmark_engine import run_benchmark
 from tools import build_release as build_release_module
 from tools import import_chapter_screenshots
 from tools.validate_bank import validate_bank, write_markdown_report
+from tests.test_release_tools import minimal_valid_pe_bytes
 
 
 class SecurityTestingEngineTests(unittest.TestCase):
@@ -173,7 +174,7 @@ class SecurityTestingEngineTests(unittest.TestCase):
             source_tree_exe = source_root / "SecurityTestingEngine.exe"
             dist.mkdir(parents=True)
             release.mkdir(parents=True)
-            (dist / "SecurityTestingEngine.exe").write_bytes(b"MZ" + (b"\0" * 2048))
+            (dist / "SecurityTestingEngine.exe").write_bytes(minimal_valid_pe_bytes())
             (release / "old_bank.json").write_text("{}", encoding="utf-8")
             source_tree_exe.write_bytes(b"stale")
 
@@ -588,6 +589,46 @@ class SecurityTestingEngineTests(unittest.TestCase):
         result = validate_bank(ROOT / "public_sy0701_bank_v4_plus_studyguide_clean.json")
         self.assertEqual([], result["issues"])
         self.assertEqual([], result["warnings"])
+
+    def test_q1160_prompt_is_restored_from_verified_source(self):
+        data = load_bank(ROOT / "public_sy0701_bank_v4_plus_studyguide_clean.json")
+        question = next(q for q in data["questions"] if q["question_number"] == 1160)
+
+        self.assertFalse(question.get("suspended"))
+        self.assertEqual("A CVSS score is based on what three metric groups of data?", question["prompt"])
+
+    def test_bank_validation_warns_on_active_fragmentary_prompt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "fragment_bank.json"
+            payload = {
+                "title": "Fragment Bank",
+                "questions": [
+                    {
+                        "question_number": 1,
+                        "prompt": "Operations Incorrect",
+                        "choices": {
+                            "A": "Scope, Impact, Environmental",
+                            "B": "Base, Temporal, and Environmental",
+                            "C": "Risk, Threat, Impact",
+                            "D": "Time, Risk, Scope",
+                        },
+                        "correct": ["B"],
+                        "general_explanation": "Base, Temporal, and Environmental is correct.",
+                        "choice_explanations": {
+                            "A": "Wrong metric groups.",
+                            "B": "These are the CVSS metric groups.",
+                            "C": "Not the CVSS group names.",
+                            "D": "Not the CVSS group names.",
+                        },
+                        "topics": ["Vulnerability Management"],
+                    }
+                ],
+            }
+            path.write_text(json.dumps(payload), encoding="utf-8")
+
+            result = validate_bank(path)
+
+            self.assertTrue(any(title == "Q1" and "fragmentary" in body.lower() for title, body in result["warnings"]))
 
     def test_sanitize_text_repairs_mojibake_and_trims_embedded_questions(self):
         cleaned, notes = sanitize_text(
@@ -4068,6 +4109,47 @@ class SecurityTestingEngineGuiTests(unittest.TestCase):
         self.assertTrue(is_super_confident_active(rec, on_date="2026-05-21"))
         self.assertFalse(is_super_confident_active(rec, on_date="2026-05-22"))
         self.assertTrue(is_review_due(rec, on_date="2026-05-22"))
+
+    def test_wrong_answer_clears_super_confident_and_reactivates_due_weak_state(self):
+        rec = update_progress_record({}, ["A"], True, seen_on="2026-05-17", confidence="Sure")
+        rec = set_progress_super_confident(rec, seen_on="2026-05-17", cooldown_days=120)
+
+        updated = update_progress_record(rec, ["B"], False, seen_on="2026-07-01", confidence="Sure")
+
+        self.assertEqual("", updated["super_confident_until"])
+        self.assertFalse(is_super_confident_active(updated, on_date="2026-07-01"))
+        self.assertTrue(is_active_weak(updated))
+        self.assertTrue(is_review_due(updated, on_date="2026-07-01"))
+
+    def test_smart_practice_due_weak_question_is_not_hidden_by_stale_super_confident_state(self):
+        app = self.make_app(start_session=False)
+        app.master_questions = [
+            {
+                "question_number": 1,
+                "prompt": "Question 1",
+                "choices": {"A": "Correct 1", "B": "Wrong 1"},
+                "correct": ["A"],
+                "domain": "Domain A",
+                "topics": ["Topic 1"],
+                "source_name": "Source One",
+                "objective_code": "1.1",
+            }
+        ]
+        app.questions = list(app.master_questions)
+        app._reset_runtime_question_state(app.master_questions)
+        rec = update_progress_record({}, ["A"], True, seen_on="2026-05-17", confidence="Sure")
+        rec = set_progress_super_confident(rec, seen_on="2026-05-17", cooldown_days=120)
+        rec["wrong_count"] = 1
+        rec["correct_count"] = 0
+        rec["correct_streak"] = 0
+        rec["last_correct"] = False
+        rec["learner_memory"]["next_review_at"] = "2026-07-01"
+        rec["next_review"] = "2026-07-01"
+        app._progress_questions()["1"] = rec
+
+        pool = app.build_smart_practice_pool("1", randomize=False)
+
+        self.assertEqual([1], [question["question_number"] for question in pool])
 
     def test_wrong_answer_queues_confusion_pair_drill_before_generic_twins(self):
         app = self.make_app(start_session=False)

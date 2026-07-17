@@ -17,6 +17,18 @@ class SmartPracticeWorkerSnapshot:
     progress_meta_cache_raw: dict[str, Any]
     progress_meta_cache_value: Any
     base_pool: list[dict[str, Any]] | None
+    session_source_value: str
+    domain_filter_value: str
+    topic_filter_value: str
+    status_filter_value: str
+
+
+class _DetachedVar:
+    def __init__(self, value: Any):
+        self._value = value
+
+    def get(self) -> Any:
+        return self._value
 
 
 class DetachedSmartPracticeContext:
@@ -33,6 +45,10 @@ class DetachedSmartPracticeContext:
         self.progress_meta_cache_raw = snapshot.progress_meta_cache_raw
         self.progress_meta_cache_value = snapshot.progress_meta_cache_value
         self.base_pool = snapshot.base_pool
+        self.session_source_var = _DetachedVar(snapshot.session_source_value)
+        self.domain_filter_var = _DetachedVar(snapshot.domain_filter_value)
+        self.topic_filter_var = _DetachedVar(snapshot.topic_filter_value)
+        self.status_filter_var = _DetachedVar(snapshot.status_filter_value)
         self.smart_practice_prewarm = None
         self.render_cache = None
         self.root = None

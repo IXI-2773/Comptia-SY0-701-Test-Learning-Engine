@@ -1,18 +1,19 @@
 import hashlib
 import io
 import json
+import os
 import sys
 import unittest
 from importlib import import_module
 from pathlib import Path
-
-from pe_validation import validate_pe_file
 
 ROOT = Path(__file__).resolve().parents[1]
 CHECKOUT_ROOT = ROOT.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+build_release_module = import_module("tools.build_release")
+validate_pe_file = import_module("pe_validation").validate_pe_file
 validate_bank_module = import_module("tools.validate_bank")
 validate_bank = validate_bank_module.validate_bank
 write_markdown_report = validate_bank_module.write_markdown_report
@@ -40,7 +41,9 @@ def _sha256(path: Path) -> str:
 
 
 def _run_release_tests() -> list[str]:
-    suite = unittest.defaultTestLoader.discover(str(ROOT / "tests"), pattern="test_release_tools.py")
+    if os.environ.get("STE_SMOKE_SKIP_RELEASE_TESTS") == "1":
+        return []
+    suite = unittest.defaultTestLoader.loadTestsFromName("tests.test_release_tools.ReleaseToolTests")
     stream = io.StringIO()
     result = unittest.TextTestRunner(stream=stream, verbosity=1).run(suite)
     if result.wasSuccessful():
@@ -50,6 +53,27 @@ def _run_release_tests() -> list[str]:
         summary = traceback.strip().splitlines()[-1] if traceback.strip() else "unknown failure"
         details.append(f"{case.id()}: {summary}")
     return details or ["Focused release tests failed."]
+
+
+def _build_input_staleness_failure(manifest: dict[str, object], bank_path: Path) -> str | None:
+    fingerprint = manifest.get("build_input_fingerprint")
+    if not isinstance(fingerprint, dict):
+        return "Release manifest is missing a build-input fingerprint; rebuild required."
+    version = int(fingerprint.get("version", 0) or 0)
+    if version <= 0:
+        return "Release manifest build-input fingerprint is invalid; rebuild required."
+    expected_sha = str(fingerprint.get("sha256") or "").strip().lower()
+    if not expected_sha:
+        return "Release manifest build-input fingerprint is incomplete; rebuild required."
+    current = build_release_module.build_input_fingerprint(
+        bank_path.parent,
+        bank_file=bank_path,
+        build_batch_file=bank_path.parent / "build_windows_v8.bat",
+    )
+    current_sha = str(current.get("sha256") or "").strip().lower()
+    if current_sha != expected_sha:
+        return "Release build inputs changed since packaging; rebuild required."
+    return None
 
 
 def run_smoke_checks(
@@ -85,6 +109,9 @@ def run_smoke_checks(
                 failures.append("Release manifest bank hash mismatch.")
             if int(manifest.get("expected_bank_count", -1)) != expected_question_count:
                 failures.append("Release manifest expected bank count mismatch.")
+            stale_failure = _build_input_staleness_failure(manifest, bank_path)
+            if stale_failure:
+                failures.append(stale_failure)
         except Exception as exc:
             failures.append(f"Release manifest is unreadable: {exc}")
 

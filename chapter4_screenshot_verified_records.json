@@ -886,7 +886,7 @@
       "status": "verified",
       "ocr_available": true,
       "ocr_text": "Chapter 4: Domain 4.0: Security Operations O Incorrect A CVSS score is based on what three metric groups of data? C) A Scope, Impact, Environmental O B. Base, Temporal, and Environmental @ C. Risk, Threat, Impact C) D. Time, Risk, Scope Explanation CVSS scores are based on base metrics like the attack vector; complexity; scope; user interaction required and privileges required; the temporal group, which includes exploit code maturity, remediation level, and report confidence; and the environmental group, including confidentiality, availability, and integrity' requirements. While scope, impact, risk, and threat all play into these elements, CVSS calls the three QUESTION 175 of 215 metric groups Base, Temporal, and Environmental. CONTENT FEEDBACK PREVIOUS N EXT",
-      "prompt": "Operations Incorrect",
+      "prompt": "A CVSS score is based on what three metric groups of data?",
       "choices": {
         "A": "Scope, Impact, Environmental",
         "B": "Base, Temporal, and Environmental",

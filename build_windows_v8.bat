@@ -32,8 +32,8 @@ if errorlevel 1 (
   exit /b 1
 )
 
-echo Running tests...
-%PYTHON_CMD% -m unittest discover -s tests -v
+echo Running focused release tests...
+%PYTHON_CMD% -m unittest -v tests.test_release_tools
 if errorlevel 1 (
   echo Tests failed.
   pause
@@ -41,11 +41,28 @@ if errorlevel 1 (
 )
 
 %PYTHON_CMD% -m pip install pyinstaller
-%PYTHON_CMD% -m PyInstaller --onefile --windowed --name SecurityTestingEngine ^
+if exist dist rmdir /s /q dist
+if exist build rmdir /s /q build
+
+%PYTHON_CMD% tools\build_release.py --prepare-build "%BANK_FILE%"
+if errorlevel 1 (
+  echo Build receipt preparation failed.
+  pause
+  exit /b 1
+)
+
+%PYTHON_CMD% -m PyInstaller --clean --noconfirm --onefile --windowed --name SecurityTestingEngine ^
   --add-data "%BANK_FILE%;." ^
   app.py
 if errorlevel 1 (
   echo Build failed.
+  pause
+  exit /b 1
+)
+
+%PYTHON_CMD% tools\build_release.py --record-built "%BANK_FILE%"
+if errorlevel 1 (
+  echo Build receipt finalization failed.
   pause
   exit /b 1
 )

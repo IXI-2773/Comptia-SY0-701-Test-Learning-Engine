@@ -1,6 +1,9 @@
 import copy
 import unittest
 
+from app_question_flow_mixin import QuestionFlowMixin
+from progress_store import set_progress_super_confident, update_progress_record
+from session_models import reset_runtime_question_state
 from smart_practice_core import (
     SmartPracticeCandidate,
     build_smart_practice_score,
@@ -9,7 +12,47 @@ from smart_practice_core import (
 from smart_practice_profile import SMART_PRACTICE_SCORING, UTILITY_COMPONENT_BOUNDS
 
 
+class _HeadlessFollowupHarness(QuestionFlowMixin):
+    def __init__(self, questions, *, progress_questions=None):
+        self.master_questions = copy.deepcopy(questions)
+        self.questions = [copy.deepcopy(self.master_questions[0])]
+        self.index = 0
+        self.session_question_limit = None
+        self.progress_data = {"questions": copy.deepcopy(progress_questions or {}), "history": [], "meta": {}}
+        self.last_question_list_signature = None
+        for question in self.master_questions:
+            reset_runtime_question_state(question)
+        for question in self.questions:
+            reset_runtime_question_state(question)
+
+    def _clone_questions(self, questions):
+        return copy.deepcopy(questions)
+
+    def _reset_runtime_question_state(self, questions):
+        for question in questions:
+            reset_runtime_question_state(question)
+
+    def refresh_session_runtime_identity(self):
+        return None
+
+    def _question_key(self, question):
+        return str(question.get("question_number"))
+
+    def _progress_questions(self):
+        return self.progress_data.setdefault("questions", {})
+
+
 class SmartPracticeCoreTests(unittest.TestCase):
+    def _question(self, qnum, *, topic="Topic 1"):
+        return {
+            "question_number": qnum,
+            "prompt": f"Question {qnum}",
+            "choices": {"A": "Correct", "B": "Wrong"},
+            "correct": ["A"],
+            "domain": "Domain A",
+            "topics": [topic],
+        }
+
     def test_build_smart_practice_score_returns_payload_without_mutating_question(self):
         question = {
             "question_number": 101,
@@ -183,6 +226,43 @@ class SmartPracticeCoreTests(unittest.TestCase):
         self.assertFalse(result.retry_used)
         self.assertGreater(result.quality_score, 0.0)
         self.assertEqual(1, result.audit["selected_unseen"])
+
+    def test_super_confident_candidate_is_blocked_from_immediate_followup_insertion(self):
+        questions = [self._question(1), self._question(2)]
+        record = update_progress_record({}, ["A"], True, seen_on="2026-05-17", confidence="Sure")
+        record = set_progress_super_confident(record, seen_on="2026-05-17", cooldown_days=120)
+        harness = _HeadlessFollowupHarness(questions, progress_questions={"2": record})
+
+        inserted = harness._insert_followup_questions(
+            harness.questions[0], [harness.master_questions[1]], "Question twin"
+        )
+
+        self.assertEqual([], inserted)
+        self.assertEqual([1], [question["question_number"] for question in harness.questions])
+
+    def test_super_confident_candidate_is_blocked_from_delayed_followup_insertion(self):
+        questions = [self._question(1), self._question(2)]
+        record = update_progress_record({}, ["A"], True, seen_on="2026-05-17", confidence="Sure")
+        record = set_progress_super_confident(record, seen_on="2026-05-17", cooldown_days=120)
+        harness = _HeadlessFollowupHarness(questions, progress_questions={"2": record})
+
+        inserted = harness._insert_delayed_followup_questions(
+            harness.questions[0], [harness.master_questions[1]], "Delayed recall", delay_slots=2
+        )
+
+        self.assertEqual([], inserted)
+        self.assertEqual([1], [question["question_number"] for question in harness.questions])
+
+    def test_eligible_candidate_still_inserts_as_followup(self):
+        questions = [self._question(1), self._question(2)]
+        harness = _HeadlessFollowupHarness(questions)
+
+        inserted = harness._insert_followup_questions(
+            harness.questions[0], [harness.master_questions[1]], "Question twin"
+        )
+
+        self.assertEqual([2], [question["question_number"] for question in inserted])
+        self.assertEqual([1, 2], [question["question_number"] for question in harness.questions])
 
 
 if __name__ == "__main__":

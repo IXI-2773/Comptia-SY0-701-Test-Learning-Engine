@@ -249,10 +249,10 @@ def normalize_progress_record(record: Mapping[str, Any] | None) -> ProgressRecor
         **default_progress_record()["miss_reason_counts"],
         **dict(merged.get("miss_reason_counts") or {}),
     }
-    merged["attempts"] = int(merged.get("attempts", 0) or 0)
-    merged["correct_count"] = int(merged.get("correct_count", 0) or 0)
-    merged["wrong_count"] = int(merged.get("wrong_count", 0) or 0)
-    merged["correct_streak"] = int(merged.get("correct_streak", 0) or 0)
+    merged["attempts"] = max(0, int(merged.get("attempts", 0) or 0))
+    merged["correct_count"] = max(0, int(merged.get("correct_count", 0) or 0))
+    merged["wrong_count"] = max(0, int(merged.get("wrong_count", 0) or 0))
+    merged["correct_streak"] = max(0, int(merged.get("correct_streak", 0) or 0))
     merged["last_seen"] = str(merged.get("last_seen", "") or "")
     merged["next_review"] = str(merged.get("next_review", "") or "")
     merged["last_selected"] = [str(value) for value in merged.get("last_selected", [])]
@@ -264,6 +264,10 @@ def normalize_progress_record(record: Mapping[str, Any] | None) -> ProgressRecor
     merged["flagged"] = bool(merged.get("flagged"))
     merged["suspended"] = bool(merged.get("suspended"))
     merged["super_confident_until"] = str(merged.get("super_confident_until", "") or "")
+    merged["attempts"] = max(
+        int(merged["attempts"]),
+        int(merged["correct_count"]) + int(merged["wrong_count"]),
+    )
     legacy_next_review = str(merged.get("next_review", "") or "")
     had_learner_memory = isinstance(merged.get("learner_memory"), Mapping)
     learner_memory = normalize_learner_memory(merged.get("learner_memory"))
@@ -399,6 +403,7 @@ def update_progress_record(
     else:
         record["wrong_count"] = int(record.get("wrong_count", 0)) + 1
         record["correct_streak"] = 0
+        record["super_confident_until"] = ""
         if miss_reason:
             record["miss_reason_counts"][miss_reason] = int(record["miss_reason_counts"].get(miss_reason, 0)) + 1
     record["learner_memory"] = update_learner_memory(
@@ -443,6 +448,17 @@ def is_super_confident_active(record: Mapping[str, Any] | None, on_date=None) ->
         return False
     on_date = date.fromisoformat(on_date) if isinstance(on_date, str) else (on_date or date.today())
     return until_day > on_date
+
+
+def is_effective_super_confident_active(record: Mapping[str, Any] | None, on_date=None) -> bool:
+    record = record or {}
+    if not is_super_confident_active(record, on_date=on_date):
+        return False
+    if is_active_weak(record):
+        return False
+    if is_review_due(record, on_date=on_date):
+        return False
+    return True
 
 
 def set_progress_super_confident(

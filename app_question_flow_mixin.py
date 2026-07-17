@@ -1,8 +1,9 @@
 import re
 import time
 import tkinter as tk
+from collections.abc import Mapping
 from tkinter import messagebox
-from typing import Any
+from typing import Any, cast
 
 from app_constants import (
     MODE_EXAM,
@@ -16,6 +17,7 @@ from app_constants import (
 )
 from progress_store import (
     is_active_weak,
+    is_effective_super_confident_active,
     is_review_due,
     is_suspended,
     sanitize_response_time,
@@ -23,6 +25,19 @@ from progress_store import (
 )
 from session_models import QuestionRuntimeState, SessionAnswerEvent, clear_runtime_answer_state
 from smart_practice_concept_graph import concept_key_for_question
+
+
+def followup_candidate_is_eligible(
+    question: Mapping[str, Any] | None, record: Mapping[str, Any] | None, *, on_date=None
+) -> bool:
+    question = question or {}
+    if bool(question.get("suspended")):
+        return False
+    if is_suspended(record):
+        return False
+    if is_effective_super_confident_active(record, on_date=on_date):
+        return False
+    return True
 
 
 class QuestionFlowMixin:
@@ -326,6 +341,9 @@ class QuestionFlowMixin:
     ) -> list[QuestionRuntimeState]:
         if not candidates:
             return []
+        candidates = self._eligible_followup_candidates_for_insert(candidates)
+        if not candidates:
+            return []
         existing_qnums = {q.get("question_number") for q in self.questions}
         unique_candidates = [q for q in candidates if q.get("question_number") not in existing_qnums]
         if not unique_candidates:
@@ -348,6 +366,9 @@ class QuestionFlowMixin:
     ) -> list[QuestionRuntimeState]:
         if not candidates:
             return []
+        candidates = self._eligible_followup_candidates_for_insert(candidates)
+        if not candidates:
+            return []
         existing_qnums = {q.get("question_number") for q in self.questions}
         unique_candidates = [q for q in candidates if q.get("question_number") not in existing_qnums]
         if not unique_candidates:
@@ -364,6 +385,17 @@ class QuestionFlowMixin:
         self.refresh_session_runtime_identity()
         self.last_question_list_signature = None
         return inserted
+
+    def _eligible_followup_candidates_for_insert(
+        self, candidates: list[QuestionRuntimeState]
+    ) -> list[QuestionRuntimeState]:
+        records = self._progress_questions()
+        eligible = []
+        for candidate in candidates:
+            rec = records.get(self._question_key(candidate), {})
+            if followup_candidate_is_eligible(candidate, rec):
+                eligible.append(candidate)
+        return eligible
 
     def _is_replaceable_followup_slot(self, q: QuestionRuntimeState) -> bool:
         return not (
@@ -910,7 +942,9 @@ class QuestionFlowMixin:
                 if not candidates:
                     candidates = self.find_question_twins(q, limit=1)
                     tag = QUESTION_TAG_TRANSFER_CHECK
-                inserted = self._insert_delayed_followup_questions(q, candidates, tag or QUESTION_TAG_TRANSFER_CHECK, delay_slots=3)
+                inserted = self._insert_delayed_followup_questions(
+                    q, candidates, tag or QUESTION_TAG_TRANSFER_CHECK, delay_slots=3
+                )
                 if inserted:
                     for item in inserted:
                         item["repair_stage"] = "transfer"
@@ -1164,7 +1198,10 @@ class QuestionFlowMixin:
                     event["confidence"] = new_conf
                     event["miss_reason"] = new_reason
                     break
-            self._progress_questions()[self._question_key(q)] = rec
+            self_any = cast(Any, self)
+            progress_questions = self_any._progress_questions()
+            question_key = self_any._question_key(q)
+            progress_questions[question_key] = rec
             self.mark_question_list_dirty()
             self.schedule_progress_save()
             self.schedule_session_save(delay_ms=125)
@@ -1187,7 +1224,10 @@ class QuestionFlowMixin:
                 event["confidence"] = "Sure"
                 event["miss_reason"] = ""
                 break
-        self._progress_questions()[self._question_key(q)] = rec
+        self_any = cast(Any, self)
+        progress_questions = self_any._progress_questions()
+        question_key = self_any._question_key(q)
+        progress_questions[question_key] = rec
         self.mark_question_list_dirty()
         self.invalidate_learning_state(prewarm=True, prewarm_delay_ms=350)
         self.schedule_progress_save()

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from math import ceil
 from typing import Any
 
-from progress_store import is_active_weak, is_review_due, is_super_confident_active
+from progress_store import is_active_weak, is_effective_super_confident_active, is_review_due
 from smart_practice_concept_graph import GRAPH_VERSION, diagnose_root_cause
 from smart_practice_profile import (
     SMART_PRACTICE_POLICY_VERSION,
@@ -403,7 +403,7 @@ def build_smart_practice_score(
     )
     if unseen_sibling_exists and (policy_active_weak or str(rec.get("last_confidence") or "").casefold() == "guessed"):
         repetition_cost = min(15.0, repetition_cost + 10.0)
-    if is_super_confident_active(rec) and not memory_due and not policy_active_weak:
+    if is_effective_super_confident_active(rec) and not memory_due and not policy_active_weak:
         repetition_cost = 15.0
     repair_spacing_settings = dict(context.get("repair_spacing_settings") or {})
     repair_recent_delay = int(repair_spacing_settings.get("contrast_delay", 2) or 2)

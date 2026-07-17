@@ -1,15 +1,17 @@
 import copy
+import logging
 import random
 import threading
 from datetime import date
 from tkinter import messagebox
+from typing import Any, cast
 
 from app_constants import MODE_PRACTICE, MODE_SMART_PRACTICE
 from progress_store import (
     is_active_weak,
+    is_effective_super_confident_active,
     is_ever_wrong,
     is_review_due,
-    is_super_confident_active,
     is_suspended,
     select_due_review_questions,
     select_questions_by_history,
@@ -54,6 +56,13 @@ from study_question_utils import (
 
 
 class SessionBuilderMixin:
+    def _log_session_start_event(self, event: str, **fields) -> None:
+        details = ", ".join(f"{key}={fields[key]!r}" for key in sorted(fields))
+        message = f"[session-start] {event}"
+        if details:
+            message = f"{message} | {details}"
+        logging.info(message)
+
     def _advance_smart_practice_rotation_epoch(self):
         meta = self.progress_data.setdefault("meta", {})
         rotation = dict(meta.get("smart_practice_rotation") or {})
@@ -76,6 +85,11 @@ class SessionBuilderMixin:
 
     def _smart_practice_worker_snapshot(self, *, base_pool=None):
         meta = self.progress_data.setdefault("meta", {})
+        self_any = cast(Any, self)
+        session_source_var = self_any.session_source_var
+        domain_filter_var = self_any.domain_filter_var
+        topic_filter_var = self_any.topic_filter_var
+        status_filter_var = self_any.status_filter_var
         return SmartPracticeWorkerSnapshot(
             master_questions=copy.deepcopy(self.master_questions),
             questions=copy.deepcopy(self.questions),
@@ -90,6 +104,10 @@ class SessionBuilderMixin:
             progress_meta_cache_raw=copy.deepcopy(meta if isinstance(meta, dict) else {}),
             progress_meta_cache_value=None,
             base_pool=copy.deepcopy(list(base_pool) if base_pool is not None else None),
+            session_source_value=str(session_source_var.get()),
+            domain_filter_value=str(domain_filter_var.get()),
+            topic_filter_value=str(topic_filter_var.get()),
+            status_filter_value=str(status_filter_var.get()),
         )
 
     def _normalized_study_label(self, value: str) -> str:
@@ -552,7 +570,9 @@ class SessionBuilderMixin:
 
     def _run_session_start_action(self, action) -> None:
         if getattr(self, "_session_start_busy", False):
+            self._log_session_start_event("run_action_skipped_busy")
             return
+        self._log_session_start_event("run_action_begin", action=getattr(action, "__name__", repr(action)))
         self._session_start_busy = True
         self._set_session_start_controls_enabled(False)
         try:
@@ -572,6 +592,7 @@ class SessionBuilderMixin:
                 pass
             self._set_session_start_controls_enabled(True)
             self._session_start_busy = False
+            self._log_session_start_event("run_action_end", action=getattr(action, "__name__", repr(action)))
 
     def _set_session_start_busy_state(self, busy: bool, message: str = "") -> None:
         self._session_start_busy = bool(busy)
@@ -605,7 +626,13 @@ class SessionBuilderMixin:
             return None
         resume_path = self.find_resumable_session_for_builder(builder_context)
         if resume_path is None:
+            self._log_session_start_event("resume_prompt_not_needed", builder_context=builder_context)
             return None
+        self._log_session_start_event(
+            "resume_prompt_shown",
+            builder_context=builder_context,
+            resume_path=str(resume_path),
+        )
         answer = messagebox.askyesnocancel(
             "Resume saved set?",
             "An unfinished matching set was found.\n\n"
@@ -614,14 +641,30 @@ class SessionBuilderMixin:
             "Cancel: stay on the builder.",
         )
         if answer is None:
+            self._log_session_start_event("resume_prompt_result", result="cancel")
             return "cancel"
+        self._log_session_start_event("resume_prompt_result", result=bool(answer))
         return bool(answer)
 
     def _start_smart_practice_async(
         self, count, randomize, base_pool, *, preserve_if_saved=True, builder_context=None
     ) -> None:
         if getattr(self, "_session_start_busy", False):
+            self._log_session_start_event(
+                "smart_async_skipped_busy",
+                count=count,
+                preserve_if_saved=preserve_if_saved,
+                randomize=randomize,
+            )
             return
+        self._log_session_start_event(
+            "smart_async_begin",
+            base_pool_count=len(list(base_pool or [])),
+            builder_context=builder_context,
+            count=count,
+            preserve_if_saved=preserve_if_saved,
+            randomize=randomize,
+        )
         builder_context = builder_context or self.current_builder_context(
             mode=MODE_SMART_PRACTICE,
             count=count,
@@ -632,14 +675,18 @@ class SessionBuilderMixin:
             root_withdrawn = self.root.state() == "withdrawn"
         except Exception:
             root_withdrawn = False
+        self._log_session_start_event("smart_async_root_state", root_withdrawn=root_withdrawn)
         if root_withdrawn:
             pool = self._build_smart_practice_pool_compat(count, randomize=randomize, base_pool=base_pool)
+            self._log_session_start_event("smart_async_withdrawn_pool_built", pool_count=len(pool))
             if not pool:
+                self._log_session_start_event("smart_async_withdrawn_no_pool")
                 messagebox.showinfo(
                     "Smart Practice", "No questions are available for smart practice with the current filters."
                 )
                 return
             self.save_app_config()
+            self._log_session_start_event("smart_async_withdrawn_starting_session", pool_count=len(pool))
             self.start_session_from_pool(
                 pool,
                 mode=MODE_SMART_PRACTICE,
@@ -659,11 +706,19 @@ class SessionBuilderMixin:
         signal_key = self._smart_practice_signal_key()
         revision = self._smart_practice_worker_revision()
         snapshot = self._smart_practice_worker_snapshot(base_pool=base_pool)
+        self._log_session_start_event(
+            "smart_async_worker_scheduled",
+            generation=generation,
+            revision=revision,
+            signal_key=signal_key,
+            snapshot_base_pool_count=len(list(snapshot.base_pool or [])),
+        )
 
         def worker():
             error = None
             pool = []
             worker_meta = {}
+            self._log_session_start_event("smart_async_worker_thread_begin", generation=generation)
             try:
                 context = create_detached_context(type(self), snapshot)
                 pool = context._build_smart_practice_pool_compat(
@@ -678,24 +733,53 @@ class SessionBuilderMixin:
                     "signal_cache_payload": copy.deepcopy(detached_signal_payload),
                     "pool_cache": copy.deepcopy(snapshot.smart_practice_pool_cache),
                 }
+                self._log_session_start_event(
+                    "smart_async_worker_thread_built_pool",
+                    generation=generation,
+                    pool_count=len(pool),
+                )
             except Exception as exc:
                 error = exc
+                self._log_session_start_event(
+                    "smart_async_worker_thread_error",
+                    error=repr(exc),
+                    generation=generation,
+                )
 
             def finish():
+                self._log_session_start_event(
+                    "smart_async_finish_enter",
+                    error=repr(error) if error is not None else None,
+                    generation=generation,
+                    pool_count=len(pool),
+                )
                 if getattr(self, "_app_closing", False):
+                    self._log_session_start_event("smart_async_finish_aborted_app_closing", generation=generation)
                     return
                 if generation != getattr(self, "_smart_practice_async_generation", 0):
+                    self._log_session_start_event(
+                        "smart_async_finish_aborted_generation_mismatch",
+                        actual_generation=getattr(self, "_smart_practice_async_generation", 0),
+                        generation=generation,
+                    )
                     return
                 if revision != self._smart_practice_worker_revision():
                     self._set_session_start_busy_state(False)
                     self.session_label.configure(text="Smart Practice build discarded because learner state changed.")
+                    self._log_session_start_event("smart_async_finish_discarded_revision_changed", generation=generation)
                     return
                 self._set_session_start_busy_state(False)
                 if error is not None:
+                    self._log_session_start_event(
+                        "smart_async_finish_showing_error",
+                        error=repr(error),
+                        generation=generation,
+                    )
                     messagebox.showerror("Smart Practice", f"Could not build Smart Practice set.\n\n{error}")
                     self.render_question()
                     return
                 if not pool:
+                    self._log_session_start_event("smart_async_finish_no_pool", generation=generation)
                     messagebox.showinfo(
                         "Smart Practice", "No questions are available for smart practice with the current filters."
                     )
@@ -709,6 +793,11 @@ class SessionBuilderMixin:
                 self.smart_practice_signal_cache_payload = worker_meta.get("signal_cache_payload")
                 self.smart_practice_pool_cache = worker_meta.get("pool_cache", {})
                 self.save_app_config()
+                self._log_session_start_event(
+                    "smart_async_finish_starting_session",
+                    generation=generation,
+                    pool_count=len(pool),
+                )
                 self.start_session_from_pool(
                     pool,
                     mode=MODE_SMART_PRACTICE,
@@ -722,8 +811,9 @@ class SessionBuilderMixin:
 
             try:
                 self.root.after(0, finish)
+                self._log_session_start_event("smart_async_finish_queued_on_ui_thread", generation=generation)
             except Exception:
-                pass
+                self._log_session_start_event("smart_async_finish_queue_failed", generation=generation)
 
         threading.Thread(target=worker, daemon=True).start()
 
@@ -822,6 +912,13 @@ class SessionBuilderMixin:
 
     def start_custom_session(self):
         mode = self.session_mode_var.get()
+        self._log_session_start_event(
+            "start_custom_session_enter",
+            mode=mode,
+            session_count=self.session_count_var.get(),
+            session_source=self.session_source_var.get(),
+            sidebar_visible=getattr(self, "sidebar_visible", None),
+        )
         if mode == MODE_SMART_PRACTICE:
             builder_context = self.current_builder_context(
                 mode=MODE_SMART_PRACTICE,
@@ -831,9 +928,11 @@ class SessionBuilderMixin:
             )
             resume_choice = self._resume_existing_session_choice(builder_context)
             if resume_choice == "cancel":
+                self._log_session_start_event("start_custom_session_cancelled_resume_prompt", mode=mode)
                 return
             if resume_choice is True:
                 self.save_app_config()
+                self._log_session_start_event("start_custom_session_resuming_saved_set", mode=mode)
                 self.start_session_from_pool(
                     self.master_questions,
                     mode=MODE_SMART_PRACTICE,
@@ -870,6 +969,7 @@ class SessionBuilderMixin:
                 return
             if resume_choice is False:
                 self._advance_smart_practice_rotation_epoch()
+                self._log_session_start_event("start_custom_session_forcing_fresh_rotation_epoch", mode=mode)
             self._start_smart_practice_async(
                 self.session_count_var.get(),
                 self.session_random_var.get(),
@@ -883,10 +983,17 @@ class SessionBuilderMixin:
             pool = self.get_session_builder_pool()
             mode = self.session_mode_var.get()
             count = self.session_count_var.get()
+            self._log_session_start_event(
+                "start_custom_session_sync_pool_loaded",
+                count=count,
+                mode=mode,
+                pool_count=len(pool),
+            )
             if mode == "Weak retest":
                 pool = self.build_weak_retest_pool()
                 pool = self.filter_pool_by_session_source(pool)
                 if not pool:
+                    self._log_session_start_event("start_custom_session_no_weak_pool")
                     messagebox.showinfo(
                         "Weak retest",
                         "No weak-area pool is available yet. Answer some questions wrong, flag some, or build more coverage first.",
@@ -896,12 +1003,14 @@ class SessionBuilderMixin:
                 pool = self.build_due_review_pool()
                 pool = self.filter_pool_by_session_source(pool)
                 if not pool:
+                    self._log_session_start_event("start_custom_session_no_due_pool")
                     messagebox.showinfo(
                         "Due review",
                         "No questions are due for review yet. Missed answers become due immediately; correct answers are scheduled for later.",
                     )
                     return
             if not pool:
+                self._log_session_start_event("start_custom_session_no_pool_after_filters", mode=mode)
                 messagebox.showinfo("No questions", "No questions match the current filters and source selection.")
                 return
             builder_context = self.current_builder_context(
@@ -912,8 +1021,15 @@ class SessionBuilderMixin:
             )
             resume_choice = self._resume_existing_session_choice(builder_context)
             if resume_choice == "cancel":
+                self._log_session_start_event("start_custom_session_sync_cancelled_resume_prompt", mode=mode)
                 return
             self.save_app_config()
+            self._log_session_start_event(
+                "start_custom_session_sync_starting_session",
+                count=count,
+                mode=mode,
+                pool_count=len(pool),
+            )
             self.start_session_from_pool(
                 pool,
                 mode=mode,
@@ -1840,20 +1956,20 @@ class SessionBuilderMixin:
             attempts = int(record.get("attempts", 0) or 0)
             due_now = is_review_due(record)
             active_weak_now = is_active_weak(record)
-            super_confident_now = is_super_confident_active(record)
+            super_confident_now = is_effective_super_confident_active(record)
             mastered_now = status_name == "Mastered" and not due_now
             recent_pressure = float(freshness_map.get(qnum, 0.0) or 0.0) / max(profile.freshness_suppression_min, 1.0)
             if qnum in pending_reference_qnums:
                 recent_pressure += profile.recent_selection_rotation_penalty
-            if super_confident_now:
-                eligibility_tier = 99
-            elif (
+            if (
                 attempts <= 0
                 or active_weak_now
                 or due_now
                 or str(question.get("smart_primary_role") or "") == "weak_repair"
             ):
                 eligibility_tier = 1
+            elif super_confident_now:
+                eligibility_tier = 99
             elif attempts > 0 and not mastered_now:
                 eligibility_tier = 2
             else:

@@ -251,7 +251,9 @@ def apply_answer_state(question: RuntimeQuestionMapping, state: Mapping[str, Any
     runtime["smart_information_value"] = float(answer_state.get("smart_information_value", 0.0) or 0.0)
     runtime["smart_information_breakdown"] = dict(answer_state.get("smart_information_breakdown") or {})
     runtime["smart_question_quality_status"] = str(answer_state.get("smart_question_quality_status", "") or "")
-    runtime["smart_question_quality_confidence"] = float(answer_state.get("smart_question_quality_confidence", 0.0) or 0.0)
+    runtime["smart_question_quality_confidence"] = float(
+        answer_state.get("smart_question_quality_confidence", 0.0) or 0.0
+    )
     runtime["smart_graph_bottleneck"] = float(answer_state.get("smart_graph_bottleneck", 0.0) or 0.0)
     runtime["repair_stage"] = str(answer_state.get("repair_stage", "") or "")
     runtime["repair_concept_key"] = str(answer_state.get("repair_concept_key", "") or "")

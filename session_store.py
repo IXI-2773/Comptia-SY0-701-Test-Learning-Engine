@@ -116,19 +116,27 @@ def migrate_session_snapshot(
     saved: Mapping[str, Any] | None, mode: str, question_numbers: list[Any]
 ) -> SessionSnapshot:
     payload = dict(saved or {})
-    current_qnums = [_coerce_int(qnum, field="question_numbers", minimum=1) for qnum in question_numbers if str(qnum).strip()]
+    current_qnums = [
+        _coerce_int(qnum, field="question_numbers", minimum=1) for qnum in question_numbers if str(qnum).strip()
+    ]
     saved_mode = str(payload.get("mode") or mode or "")
     if saved_mode not in SUPPORTED_SESSION_MODES:
         raise ValueError(f"Unsupported session mode: {saved_mode!r}")
     raw_saved_qnums = payload.get("question_numbers", [])
     if raw_saved_qnums not in (None, "") and not isinstance(raw_saved_qnums, list):
         raise ValueError("Session question_numbers must be a list.")
-    saved_qnums = [_coerce_int(qnum, field="question_numbers", minimum=1) for qnum in raw_saved_qnums if str(qnum).strip()]
+    saved_qnums = [
+        _coerce_int(qnum, field="question_numbers", minimum=1) for qnum in raw_saved_qnums if str(qnum).strip()
+    ]
     raw_restore_qnums = payload.get("restore_question_numbers", [])
     if raw_restore_qnums not in (None, "") and not isinstance(raw_restore_qnums, list):
         raise ValueError("Session restore_question_numbers must be a list.")
     restore_qnums = (
-        [_coerce_int(qnum, field="restore_question_numbers", minimum=1) for qnum in raw_restore_qnums if str(qnum).strip()]
+        [
+            _coerce_int(qnum, field="restore_question_numbers", minimum=1)
+            for qnum in raw_restore_qnums
+            if str(qnum).strip()
+        ]
         or saved_qnums
         or current_qnums
     )
@@ -176,8 +184,9 @@ def migrate_session_snapshot(
     raw_builder_context = payload.get("builder_context")
     if raw_builder_context not in (None, "") and not isinstance(raw_builder_context, Mapping):
         raise ValueError("Session builder_context must be a mapping.")
+    builder_context_payload = raw_builder_context if isinstance(raw_builder_context, Mapping) else None
     builder_context = normalize_builder_context(
-        raw_builder_context,
+        builder_context_payload,
         mode=saved_mode,
         source_label=str(payload.get("source_label") or ""),
         question_count=base_count,
@@ -215,9 +224,15 @@ def migrate_session_snapshot(
         "unlocked_rewards": _coerce_str_list(payload.get("unlocked_rewards", []), field="unlocked_rewards"),
         "session_answer_history": answer_history,
         "current_quests": quests,
-        "quest_completion_keys": _coerce_str_list(payload.get("quest_completion_keys", []), field="quest_completion_keys"),
-        "session_boss_markers": _coerce_int_list(payload.get("session_boss_markers", []), field="session_boss_markers", minimum=0),
-        "session_stealth_markers": _coerce_int_list(payload.get("session_stealth_markers", []), field="session_stealth_markers", minimum=0),
+        "quest_completion_keys": _coerce_str_list(
+            payload.get("quest_completion_keys", []), field="quest_completion_keys"
+        ),
+        "session_boss_markers": _coerce_int_list(
+            payload.get("session_boss_markers", []), field="session_boss_markers", minimum=0
+        ),
+        "session_stealth_markers": _coerce_int_list(
+            payload.get("session_stealth_markers", []), field="session_stealth_markers", minimum=0
+        ),
         "session_xp_gained": _coerce_int(payload.get("session_xp_gained", 0), field="session_xp_gained", minimum=0),
         "answers": answers,
     }
@@ -295,8 +310,14 @@ def saved_session_matches_current(
     if raw_session_signature:
         return raw_session_signature == session_signature(mode, list(current_question_numbers))
     try:
-        saved_qnums = [_coerce_int(qnum, field="question_numbers", minimum=1) for qnum in saved.get("question_numbers", []) if str(qnum).strip()]
-        current_qnums = [_coerce_int(qnum, field="current_question_numbers", minimum=1) for qnum in current_question_numbers]
+        saved_qnums = [
+            _coerce_int(qnum, field="question_numbers", minimum=1)
+            for qnum in saved.get("question_numbers", [])
+            if str(qnum).strip()
+        ]
+        current_qnums = [
+            _coerce_int(qnum, field="current_question_numbers", minimum=1) for qnum in current_question_numbers
+        ]
     except (TypeError, ValueError):
         return False
     return bool(saved_qnums) and saved_qnums == current_qnums

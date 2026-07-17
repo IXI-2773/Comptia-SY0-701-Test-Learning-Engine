@@ -20,7 +20,9 @@ class SmartPracticePrewarmService:
         self._scheduled_id = None
         self._active = False
         self._pending: tuple[int, tuple[object, object | None], Callable[[], dict[str, Any]]] | None = None
-        self._results: queue.Queue[tuple[int, object, object | None, dict[str, Any] | None, Exception | None]] = queue.Queue()
+        self._results: queue.Queue[tuple[int, object, object | None, dict[str, Any] | None, Exception | None]] = (
+            queue.Queue()
+        )
         self._closed = False
         self._poll_id = self.root.after(50, self._poll_results)
 

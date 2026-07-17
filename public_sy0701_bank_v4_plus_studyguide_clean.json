@@ -40506,7 +40506,7 @@
       "source_image": "Screenshot 2026-06-08 at 00-57-55 Question 175 - Chapter 4 Domain 4.0 Security Operations - CompTIA Security Practice Tests Exam SY0-701 3rd Edition - Online Test Banks.png",
       "source_label": "Chapter 4 screenshot bank",
       "source_page": 175,
-      "prompt": "Operations Incorrect",
+      "prompt": "A CVSS score is based on what three metric groups of data?",
       "choices": {
         "A": "Scope, Impact, Environmental",
         "B": "Base, Temporal, and Environmental",
